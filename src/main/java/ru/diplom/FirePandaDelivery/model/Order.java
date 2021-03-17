@@ -7,6 +7,7 @@ import javax.persistence.*;
 
 @Entity
 @Data
+@Table(name = "orders")
 public class Order {
 
 
