@@ -15,8 +15,8 @@ public class Order {
     private long id;
 
 
-    @ApiModelProperty
-    @ManyToOne
-    private Restaurant restaurant;
+//    @ApiModelProperty
+//    @ManyToOne
+//    private Restaurant restaurant;
 
 }
