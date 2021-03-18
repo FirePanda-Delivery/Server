@@ -37,4 +37,5 @@ public class Courier {
     @Column
     @ApiModelProperty
     private String city;
+
 }
