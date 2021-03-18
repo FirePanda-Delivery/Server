@@ -50,4 +50,9 @@ public class Restaurant {
     @JoinColumn(name = "restaurant_id")
     private List<Categories> categories;
 
+    @JoinColumn
+    @ManyToMany
+    @ApiModelProperty
+    private List<Cities> Cities;
+
 }
