@@ -1,5 +1,6 @@
 package ru.diplom.FirePandaDelivery.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
@@ -31,5 +32,9 @@ public class User {
     @ApiModelProperty
     @Column(name = "EMAIL")
     private String email;
+
+    @Column
+    @JsonIgnore
+    private boolean isDeleted;
 
 }
