@@ -3,6 +3,7 @@ package ru.diplom.FirePandaDelivery.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.diplom.FirePandaDelivery.model.Categories;
+import ru.diplom.FirePandaDelivery.model.Product;
 import ru.diplom.FirePandaDelivery.model.Restaurant;
 import ru.diplom.FirePandaDelivery.repositories.CategoriesRepositories;
 import ru.diplom.FirePandaDelivery.repositories.ProductRepositories;
@@ -55,9 +56,38 @@ public class RestaurantService {
 
     public Categories getCategories(long id) {
         Optional<Categories> optionalCategories = categoriesRepositories.findById(id);
-        if (optionalCategories.isEmpty()) { throw new EntityNotFoundException("Categories is not found"); }
+        if (optionalCategories.isEmpty()) {
+            throw new EntityNotFoundException("Categories is not found");
+        }
         return optionalCategories.get();
     }
+
+    public List<Product> getProductsFromCategory(long catId) {
+
+        Optional<Categories> optionalCategory = categoriesRepositories.findById(catId);
+
+        if (optionalCategory.isEmpty()) { throw new NullPointerException("Category is not found"); }
+
+        return optionalCategory.get().getProducts();
+    }
+
+    public List<Product> getProductList() {
+        return productRepositories.findByIsdeletedFalse();
+    }
+
+    public List<Product> getAllProduct() {
+        return productRepositories.findAll();
+    }
+
+    public Product getProduct(long id) {
+        Optional<Product> optionalProduct = productRepositories.findById(id);
+        if (optionalProduct.isEmpty()) {
+            throw new EntityNotFoundException("Product is not found");
+        }
+        return optionalProduct.get();
+    }
+
+
 
 
 }
