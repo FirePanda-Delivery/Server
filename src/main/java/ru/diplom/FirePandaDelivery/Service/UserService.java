@@ -51,7 +51,7 @@ public final class UserService {
     public User get(long id) {
         if (id == 0) { throw new NullPointerException("id not set"); }
         Optional<User> user = userRepositories.findById(id);
-        if (user.isEmpty()) { throw new NullPointerException("User is not found"); }
+        if (user.isEmpty()) { throw new EntityNotFoundException("User is not found"); }
         return user.get();
     }
 

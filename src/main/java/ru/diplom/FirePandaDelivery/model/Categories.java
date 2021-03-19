@@ -1,5 +1,6 @@
 package ru.diplom.FirePandaDelivery.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -25,4 +26,8 @@ public class Categories {
     @JoinColumn(name = "cat_id")
     @OneToMany
     private List<Product> products;
+
+    @Column
+    @JsonIgnore
+    private boolean isDeleted;
 }
