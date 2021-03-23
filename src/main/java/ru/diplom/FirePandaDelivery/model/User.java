@@ -15,7 +15,7 @@ public class User {
     @Id
     @Column(name = "ID", unique = true, nullable = false)
     @GeneratedValue(strategy = GenerationType.AUTO)
-    public long id;
+    private long id;
 
     @ApiModelProperty
     @Column(name = "FIRST_NAME", nullable = false)

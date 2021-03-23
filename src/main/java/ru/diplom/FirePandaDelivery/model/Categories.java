@@ -24,7 +24,12 @@ public class Categories {
 
     @ApiModelProperty
     @JoinColumn(name = "cat_id")
-    @OneToMany
+    @OneToMany(fetch = FetchType.EAGER, cascade = {
+            CascadeType.PERSIST,
+            CascadeType.MERGE,
+            CascadeType.REFRESH,
+            CascadeType.DETACH
+    })
     private List<Product> products;
 
     @Column

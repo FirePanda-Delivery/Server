@@ -60,18 +60,18 @@ public final class UserService {
         return userRepositories.findByIsDeletedTrue();
     }
 
-    public User set(User user) {
+    public User add(User user) {
         if (user == null) { throw new NullPointerException("user not set"); }
         return userRepositories.save(user);
     }
 
-    public List<User> SetUserList(List<User> users) {
+    public List<User> addUserList(List<User> users) {
         if (users == null || users.isEmpty()) {  throw new NullPointerException("users not set"); }
         return userRepositories.saveAll(users);
     }
 
     public User update(User user) {
-        if (!userRepositories.existsById(user.id)) {
+        if (!userRepositories.existsById(user.getId())) {
             throw new EntityNotFoundException("user not found!");
         }
         return userRepositories.save(user);

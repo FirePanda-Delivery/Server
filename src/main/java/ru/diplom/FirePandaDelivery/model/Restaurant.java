@@ -1,10 +1,12 @@
 package ru.diplom.FirePandaDelivery.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import javax.persistence.*;
 import java.sql.Time;
+import java.util.LinkedList;
 import java.util.List;
 
 @Entity
@@ -44,9 +46,8 @@ public class Restaurant {
     @ApiModelProperty
     private boolean ownDelivery;
 
-    @Column
     @ApiModelProperty
-    @OneToMany
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(name = "restaurant_id")
     private List<Categories> categories;
 
@@ -54,5 +55,9 @@ public class Restaurant {
     @ManyToMany
     @ApiModelProperty
     private List<Cities> Cities;
+
+    @Column
+    @JsonIgnore
+    private boolean isDeleted;
 
 }
