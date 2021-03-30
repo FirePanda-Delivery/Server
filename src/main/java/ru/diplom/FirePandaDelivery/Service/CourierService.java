@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+@Service
 public class CourierService {
 
     private CourierRepositories courierRepositories;
@@ -26,7 +27,7 @@ public class CourierService {
      * get all users except deleted ones
      * @return list of users without deleted
      */
-    public List<Courier> getUserList() {
+    public List<Courier> getCourierList() {
 
         return courierRepositories.findByIsDeletedFalse();
     }
@@ -111,6 +112,8 @@ public class CourierService {
 
         Courier courier = courierOptional.get();
         courier.setDeleted(true);
+
+        courierRepositories.save(courier);
     }
 
 }

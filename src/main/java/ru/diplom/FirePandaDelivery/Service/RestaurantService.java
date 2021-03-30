@@ -10,6 +10,8 @@ import ru.diplom.FirePandaDelivery.repositories.ProductRepositories;
 import ru.diplom.FirePandaDelivery.repositories.RestaurantRepositories;
 
 import javax.persistence.EntityNotFoundException;
+import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
@@ -40,6 +42,39 @@ public class RestaurantService {
         Optional<Restaurant> optionalRestaurant = restaurantRepositories.findById(id);
         if (optionalRestaurant.isEmpty()) { throw new NullPointerException("Restaurant is not found"); }
         return optionalRestaurant.get();
+    }
+
+    public List<Restaurant> getRestaurantsByCategoryName(String name) {
+
+        List<Restaurant> restaurantList = new LinkedList<>();
+
+        for (Categories category : categoriesRepositories.findByName(name)) {
+
+            Optional<Restaurant> optionalRestaurant = restaurantRepositories.findAllByCategoriesContaining(category);
+            if (optionalRestaurant.isEmpty()) { throw new EntityNotFoundException("Restaurant is not found"); }
+
+            restaurantList.add(optionalRestaurant.get());
+        }
+
+        return restaurantList;
+    }
+
+    public List<Restaurant> getRestaurantsByProductName(String name) {
+
+        List<Restaurant> restaurantList = new LinkedList<>();
+
+        for (Product product : productRepositories.findByNameAndIsDeletedFalse(name)) {
+
+            Optional<Categories> optionalCategory = categoriesRepositories.findByProductsContaining(product);
+            if (optionalCategory.isEmpty()) { throw new EntityNotFoundException("Category is not found"); }
+
+            Optional<Restaurant> optionalRestaurant = restaurantRepositories.findAllByCategoriesContaining(optionalCategory.get());
+            if (optionalRestaurant.isEmpty()) { throw new EntityNotFoundException("Restaurant is not found"); }
+
+            restaurantList.add(optionalRestaurant.get());
+        }
+
+        return restaurantList;
     }
 
     public List<Categories> getRestaurantCategories(long restaurantId) {
@@ -208,7 +243,7 @@ public class RestaurantService {
         return productRepositories.save(product);
     }
 
-    public void delete(long id) {
+    public void deleteRestaurant(long id) {
         if (!restaurantRepositories.existsById(id)) {
             throw new EntityNotFoundException("restaurant not found!");
         }
@@ -229,6 +264,7 @@ public class RestaurantService {
         }
 
         restaurant.setDeleted(true);
+        restaurantRepositories.save(restaurant);
     }
 
     public void deleteCategory(long id) {
@@ -240,6 +276,39 @@ public class RestaurantService {
         categoriesRepositories.delete(categoriesOptional.get());
     }
 
+    public void deleteCategories(long[] idList) {
+
+        List<Categories> categories = new ArrayList<>(idList.length+1);
+
+        for (long id : idList) {
+            Optional<Categories> categoriesOptional = categoriesRepositories.findById(id);
+            if (categoriesOptional.isEmpty()) {
+                throw new EntityNotFoundException("not found Category by id: " + id);
+            }
+            categories.add(categoriesOptional.get());
+        }
+
+        categoriesRepositories.deleteAll(categories);
+    }
+
+    public void deleteProducts(long[] idList) {
+
+        for (long id : idList) {
+            Optional<Product> productOptional = productRepositories.findById(id);
+            if (productOptional.isEmpty()) {
+                throw new EntityNotFoundException("not found Category by id: " + id);
+            }
+
+            Product product = productOptional.get();
+            product.setDeleted(true);
+
+            productRepositories.save(product);
+        }
+
+    }
+
+
+
     public void deleteProduct(long id) {
         Optional<Product> productOptional = productRepositories.findById(id);
         if (productOptional.isEmpty()) {
@@ -250,10 +319,5 @@ public class RestaurantService {
         product.setDeleted(true);
         productRepositories.save(product);
     }
-
-
-
-
-
 
 }

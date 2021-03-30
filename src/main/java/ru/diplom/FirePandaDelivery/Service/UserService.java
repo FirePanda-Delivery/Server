@@ -111,6 +111,7 @@ public final class UserService {
 
         User user = userOptional.get();
         user.setDeleted(true);
+        userRepositories.save(user);
     }
 
 }
