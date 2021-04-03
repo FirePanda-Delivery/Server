@@ -1,16 +1,17 @@
 package ru.diplom.FirePandaDelivery.model;
 
 import io.swagger.annotations.ApiModelProperty;
+import lombok.Builder;
 import lombok.Data;
 
 import javax.persistence.*;
-import java.awt.*;
 import java.sql.Time;
 import java.util.Date;
 import java.util.Set;
 
 @Entity
 @Data
+@Builder
 @Table(name = "orders")
 public class Order {
 
@@ -35,13 +36,9 @@ public class Order {
     private Double totalPrice;
 
     @ApiModelProperty
-    @ManyToMany
-    @JoinTable(
-            name = "Order_product",
-            joinColumns = @JoinColumn(name = "order_id"),
-            inverseJoinColumns = @JoinColumn(name = "product_id")
-    )
-    private Set<Product> productList;
+    @OneToMany
+    @JoinColumn(name = "order_id")
+    private Set<OrderProduct> productList;
 
     @Column
     @ApiModelProperty
@@ -63,5 +60,10 @@ public class Order {
     @Column
     @ApiModelProperty
     private Time timeEnd;
+
+
+    @Column
+    @ApiModelProperty
+    private String address;
 
 }
