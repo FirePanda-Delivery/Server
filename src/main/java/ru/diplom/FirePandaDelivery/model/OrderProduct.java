@@ -12,10 +12,10 @@ public class OrderProduct {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
 
-    @Column
+    @Column(nullable = false)
     private int count;
 
-    @JoinColumn
+    @JoinColumn(nullable = false)
     @ManyToOne
     private Product product;
 }

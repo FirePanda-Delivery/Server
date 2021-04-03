@@ -22,38 +22,38 @@ public class Order {
 
 
     @ApiModelProperty
-    @JoinColumn
+    @JoinColumn(nullable = false)
     @ManyToOne
     private Restaurant restaurant;
 
     @ApiModelProperty
-    @JoinColumn
+    @JoinColumn(nullable = false)
     @ManyToOne
     private User user;
 
-    @Column
-    @ApiModelProperty
+    @Column(nullable = false)
+    @ApiModelProperty()
     private Double totalPrice;
 
     @ApiModelProperty
     @OneToMany
-    @JoinColumn(name = "order_id")
+    @JoinColumn(name = "order_id", nullable = false)
     private Set<OrderProduct> productList;
 
-    @Column
+    @Column(nullable = false)
     @ApiModelProperty
     private Date date;
 
-    @Column
+    @Column(nullable = false)
     @ApiModelProperty
     private OrderStatus orderStatus;
 
-    @JoinColumn
+    @JoinColumn(nullable = false)
     @ApiModelProperty
     @ManyToOne
     private Courier courier;
 
-    @Column
+    @Column(nullable = false)
     @ApiModelProperty
     private Time timeStart;
 
@@ -62,7 +62,7 @@ public class Order {
     private Time timeEnd;
 
 
-    @Column
+    @Column(nullable = false)
     @ApiModelProperty
     private String address;
 

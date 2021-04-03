@@ -1,5 +1,6 @@
 package ru.diplom.FirePandaDelivery.Controllers;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.diplom.FirePandaDelivery.Service.OrderServices;
@@ -11,10 +12,11 @@ import java.util.List;
 import java.util.Set;
 
 @RestController
-@RequestMapping(name = "/order")
+@RequestMapping("/order")
 public class OrderController {
 
-    OrderServices orderServices;
+    final OrderServices orderServices;
+
 
     public OrderController(OrderServices orderServices) {
         this.orderServices = orderServices;

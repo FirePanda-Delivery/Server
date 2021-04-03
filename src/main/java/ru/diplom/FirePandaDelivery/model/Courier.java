@@ -28,16 +28,18 @@ public class Courier {
     private String phone;
 
     @ApiModelProperty
-    @Column(name = "EMAIL")
+    @Column(name = "EMAIL", unique = true)
     private String email;
 
     @Column
     @ApiModelProperty
     private float rating;
 
-    @Column
+
+    @ManyToOne
+    @JoinColumn(nullable = false)
     @ApiModelProperty
-    private String city;
+    private Cities city;
 
 
     @Column

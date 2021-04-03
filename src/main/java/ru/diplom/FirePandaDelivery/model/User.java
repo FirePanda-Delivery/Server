@@ -30,7 +30,7 @@ public class User {
     private String phone;
 
     @ApiModelProperty
-    @Column(name = "EMAIL")
+    @Column(name = "EMAIL", unique = true)
     private String email;
 
     @Column

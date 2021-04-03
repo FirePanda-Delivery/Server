@@ -127,6 +127,9 @@ public class RestaurantService {
     }
 
     public Restaurant add(Restaurant restaurant) {
+
+
+
         if (restaurant == null) {
             throw new NullPointerException("restaurant not set");
         }

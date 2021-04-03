@@ -48,7 +48,7 @@ public class Restaurant {
 
     @ApiModelProperty
     @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    @JoinColumn(name = "restaurant_id")
+    @JoinColumn(name = "restaurant_id", nullable = false)
     private List<Categories> categories;
 
     @JoinColumn
@@ -59,5 +59,8 @@ public class Restaurant {
     @Column
     @JsonIgnore
     private boolean isDeleted;
+
+    @Column
+    private boolean img;
 
 }

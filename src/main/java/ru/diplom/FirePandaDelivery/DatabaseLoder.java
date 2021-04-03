@@ -222,7 +222,6 @@ public class DatabaseLoder {
 
             long id = restaurantService.add(restaurant).getId();
 
-            restaurantService.addCategory(id, new Categories());
             System.out.println("kjbn,");
 
             List<Restaurant> restaurantList = restaurantService.getRestaurantsByProductName("Капучино");

@@ -2,6 +2,7 @@ package ru.diplom.FirePandaDelivery.Service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ru.diplom.FirePandaDelivery.model.Cities;
 import ru.diplom.FirePandaDelivery.model.Courier;
 import ru.diplom.FirePandaDelivery.model.User;
 import ru.diplom.FirePandaDelivery.repositories.CourierRepositories;
@@ -57,8 +58,17 @@ public class CourierService {
 
     public List<Courier> getDeletedList() {
 
-        return
-        courierRepositories.findByIsDeletedTrue();
+        return courierRepositories.findByIsDeletedTrue();
+    }
+
+    public List<Courier> getByCities(Cities cities) {
+
+        return courierRepositories.findAllByCity(cities);
+    }
+
+    public List<Courier> getByCitiesName(String cities) {
+
+        return courierRepositories.findAllByCity_Citi(cities);
     }
 
     public Courier add(Courier courier) {

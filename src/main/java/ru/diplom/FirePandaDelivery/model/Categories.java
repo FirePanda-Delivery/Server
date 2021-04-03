@@ -18,7 +18,7 @@ public class Categories {
     @ApiModelProperty
     private long id;
 
-    @Column
+    @Column(nullable = false)
     @ApiModelProperty
     private String name;
 
