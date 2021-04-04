@@ -1,16 +1,17 @@
 package ru.diplom.FirePandaDelivery.model;
 
 import io.swagger.annotations.ApiModelProperty;
+import lombok.Builder;
 import lombok.Data;
 
 import javax.persistence.*;
-import java.awt.*;
 import java.sql.Time;
 import java.util.Date;
 import java.util.Set;
 
 @Entity
 @Data
+@Builder
 @Table(name = "orders")
 public class Order {
 
@@ -21,47 +22,48 @@ public class Order {
 
 
     @ApiModelProperty
-    @JoinColumn
+    @JoinColumn(nullable = false)
     @ManyToOne
     private Restaurant restaurant;
 
     @ApiModelProperty
-    @JoinColumn
+    @JoinColumn(nullable = false)
     @ManyToOne
     private User user;
 
-    @Column
-    @ApiModelProperty
+    @Column(nullable = false)
+    @ApiModelProperty()
     private Double totalPrice;
 
     @ApiModelProperty
-    @ManyToMany
-    @JoinTable(
-            name = "Order_product",
-            joinColumns = @JoinColumn(name = "order_id"),
-            inverseJoinColumns = @JoinColumn(name = "product_id")
-    )
-    private Set<Product> productList;
+    @OneToMany
+    @JoinColumn(name = "order_id", nullable = false)
+    private Set<OrderProduct> productList;
 
-    @Column
+    @Column(nullable = false)
     @ApiModelProperty
     private Date date;
 
-    @Column
+    @Column(nullable = false)
     @ApiModelProperty
     private OrderStatus orderStatus;
 
-    @JoinColumn
+    @JoinColumn(nullable = false)
     @ApiModelProperty
     @ManyToOne
     private Courier courier;
 
-    @Column
+    @Column(nullable = false)
     @ApiModelProperty
     private Time timeStart;
 
     @Column
     @ApiModelProperty
     private Time timeEnd;
+
+
+    @Column(nullable = false)
+    @ApiModelProperty
+    private String address;
 
 }

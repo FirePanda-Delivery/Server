@@ -1,5 +1,6 @@
 package ru.diplom.FirePandaDelivery.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -17,12 +18,21 @@ public class Categories {
     @ApiModelProperty
     private long id;
 
-    @Column
+    @Column(nullable = false)
     @ApiModelProperty
     private String name;
 
     @ApiModelProperty
     @JoinColumn(name = "cat_id")
-    @OneToMany
+    @OneToMany(fetch = FetchType.EAGER, cascade = {
+            CascadeType.PERSIST,
+            CascadeType.MERGE,
+            CascadeType.REFRESH,
+            CascadeType.DETACH
+    })
     private List<Product> products;
+
+    @Column
+    @JsonIgnore
+    private boolean isDeleted;
 }

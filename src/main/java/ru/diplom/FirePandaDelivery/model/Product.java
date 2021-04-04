@@ -1,5 +1,6 @@
 package ru.diplom.FirePandaDelivery.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
@@ -34,6 +35,10 @@ public class Product {
     @Column
     @ApiModelProperty
     private String img;
+
+    @Column
+    @JsonIgnore
+    private boolean isDeleted;
 
 
 

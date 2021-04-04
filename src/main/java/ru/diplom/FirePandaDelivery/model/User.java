@@ -1,5 +1,6 @@
 package ru.diplom.FirePandaDelivery.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
@@ -13,8 +14,8 @@ public class User {
 
     @Id
     @Column(name = "ID", unique = true, nullable = false)
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    public long id;
+    @GeneratedValue(strategy = GenerationType.TABLE)
+    private long id;
 
     @ApiModelProperty
     @Column(name = "FIRST_NAME", nullable = false)
@@ -29,7 +30,11 @@ public class User {
     private String phone;
 
     @ApiModelProperty
-    @Column(name = "EMAIL")
+    @Column(name = "EMAIL", unique = true)
     private String email;
+
+    @Column
+    @JsonIgnore
+    private boolean isDeleted;
 
 }

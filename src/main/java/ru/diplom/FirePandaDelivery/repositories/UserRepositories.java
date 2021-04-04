@@ -9,4 +9,9 @@ import java.util.List;
 @Repository
 public interface UserRepositories extends JpaRepository<User, Long> {
 
+    List<User> findByIsDeletedFalse();
+
+    User findFirstByPhone(String phone);
+
+    List<User> findByIsDeletedTrue();
 }

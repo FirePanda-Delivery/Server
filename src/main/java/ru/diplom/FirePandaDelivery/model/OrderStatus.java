@@ -3,7 +3,7 @@ package ru.diplom.FirePandaDelivery.model;
 public enum OrderStatus {
 
     CREATED,
-    PREPARED,
+    BEING_PREPARED,
     DELIVERY,
     DELIVERED,
     CANCELED,

@@ -1,5 +1,6 @@
 package ru.diplom.FirePandaDelivery.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
@@ -27,15 +28,22 @@ public class Courier {
     private String phone;
 
     @ApiModelProperty
-    @Column(name = "EMAIL")
+    @Column(name = "EMAIL", unique = true)
     private String email;
 
     @Column
     @ApiModelProperty
     private float rating;
 
-    @Column
+
+    @ManyToOne
+    @JoinColumn(nullable = false)
     @ApiModelProperty
-    private String city;
+    private Cities city;
+
+
+    @Column
+    @JsonIgnore
+    private boolean isDeleted;
 
 }
