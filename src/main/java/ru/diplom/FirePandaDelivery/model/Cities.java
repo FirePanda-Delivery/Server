@@ -18,9 +18,11 @@ public class Cities {
     @ApiModelProperty
     private String citi;
 
-    @ElementCollection
-    @CollectionTable()
+//    @ElementCollection
+//    @CollectionTable()
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @Column(nullable = false, unique = true)
+    @JoinColumn(name = "cityId")
     @ApiModelProperty
-    private List<Double> Cords;
+    private List<CitiesCoordinates> Cords;
 }
