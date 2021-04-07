@@ -339,12 +339,12 @@ public class DatabaseLoder {
 
             cities.setCiti("Воронеж");
             cities.setCords(coordinates);
-           // citiesServices.add(cities);
+            citiesServices.add(cities);
 
-
-            boolean tt = validateAddress.isValid("Воронеж, улица Ленина, 73А", "Воронеж");
-
-            Object ob = new Object();
+//
+//            boolean tt = validateAddress.isValid("Воронеж, Южно-Моравская улица, 74", "Воронеж");
+//
+//            Object ob = new Object();
         };
 
 

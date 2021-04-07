@@ -9,7 +9,6 @@ import ru.diplom.FirePandaDelivery.dto.Coordinates;
 import ru.diplom.FirePandaDelivery.model.Cities;
 import ru.diplom.FirePandaDelivery.model.CitiesCoordinates;
 
-import javax.transaction.Transactional;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -29,6 +28,7 @@ public class ValidateAddress {
     }
 
     public boolean isValid(String address, String city) {
+
         return isValid(address, citiesServices.getByName(city));
     }
 

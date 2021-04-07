@@ -4,10 +4,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.diplom.FirePandaDelivery.Service.OrderServices;
+import ru.diplom.FirePandaDelivery.Service.RestaurantService;
+import ru.diplom.FirePandaDelivery.dto.OrderProductRequestModel;
+import ru.diplom.FirePandaDelivery.exception.AddressNotInDeliveryAreaException;
 import ru.diplom.FirePandaDelivery.model.Order;
 import ru.diplom.FirePandaDelivery.model.OrderProduct;
 import ru.diplom.FirePandaDelivery.model.OrderStatus;
+import ru.diplom.FirePandaDelivery.validate.ValidateAddress;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -15,11 +20,15 @@ import java.util.Set;
 @RequestMapping("/order")
 public class OrderController {
 
-    final OrderServices orderServices;
+    private final OrderServices orderServices;
+    private final ValidateAddress validateAddress;
+    private final RestaurantService restaurantService;
 
-
-    public OrderController(OrderServices orderServices) {
+    @Autowired
+    public OrderController(OrderServices orderServices, ValidateAddress validateAddress, RestaurantService restaurantService) {
         this.orderServices = orderServices;
+        this.validateAddress = validateAddress;
+        this.restaurantService = restaurantService;
     }
 
     @GetMapping("/{id}")
@@ -44,13 +53,26 @@ public class OrderController {
 
     @PostMapping(params = {"restId", "userId"})
     public ResponseEntity<Order> createOrder(
-            @RequestBody Set<OrderProduct> orderProducts,
+            @RequestBody Set<OrderProductRequestModel> products,
             long restId,
             long userId,
-            @CookieValue("address") String address
-    ) {
+            @CookieValue("address") String address) {
 
-        // TODO добавить проверку вхождения адреса в зону доставки
+        //TODO разобраться с куками
+
+        if (!validateAddress.isValid(address, address.split(",")[1].trim())) {
+            throw new AddressNotInDeliveryAreaException();
+        }
+
+        Set<OrderProduct> orderProducts = new HashSet<>();
+
+        for (OrderProductRequestModel product : products) {
+            OrderProduct orderProduct = new OrderProduct();
+            orderProduct.setCount(product.getCount());
+            orderProduct.setProduct(restaurantService.getProduct(product.getProductId()));
+
+            orderProducts.add(orderProduct);
+        }
 
         return ResponseEntity.ok(
                 orderServices.createOrder(userId, restId, orderProducts, address)
@@ -60,6 +82,19 @@ public class OrderController {
     @PutMapping("/{id}/status")
     public ResponseEntity<Order> updateStatus(@PathVariable long id, @RequestBody OrderStatus status) {
         return ResponseEntity.ok(orderServices.setStatus(id, status));
+    }
+
+
+    ///////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////
+    /////////////////////// Exception handling /////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////
+
+
+    @ExceptionHandler({AddressNotInDeliveryAreaException.class})
+    public ResponseEntity<String> AddressException() {
+        return ResponseEntity.ok("the address is not in the delivery area");
     }
 
 

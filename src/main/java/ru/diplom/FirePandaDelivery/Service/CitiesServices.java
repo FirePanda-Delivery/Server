@@ -1,6 +1,12 @@
 package ru.diplom.FirePandaDelivery.Service;
 
+import org.hibernate.Criteria;
+import org.hibernate.FetchMode;
+import org.hibernate.Hibernate;
+import org.springframework.orm.hibernate5.HibernateCallback;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import ru.diplom.FirePandaDelivery.model.Cities;
 import ru.diplom.FirePandaDelivery.repositories.CitiesRepositories;
 
@@ -18,6 +24,7 @@ public class CitiesServices {
         this.citiesRepositories = citiesRepositories;
     }
 
+    @Transactional()
     public Cities get(long id) {
         Optional<Cities> citiesOptional = citiesRepositories.findById(id);
         if (citiesOptional.isEmpty()) {
@@ -27,6 +34,7 @@ public class CitiesServices {
         return citiesOptional.get();
     }
 
+    @Transactional(propagation= Propagation.REQUIRED)
     public Cities getByName(String name) {
         if (name == null || name.isEmpty()) {
             throw new NullPointerException("city name not set");
@@ -36,7 +44,9 @@ public class CitiesServices {
             throw new EntityNotFoundException("Cities not found");
         }
 
-        return citiesOptional.get();
+        Cities cities = citiesOptional.get();
+        Hibernate.initialize(cities.getCords());
+        return cities;
     }
 
     public List<Cities> getAll() {
