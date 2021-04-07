@@ -21,12 +21,14 @@ public class RestaurantService {
     private final RestaurantRepositories restaurantRepositories;
     private final CategoriesRepositories categoriesRepositories;
     private final ProductRepositories productRepositories;
+    private final CitiesServices citiesServices;
 
     @Autowired
-    public RestaurantService(RestaurantRepositories restaurantRepositories, CategoriesRepositories categoriesRepositories, ProductRepositories productRepositories) {
+    public RestaurantService(RestaurantRepositories restaurantRepositories, CategoriesRepositories categoriesRepositories, ProductRepositories productRepositories, CitiesServices citiesServices) {
         this.restaurantRepositories = restaurantRepositories;
         this.categoriesRepositories = categoriesRepositories;
         this.productRepositories = productRepositories;
+        this.citiesServices = citiesServices;
     }
 
     public List<Restaurant> getRestaurantList() {
@@ -75,6 +77,11 @@ public class RestaurantService {
         }
 
         return restaurantList;
+    }
+
+    public List<Restaurant> getRestaurantsByCityName(String name) {
+
+        return restaurantRepositories.findAllByCitiesContaining(citiesServices.getByName(name));
     }
 
     public List<Categories> getRestaurantCategories(long restaurantId) {
