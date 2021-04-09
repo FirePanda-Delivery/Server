@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.diplom.FirePandaDelivery.Service.RestaurantService;
+import ru.diplom.FirePandaDelivery.dto.responseModel.RestaurantResp;
 import ru.diplom.FirePandaDelivery.model.Categories;
 import ru.diplom.FirePandaDelivery.model.Product;
 import ru.diplom.FirePandaDelivery.model.Restaurant;
@@ -31,9 +32,30 @@ public class RestaurantController {
 
     @GetMapping
     public ResponseEntity<List<Restaurant>> getRestaurantList(@CookieValue(name = "address", required = false) String address) {
-
-        return ResponseEntity.ok(restaurantService.getRestaurantList());
+        if (address.isEmpty()) {
+            return ResponseEntity.ok(restaurantService.getRestaurantList());
+        }
+        String city = address.split(",")[1].trim();
+        return ResponseEntity.ok(restaurantService.getRestaurantsByCityName(city));
     }
+
+    @GetMapping("/only")
+    public ResponseEntity<List<RestaurantResp>> getOnlyRestaurantList(@CookieValue(name = "address", required = false) String address) {
+        if (address.isEmpty()) {
+
+        }
+
+      //TODO разобраться с куки
+
+        return ResponseEntity.ok(
+                RestaurantResp.toRestaurantResponse(
+                        restaurantService.getRestaurantsByCityName(
+                                address.split(",")[1].trim()
+                        )
+                )
+        );
+    }
+
 
     @GetMapping(value = "/getByCategory", params = {"catName"})
     public ResponseEntity<List<Restaurant>> getRestaurantByCategory(String catName) {

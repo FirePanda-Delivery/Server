@@ -5,10 +5,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.diplom.FirePandaDelivery.Service.OrderServices;
 import ru.diplom.FirePandaDelivery.Service.RestaurantService;
-import ru.diplom.FirePandaDelivery.dto.OrderProductRequestModel;
+import ru.diplom.FirePandaDelivery.dto.requestModel.OrderProductReq;
 import ru.diplom.FirePandaDelivery.exception.AddressNotInDeliveryAreaException;
 import ru.diplom.FirePandaDelivery.model.Order;
-import ru.diplom.FirePandaDelivery.model.OrderProduct;
 import ru.diplom.FirePandaDelivery.model.OrderStatus;
 import ru.diplom.FirePandaDelivery.validate.ValidateAddress;
 
@@ -53,7 +52,7 @@ public class OrderController {
 
     @PostMapping(params = {"restId", "userId"})
     public ResponseEntity<Order> createOrder(
-            @RequestBody Set<OrderProductRequestModel> products,
+            @RequestBody Set<OrderProductReq> products,
             long restId,
             long userId,
             @CookieValue("address") String address) {
@@ -64,10 +63,10 @@ public class OrderController {
             throw new AddressNotInDeliveryAreaException();
         }
 
-        Set<OrderProduct> orderProducts = new HashSet<>();
+        Set<ru.diplom.FirePandaDelivery.model.OrderProduct> orderProducts = new HashSet<>();
 
-        for (OrderProductRequestModel product : products) {
-            OrderProduct orderProduct = new OrderProduct();
+        for (OrderProductReq product : products) {
+            ru.diplom.FirePandaDelivery.model.OrderProduct orderProduct = new ru.diplom.FirePandaDelivery.model.OrderProduct();
             orderProduct.setCount(product.getCount());
             orderProduct.setProduct(restaurantService.getProduct(product.getProductId()));
 

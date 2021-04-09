@@ -61,6 +61,6 @@ public class Restaurant {
     private boolean isDeleted;
 
     @Column
-    private boolean img;
+    private String img;
 
 }
