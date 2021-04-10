@@ -14,6 +14,8 @@ public interface CategoriesRepositories extends JpaRepository<Categories, Long> 
 
     List<Categories> findByName(String name);
 
+    List<Categories> findByNormalizedName(String name);
+
     Optional<Categories> findByProductsContaining(Product product);
 
 }

@@ -7,6 +7,7 @@ import lombok.Data;
 
 import javax.persistence.*;
 import java.util.List;
+import java.util.Locale;
 
 @Data
 @Entity
@@ -22,6 +23,11 @@ public class Categories {
     @ApiModelProperty
     private String name;
 
+    @JsonIgnore
+    @Column(nullable = false)
+    @ApiModelProperty
+    private String normalizedName;
+
     @ApiModelProperty
     @JoinColumn(name = "cat_id")
     @OneToMany(fetch = FetchType.EAGER, cascade = {
@@ -35,4 +41,9 @@ public class Categories {
     @Column
     @JsonIgnore
     private boolean isDeleted;
+
+    public void setName(String name) {
+        this.name = name;
+        this.normalizedName = name.toUpperCase(Locale.ROOT);
+    }
 }

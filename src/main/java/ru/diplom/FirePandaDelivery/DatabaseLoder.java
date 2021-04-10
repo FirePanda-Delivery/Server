@@ -62,13 +62,136 @@ public class DatabaseLoder {
             restaurant.setWorkingHoursStart(new Time(5000));
             restaurant.setWorkingHoursEnd(new Time(60000));
 
-            for (int i = 0; i <= 3; i++) {
+            List<CitiesCoordinates> coordinates = new LinkedList<>();
+
+            CitiesCoordinates cord1 = new CitiesCoordinates();
+            cord1.setX(39.180002);
+            cord1.setY(51.735140);
+            coordinates.add(cord1);
+
+            CitiesCoordinates cord2 = new CitiesCoordinates();
+            cord2.setX(39.171696);
+            cord2.setY(51.734682);
+            coordinates.add(cord2);
+
+            CitiesCoordinates cord3 = new CitiesCoordinates();
+            cord3.setX(39.161963);
+            cord3.setY(51.725849);
+            coordinates.add(cord3);
+
+            CitiesCoordinates cord4 = new CitiesCoordinates();
+            cord4.setX(39.154761);
+            cord4.setY(51.723338);
+            coordinates.add(cord4);
+
+            CitiesCoordinates cord5 = new CitiesCoordinates();
+            cord5.setX(39.141404);
+            cord5.setY(51.713918);
+            coordinates.add(cord5);
+
+            CitiesCoordinates cord6 = new CitiesCoordinates();
+            cord6.setX(39.113016);
+            cord6.setY(51.677332);
+            coordinates.add(cord6);
+
+            CitiesCoordinates cord7 = new CitiesCoordinates();
+            cord7.setX(39.127596);
+            cord7.setY(51.664600);
+            coordinates.add(cord7);
+
+            CitiesCoordinates cord8 = new CitiesCoordinates();
+            cord8.setX(39.103887);
+            cord8.setY(51.660705);
+            coordinates.add(cord8);
+
+            CitiesCoordinates cord9 = new CitiesCoordinates();
+            cord9.setX(39.180002);
+            cord9.setY(51.735140);
+            coordinates.add(cord9);
+
+            CitiesCoordinates cord10 = new CitiesCoordinates();
+            cord10.setX(39.100940);
+            cord10.setY(51.655563);
+            coordinates.add(cord10);
+
+            CitiesCoordinates cord11 = new CitiesCoordinates();
+            cord11.setX(39.098260);
+            cord11.setY(51.644920);
+            coordinates.add(cord11);
+
+            CitiesCoordinates cord12 = new CitiesCoordinates();
+            cord12.setX(39.145429);
+            cord12.setY(51.637393);
+            coordinates.add(cord12);
+
+            CitiesCoordinates cord13 = new CitiesCoordinates();
+            cord13.setX(39.163519);
+            cord13.setY(51.628499);
+            coordinates.add(cord13);
+
+            CitiesCoordinates cord14 = new CitiesCoordinates();
+            cord14.setX(39.172172);
+            cord14.setY(51.624150);
+            coordinates.add(cord14);
+
+            CitiesCoordinates cord15 = new CitiesCoordinates();
+            cord15.setX(39.173047);
+            cord15.setY(51.617528);
+            coordinates.add(cord15);
+
+            CitiesCoordinates cord16 = new CitiesCoordinates();
+            cord16.setX(39.196544);
+            cord16.setY(51.623877);
+            coordinates.add(cord16);
+
+            CitiesCoordinates cord17 = new CitiesCoordinates();
+            cord17.setX(39.215865);
+            cord17.setY(51.642566);
+            coordinates.add(cord17);
+
+            CitiesCoordinates cord18 = new CitiesCoordinates();
+            cord18.setX(39.241414);
+            cord18.setY(51.710398);
+            coordinates.add(cord18);
+
+
+            CitiesCoordinates cord19 = new CitiesCoordinates();
+            cord19.setX(39.232683);
+            cord19.setY(51.716396);
+            coordinates.add(cord19);
+
+            CitiesCoordinates cord20 = new CitiesCoordinates();
+            cord20.setX(39.204851);
+            cord20.setY(51.734857);
+            coordinates.add(cord20);
+
+
+            Cities cities = new Cities();
+
+
+            cities.setCiti("Воронеж");
+            cities.setCords(coordinates);
+            citiesServices.add(cities);
+
+            Cities cities1 = new Cities();
+
+
+            cities1.setCiti("Курск");
+            citiesServices.add(cities1);
+
+            for (int i = 0; i <= 50; i++) {
 
                 Restaurant restaurant1 = new Restaurant();
                 restaurant1.setName("mak"+i);
                 restaurant1.setWorkingHoursStart(new Time(5000));
                 restaurant1.setWorkingHoursEnd(new Time(60000));
 
+
+                restaurant1.setCities(new LinkedList<>());
+                if (i%3 == 0 ) {
+                    restaurant1.getCities().add(cities1);
+                }
+                restaurant1.getCities().add(cities);
                 List<Categories> list = new LinkedList<>();
 
                 Categories categories1 = new Categories();
@@ -224,7 +347,6 @@ public class DatabaseLoder {
 
 
 
-
             long id = restaurantService.add(restaurant).getId();
 
 
@@ -232,115 +354,7 @@ public class DatabaseLoder {
 
             List<Restaurant> restaurantList = restaurantService.getRestaurantsByProductName("Капучино");
 
-            List<CitiesCoordinates> coordinates = new LinkedList<>();
 
-            CitiesCoordinates cord1 = new CitiesCoordinates();
-            cord1.setX(39.180002);
-            cord1.setY(51.735140);
-            coordinates.add(cord1);
-
-            CitiesCoordinates cord2 = new CitiesCoordinates();
-            cord2.setX(39.171696);
-            cord2.setY(51.734682);
-            coordinates.add(cord2);
-
-            CitiesCoordinates cord3 = new CitiesCoordinates();
-            cord3.setX(39.161963);
-            cord3.setY(51.725849);
-            coordinates.add(cord3);
-
-            CitiesCoordinates cord4 = new CitiesCoordinates();
-            cord4.setX(39.154761);
-            cord4.setY(51.723338);
-            coordinates.add(cord4);
-
-            CitiesCoordinates cord5 = new CitiesCoordinates();
-            cord5.setX(39.141404);
-            cord5.setY(51.713918);
-            coordinates.add(cord5);
-
-            CitiesCoordinates cord6 = new CitiesCoordinates();
-            cord6.setX(39.113016);
-            cord6.setY(51.677332);
-            coordinates.add(cord6);
-
-            CitiesCoordinates cord7 = new CitiesCoordinates();
-            cord7.setX(39.127596);
-            cord7.setY(51.664600);
-            coordinates.add(cord7);
-
-            CitiesCoordinates cord8 = new CitiesCoordinates();
-            cord8.setX(39.103887);
-            cord8.setY(51.660705);
-            coordinates.add(cord8);
-
-            CitiesCoordinates cord9 = new CitiesCoordinates();
-            cord9.setX(39.180002);
-            cord9.setY(51.735140);
-            coordinates.add(cord9);
-
-            CitiesCoordinates cord10 = new CitiesCoordinates();
-            cord10.setX(39.100940);
-            cord10.setY(51.655563);
-            coordinates.add(cord10);
-
-            CitiesCoordinates cord11 = new CitiesCoordinates();
-            cord11.setX(39.098260);
-            cord11.setY(51.644920);
-            coordinates.add(cord11);
-
-            CitiesCoordinates cord12 = new CitiesCoordinates();
-            cord12.setX(39.145429);
-            cord12.setY(51.637393);
-            coordinates.add(cord12);
-
-            CitiesCoordinates cord13 = new CitiesCoordinates();
-            cord13.setX(39.163519);
-            cord13.setY(51.628499);
-            coordinates.add(cord13);
-
-            CitiesCoordinates cord14 = new CitiesCoordinates();
-            cord14.setX(39.172172);
-            cord14.setY(51.624150);
-            coordinates.add(cord14);
-
-            CitiesCoordinates cord15 = new CitiesCoordinates();
-            cord15.setX(39.173047);
-            cord15.setY(51.617528);
-            coordinates.add(cord15);
-
-            CitiesCoordinates cord16 = new CitiesCoordinates();
-            cord16.setX(39.196544);
-            cord16.setY(51.623877);
-            coordinates.add(cord16);
-
-            CitiesCoordinates cord17 = new CitiesCoordinates();
-            cord17.setX(39.215865);
-            cord17.setY(51.642566);
-            coordinates.add(cord17);
-
-            CitiesCoordinates cord18 = new CitiesCoordinates();
-            cord18.setX(39.241414);
-            cord18.setY(51.710398);
-            coordinates.add(cord18);
-
-
-            CitiesCoordinates cord19 = new CitiesCoordinates();
-            cord19.setX(39.232683);
-            cord19.setY(51.716396);
-            coordinates.add(cord19);
-
-            CitiesCoordinates cord20 = new CitiesCoordinates();
-            cord20.setX(39.204851);
-            cord20.setY(51.734857);
-            coordinates.add(cord20);
-
-
-            Cities cities = new Cities();
-
-            cities.setCiti("Воронеж");
-            cities.setCords(coordinates);
-            citiesServices.add(cities);
 
 //
 //            boolean tt = validateAddress.isValid("Воронеж, Южно-Моравская улица, 74", "Воронеж");

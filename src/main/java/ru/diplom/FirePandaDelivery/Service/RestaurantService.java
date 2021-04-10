@@ -3,6 +3,7 @@ package ru.diplom.FirePandaDelivery.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.diplom.FirePandaDelivery.model.Categories;
+import ru.diplom.FirePandaDelivery.model.Cities;
 import ru.diplom.FirePandaDelivery.model.Product;
 import ru.diplom.FirePandaDelivery.model.Restaurant;
 import ru.diplom.FirePandaDelivery.repositories.CategoriesRepositories;
@@ -10,10 +11,7 @@ import ru.diplom.FirePandaDelivery.repositories.ProductRepositories;
 import ru.diplom.FirePandaDelivery.repositories.RestaurantRepositories;
 
 import javax.persistence.EntityNotFoundException;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class RestaurantService {
@@ -50,7 +48,7 @@ public class RestaurantService {
 
         List<Restaurant> restaurantList = new LinkedList<>();
 
-        for (Categories category : categoriesRepositories.findByName(name)) {
+        for (Categories category : categoriesRepositories.findByNormalizedName(name.toUpperCase(Locale.ROOT))) {
 
             Optional<Restaurant> optionalRestaurant = restaurantRepositories.findAllByCategoriesContaining(category);
             if (optionalRestaurant.isEmpty()) { throw new EntityNotFoundException("Restaurant is not found"); }
@@ -65,7 +63,7 @@ public class RestaurantService {
 
         List<Restaurant> restaurantList = new LinkedList<>();
 
-        for (Product product : productRepositories.findByNameAndIsDeletedFalse(name)) {
+        for (Product product : productRepositories.findByNormalizedNameAndIsDeletedFalse(name.toUpperCase(Locale.ROOT).trim())) {
 
             Optional<Categories> optionalCategory = categoriesRepositories.findByProductsContaining(product);
             if (optionalCategory.isEmpty()) { throw new EntityNotFoundException("Category is not found"); }
@@ -81,7 +79,21 @@ public class RestaurantService {
 
     public List<Restaurant> getRestaurantsByCityName(String name) {
 
-        return restaurantRepositories.findAllByCitiesContaining(citiesServices.getByName(name));
+        //TODO костыль
+
+        Cities cities = citiesServices.getByName(name);
+
+        List<Restaurant> newRestaurantList = new LinkedList<>();
+
+        List<Restaurant> restaurants = restaurantRepositories.findByIsDeletedFalse();
+        for (Restaurant restaurant : restaurants) {
+            if (restaurant.getCities().contains(cities)) {
+                newRestaurantList.add(restaurant);
+            }
+        }
+
+        return newRestaurantList;
+
     }
 
     public List<Categories> getRestaurantCategories(long restaurantId) {

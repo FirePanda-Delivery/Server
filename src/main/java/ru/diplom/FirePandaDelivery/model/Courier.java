@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import javax.persistence.*;
+import java.util.Locale;
 
 @Entity
 @Data
@@ -31,6 +32,11 @@ public class Courier {
     @Column(name = "EMAIL", unique = true)
     private String email;
 
+    @JsonIgnore
+    @ApiModelProperty
+    @Column(unique = true)
+    private String normalizedEmail;
+
     @Column
     @ApiModelProperty
     private float rating;
@@ -46,4 +52,8 @@ public class Courier {
     @JsonIgnore
     private boolean isDeleted;
 
+    public void setEmail(String email) {
+        this.email = email;
+        this.normalizedEmail = email.toUpperCase(Locale.ROOT);
+    }
 }

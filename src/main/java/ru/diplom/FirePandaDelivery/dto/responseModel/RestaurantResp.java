@@ -54,6 +54,8 @@ public class RestaurantResp {
             list.add(city.getCiti());
         }
 
+        restaurantResp.setCities(list);
+
         return restaurantResp;
     }
 

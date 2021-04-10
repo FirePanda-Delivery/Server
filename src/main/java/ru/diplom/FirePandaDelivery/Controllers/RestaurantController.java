@@ -40,7 +40,11 @@ public class RestaurantController {
     }
 
     @GetMapping("/only")
-    public ResponseEntity<List<RestaurantResp>> getOnlyRestaurantList(@CookieValue(name = "address", required = false) String address) {
+    public ResponseEntity<List<RestaurantResp>> getOnlyRestaurantList(
+            //@CookieValue(name = "address", required = false)
+            @RequestBody
+            String address) {
+
         if (address.isEmpty()) {
 
         }

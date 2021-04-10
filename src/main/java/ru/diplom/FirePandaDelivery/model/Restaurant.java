@@ -8,6 +8,7 @@ import javax.persistence.*;
 import java.sql.Time;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 
 @Entity
 @Table
@@ -21,6 +22,11 @@ public class Restaurant {
     @Column(unique = true, nullable = false)
     @ApiModelProperty
     private String name;
+
+    @Column(unique = true, nullable = false)
+    @JsonIgnore
+    @ApiModelProperty
+    private String normalizedName;
 
     @Column
     @ApiModelProperty
@@ -63,4 +69,8 @@ public class Restaurant {
     @Column
     private String img;
 
+    public void setName(String name) {
+        this.name = name;
+        this.normalizedName = name.toUpperCase(Locale.ROOT);
+    }
 }

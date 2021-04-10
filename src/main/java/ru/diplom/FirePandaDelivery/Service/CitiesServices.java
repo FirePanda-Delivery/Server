@@ -12,6 +12,7 @@ import ru.diplom.FirePandaDelivery.repositories.CitiesRepositories;
 
 import javax.persistence.EntityNotFoundException;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 
 @Service
@@ -39,7 +40,8 @@ public class CitiesServices {
         if (name == null || name.isEmpty()) {
             throw new NullPointerException("city name not set");
         }
-        Optional<Cities> citiesOptional = citiesRepositories.findByCiti(name);
+
+        Optional<Cities> citiesOptional = citiesRepositories.findByNormalizedCiti(name.toUpperCase(Locale.ROOT));
         if (citiesOptional.isEmpty()) {
             throw new EntityNotFoundException("Cities not found");
         }
