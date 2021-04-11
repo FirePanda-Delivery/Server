@@ -11,6 +11,7 @@ import ru.diplom.FirePandaDelivery.repositories.UserRepositories;
 import javax.persistence.EntityNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 
 @Service
@@ -56,6 +57,10 @@ public class CourierService {
         return courier.get();
     }
 
+    public List<Courier> getActiveCourierByCity(String city) {
+        return courierRepositories.findAllByActiveTrueAndCity_NormalizedCiti(city.toUpperCase(Locale.ROOT));
+    }
+
     public List<Courier> getDeletedList() {
 
         return courierRepositories.findByIsDeletedTrue();
@@ -68,7 +73,7 @@ public class CourierService {
 
     public List<Courier> getByCitiesName(String cities) {
 
-        return courierRepositories.findAllByCity_Citi(cities);
+        return courierRepositories.findAllByCity_NormalizedCiti(cities.toUpperCase(Locale.ROOT));
     }
 
     public Courier add(Courier courier) {

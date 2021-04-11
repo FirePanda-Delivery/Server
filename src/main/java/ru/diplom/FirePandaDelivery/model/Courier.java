@@ -48,6 +48,15 @@ public class Courier {
     private Cities city;
 
 
+    @ApiModelProperty
+    @OneToOne
+    @JoinColumn
+    private CitiesCoordinates location;
+
+    @Column
+    @ApiModelProperty
+    private boolean active;
+
     @Column
     @JsonIgnore
     private boolean isDeleted;
