@@ -57,10 +57,15 @@ public class Restaurant {
     @JoinColumn(name = "restaurant_id", nullable = false)
     private List<Categories> categories;
 
-    @JoinColumn
-    @ManyToMany
+//    @JoinColumn
+//    @ManyToMany
+//    @ApiModelProperty
+//    private List<Cities> Cities;
+
+    @JoinColumn(name = "restaurant_id")
+    @OneToMany(cascade = CascadeType.ALL)
     @ApiModelProperty
-    private List<Cities> Cities;
+    private List<RestaurantAddress> citiesAddress;
 
     @Column
     @JsonIgnore

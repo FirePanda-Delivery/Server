@@ -2,10 +2,7 @@ package ru.diplom.FirePandaDelivery.Service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ru.diplom.FirePandaDelivery.model.Categories;
-import ru.diplom.FirePandaDelivery.model.Cities;
-import ru.diplom.FirePandaDelivery.model.Product;
-import ru.diplom.FirePandaDelivery.model.Restaurant;
+import ru.diplom.FirePandaDelivery.model.*;
 import ru.diplom.FirePandaDelivery.repositories.CategoriesRepositories;
 import ru.diplom.FirePandaDelivery.repositories.ProductRepositories;
 import ru.diplom.FirePandaDelivery.repositories.RestaurantRepositories;
@@ -87,8 +84,11 @@ public class RestaurantService {
 
         List<Restaurant> restaurants = restaurantRepositories.findByIsDeletedFalse();
         for (Restaurant restaurant : restaurants) {
-            if (restaurant.getCities().contains(cities)) {
-                newRestaurantList.add(restaurant);
+            for (RestaurantAddress restaurantAddress : restaurant.getCitiesAddress()) {
+                if (restaurantAddress.getCity().equals(cities)) {
+                    newRestaurantList.add(restaurant);
+                    break;
+                }
             }
         }
 

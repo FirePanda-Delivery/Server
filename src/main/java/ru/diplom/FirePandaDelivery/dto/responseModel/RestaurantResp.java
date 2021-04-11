@@ -4,11 +4,14 @@ import lombok.Data;
 import lombok.With;
 import ru.diplom.FirePandaDelivery.model.Cities;
 import ru.diplom.FirePandaDelivery.model.Restaurant;
+import ru.diplom.FirePandaDelivery.model.RestaurantAddress;
 
 
 import java.sql.Time;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 @Builder
 @Data
@@ -30,7 +33,7 @@ public class RestaurantResp {
 
     private boolean ownDelivery;
 
-    private List<String> Cities;
+    private Map<String, String> CitiesAddress;
 
     private String img;
     
@@ -48,13 +51,13 @@ public class RestaurantResp {
                 .workingHoursStart(restaurant.getWorkingHoursStart())
                 .build();
 
-        List<String> list = new LinkedList<>();
+        Map<String, String> map = new HashMap<>();
 
-        for (Cities city : restaurant.getCities()) {
-            list.add(city.getCiti());
+        for (RestaurantAddress restaurantAddress : restaurant.getCitiesAddress()) {
+            map.put(restaurantAddress.getCity().getCiti(), restaurantAddress.getAddress());
         }
 
-        restaurantResp.setCities(list);
+        restaurantResp.setCitiesAddress(map);
 
         return restaurantResp;
     }

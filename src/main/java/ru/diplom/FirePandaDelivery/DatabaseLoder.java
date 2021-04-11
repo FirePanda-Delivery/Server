@@ -185,13 +185,20 @@ public class DatabaseLoder {
                 restaurant1.setName("mak"+i);
                 restaurant1.setWorkingHoursStart(new Time(5000));
                 restaurant1.setWorkingHoursEnd(new Time(60000));
+                restaurant1.setCitiesAddress(new LinkedList<>());
 
+                RestaurantAddress restaurantAddress = new RestaurantAddress();
+                restaurantAddress.setCity(cities);
+                restaurantAddress.setAddress("пупкино " + i);
+                restaurant1.getCitiesAddress().add(restaurantAddress);
 
-                restaurant1.setCities(new LinkedList<>());
                 if (i%3 == 0 ) {
-                    restaurant1.getCities().add(cities1);
+                    RestaurantAddress restaurantAddress1 = new RestaurantAddress();
+                    restaurantAddress1.setCity(cities1);
+                    restaurantAddress1.setAddress("ленина " + i);
+                    restaurant1.getCitiesAddress().add(restaurantAddress1);
+
                 }
-                restaurant1.getCities().add(cities);
                 List<Categories> list = new LinkedList<>();
 
                 Categories categories1 = new Categories();
