@@ -155,7 +155,7 @@ public class OrderServices {
         order.setOrderStatus(OrderStatus.DELIVERED);
         order.setTimeEnd(new Time(new Date().getTime()));
 
-        Storage.courierActiveOrder.remove(order.getCourier(), order);
+        Storage.courierActiveOrder.remove(order.getCourier().getId(), order);
         // todo
 
         return orderRepositories.save(order);
