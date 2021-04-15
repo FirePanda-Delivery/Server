@@ -2,17 +2,13 @@ package ru.diplom.FirePandaDelivery.Service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ru.diplom.FirePandaDelivery.model.Order;
-import ru.diplom.FirePandaDelivery.model.OrderProduct;
-import ru.diplom.FirePandaDelivery.model.OrderStatus;
+import ru.diplom.FirePandaDelivery.model.*;
+import ru.diplom.FirePandaDelivery.processing.AddressProcessing;
 import ru.diplom.FirePandaDelivery.repositories.OrderRepositories;
 
 import javax.persistence.EntityNotFoundException;
 import java.sql.Time;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @Service
 public class OrderServices {
@@ -22,13 +18,15 @@ public class OrderServices {
     private final UserService userService;
     private final CourierService courierService;
     private final RestaurantService restaurantService;
+    private final AddressProcessing addressProcessing;
 
     @Autowired
-    public OrderServices(OrderRepositories orderRepositories, UserService userService, CourierService courierService, RestaurantService restaurantService) {
+    public OrderServices(OrderRepositories orderRepositories, UserService userService, CourierService courierService, RestaurantService restaurantService, AddressProcessing addressProcessing) {
         this.orderRepositories = orderRepositories;
         this.userService = userService;
         this.courierService = courierService;
         this.restaurantService = restaurantService;
+        this.addressProcessing = addressProcessing;
     }
 
     public List<Order> getOrderList() {
@@ -51,6 +49,35 @@ public class OrderServices {
         return orderRepositories.findAllByCourierId(id);
     }
 
+    public Order getActiveCourierOrder(Courier courier) {
+
+        if (courier == null) {
+            throw new NullPointerException();
+        }
+
+        Order order = Storage.courierActiveOrder.get(courier.getId());
+
+        if (order != null) {
+            return order;
+        }
+
+        List<OrderStatus> statuses = new LinkedList<>();
+        statuses.add(OrderStatus.DELIVERED);
+        statuses.add(OrderStatus.CANCELED);
+
+        Optional<Order> orderOptional = orderRepositories.findByCourier_IdAndOrderStatusIsNotIn(courier.getId(), statuses);
+
+        if (orderOptional.isEmpty()) {
+            throw new EntityNotFoundException("order not found");
+        }
+
+        order = orderOptional.get();
+
+        Storage.courierActiveOrder.put(courier.getId(), order);
+
+        return order;
+    }
+
     public List<Order> getRestaurantOrders(long id) {
         return orderRepositories.findAllByRestaurant_Id(id);
     }
@@ -65,7 +92,7 @@ public class OrderServices {
     }
 
 
-    public Order createOrder(long userId, long restaurantId, Set<OrderProduct> orderProducts, String address ) {
+    public Order createOrder(long userId, long restaurantId, Set<OrderProduct> orderProducts, String address, String city) {
 
         if (orderProducts.isEmpty()) {
             throw new NullPointerException("products not set");
@@ -75,18 +102,29 @@ public class OrderServices {
             throw new NullPointerException("address not set");
         }
 
+        Restaurant restaurant = restaurantService.getRestaurant(restaurantId);
+
+        String restaurantAddress = addressProcessing.restaurantNearestToAddress(restaurant, city, address);
+
+        Courier courier = addressProcessing.courierNearestToAddress(
+                courierService.getActiveCourierByCity(city), restaurantAddress);
+
 
         Order order = Order.builder()
                 .address(address)
                 .user(userService.get(userId))
-                .restaurant(restaurantService.getRestaurant(restaurantId))
+                .restaurant(restaurant)
                 .orderStatus(OrderStatus.CREATED)
                 .date(new Date())
                 .productList(orderProducts)
                 .timeStart(new Time(new Date().getTime()))
                 .totalPrice(getTotalPrice(orderProducts))
-               //.courier(null) в скобках бутед вызов к логики рапределения TODO: добавить курьера
+                .courier(courier)
+                .restaurantAddress(restaurantAddress)
                 .build();
+
+        // todo добавить запись в список заказов курьера и ресторана
+        Storage.courierActiveOrder.put(courier.getId(), order);
 
         return orderRepositories.save(order);
     }
@@ -117,6 +155,9 @@ public class OrderServices {
         order.setOrderStatus(OrderStatus.DELIVERED);
         order.setTimeEnd(new Time(new Date().getTime()));
 
+        Storage.courierActiveOrder.remove(order.getCourier(), order);
+        // todo
+
         return orderRepositories.save(order);
     }
 
@@ -130,6 +171,11 @@ public class OrderServices {
         }
 
         return price;
+    }
+
+    private static class Storage {
+
+        private final static Map<Long, Order> courierActiveOrder = new LinkedHashMap<>();
     }
 
 

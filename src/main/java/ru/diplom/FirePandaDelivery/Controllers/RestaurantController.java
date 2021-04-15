@@ -2,6 +2,7 @@ package ru.diplom.FirePandaDelivery.Controllers;
 
 import io.swagger.models.Response;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -30,32 +31,24 @@ public class RestaurantController {
         return ResponseEntity.ok(restaurantService.getRestaurant(id));
     }
 
-    @GetMapping
-    public ResponseEntity<List<Restaurant>> getRestaurantList(@CookieValue(name = "address", required = false) String address) {
-        if (address.isEmpty()) {
+    @GetMapping(params = {"city"})
+    public ResponseEntity<List<Restaurant>> getRestaurantList(String city) {
+        if (city.isEmpty()) {
             return ResponseEntity.ok(restaurantService.getRestaurantList());
         }
-        String city = address.split(",")[1].trim();
         return ResponseEntity.ok(restaurantService.getRestaurantsByCityName(city));
     }
 
-    @GetMapping("/only")
-    public ResponseEntity<List<RestaurantResp>> getOnlyRestaurantList(
-            //@CookieValue(name = "address", required = false)
-            @RequestBody
-            String address) {
+    @GetMapping(value = "/only", params = {"city"})
+    public ResponseEntity<List<RestaurantResp>> getOnlyRestaurantList(String city) {
 
-        if (address.isEmpty()) {
-
+        if (city.isEmpty()) {
+            throw new NullPointerException("address is not set");
         }
-
-      //TODO разобраться с куки
 
         return ResponseEntity.ok(
                 RestaurantResp.toRestaurantResponse(
-                        restaurantService.getRestaurantsByCityName(
-                                address.split(",")[1].trim()
-                        )
+                        restaurantService.getRestaurantsByCityName(city.trim())
                 )
         );
     }

@@ -1,4 +1,4 @@
-package ru.diplom.FirePandaDelivery.validate;
+package ru.diplom.FirePandaDelivery.processing;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -6,14 +6,14 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import ru.diplom.FirePandaDelivery.Service.CitiesServices;
 import ru.diplom.FirePandaDelivery.dto.Coordinates;
-import ru.diplom.FirePandaDelivery.model.Cities;
-import ru.diplom.FirePandaDelivery.model.CitiesCoordinates;
+import ru.diplom.FirePandaDelivery.model.*;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 
 @Component
-public class ValidateAddress {
+public class AddressProcessing {
 
     final CitiesServices citiesServices;
 
@@ -23,7 +23,7 @@ public class ValidateAddress {
     String apiKey;
 
     @Autowired
-    public ValidateAddress(CitiesServices citiesServices) {
+    public AddressProcessing(CitiesServices citiesServices) {
         this.citiesServices = citiesServices;
     }
 
@@ -43,6 +43,89 @@ public class ValidateAddress {
             list.add(new Coordinates(cord.getX(), cord.getY()));
         }
         return horizontalTracing(list, cords);
+    }
+
+    public String restaurantNearestToAddress(Restaurant restaurant, String city, String address) {
+
+        if (restaurant == null) {
+            throw new NullPointerException();
+        }
+
+        if (address == null || address.isEmpty()) {
+            throw new NullPointerException();
+        }
+
+        Coordinates addressCords = getCords(address);
+
+        int restaurantAddressIndexWithMinimumDistanceToAddress = 0;
+
+        double minDistance = 0;
+
+        List<RestaurantAddress> restaurantAddress = new LinkedList<>();
+
+        for (RestaurantAddress citiesAddress : restaurant.getCitiesAddress()) {
+            if (citiesAddress.getCity().getNormalizedCiti().equals(city.toUpperCase(Locale.ROOT))) {
+                restaurantAddress.add(citiesAddress);
+            }
+        }
+
+        if (restaurantAddress.size()<= 1) {
+            return restaurantAddress.get(0).getAddress();
+        }
+
+        for (int index = 0; index < restaurantAddress.size(); index++) {
+
+            Coordinates coordinates = getCords(restaurantAddress.get(index).getAddress());
+
+            if (index == 0) {
+                minDistance = Math.sqrt(Math.pow((addressCords.getX() - coordinates.getX()), 2) +
+                        Math.pow((addressCords.getY() - coordinates.getY()), 2));
+            }
+
+
+            double distance = Math.sqrt(Math.pow((addressCords.getX() - coordinates.getX()), 2) +
+                    Math.pow((addressCords.getY() - coordinates.getY()), 2));
+
+            if (minDistance > distance) {
+
+                minDistance = distance;
+                restaurantAddressIndexWithMinimumDistanceToAddress = index;
+            }
+
+        }
+        return restaurantAddress.get(restaurantAddressIndexWithMinimumDistanceToAddress).getAddress();
+    }
+
+    public Courier courierNearestToAddress(List<Courier> couriers, String address) {
+
+       Coordinates cords = getCords(address);
+
+        int courierIndexWithMinimumDistanceToAddress = 0;
+
+        double minDistance = 0;
+
+        for (int index = 0; index < couriers.size(); index++) {
+
+            CitiesCoordinates courierLocation = couriers.get(index).getLocation();
+
+            if (index == 0) {
+                minDistance = Math.sqrt(Math.pow((cords.getX() - courierLocation.getX()), 2) +
+                        Math.pow((cords.getY() - courierLocation.getY()), 2));
+            }
+
+
+            double distance = Math.sqrt(Math.pow((cords.getX() - courierLocation.getX()), 2) +
+                    Math.pow((cords.getY() - courierLocation.getY()), 2));
+
+            if (minDistance > distance) {
+
+                minDistance = distance;
+                courierIndexWithMinimumDistanceToAddress = index;
+            }
+
+        }
+
+        return couriers.get(courierIndexWithMinimumDistanceToAddress);
     }
 
 
@@ -116,7 +199,7 @@ public class ValidateAddress {
     }
 
 
-    private Coordinates getCords(String address) {
+    public final Coordinates getCords(String address) {
 
         if (address == null || address.isEmpty()) {
             throw new NullPointerException("address not set");

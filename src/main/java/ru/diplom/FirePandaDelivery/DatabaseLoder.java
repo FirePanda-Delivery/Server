@@ -1,24 +1,20 @@
 package ru.diplom.FirePandaDelivery;
 
 
-import org.apache.juli.logging.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 import ru.diplom.FirePandaDelivery.Service.CitiesServices;
+import ru.diplom.FirePandaDelivery.Service.CourierService;
 import ru.diplom.FirePandaDelivery.Service.RestaurantService;
 import ru.diplom.FirePandaDelivery.Service.UserService;
-import ru.diplom.FirePandaDelivery.dto.responseModel.RestaurantResp;
 import ru.diplom.FirePandaDelivery.model.*;
-import ru.diplom.FirePandaDelivery.validate.ValidateAddress;
+import ru.diplom.FirePandaDelivery.processing.AddressProcessing;
 
 import java.sql.Time;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.LogManager;
-import java.util.logging.Logger;
 
 @Component
 public class DatabaseLoder {
@@ -28,9 +24,11 @@ public class DatabaseLoder {
     @Autowired
     RestaurantService restaurantService;
     @Autowired
-    ValidateAddress validateAddress;
+    AddressProcessing validateAddress;
     @Autowired
     CitiesServices citiesServices;
+    @Autowired
+    CourierService courierService;
 
     @Bean
     CommandLineRunner initDatabase(){
@@ -361,11 +359,32 @@ public class DatabaseLoder {
 
             List<Restaurant> restaurantList = restaurantService.getRestaurantsByProductName("Капучино");
 
+            Courier courier = new Courier();
+            courier.setCity(citiesServices.getByName("воронеж"));
+            courier.setActive(true);
+            courier.setFirstName("Ирина");
+            courier.setLastName("Хмырова");
+            courier.setPhone("892038965");
+
+
+            CitiesCoordinates citiesCoordinates = new CitiesCoordinates();
+            citiesCoordinates.setX(39.216253);
+            citiesCoordinates.setY(51.684610);
+            courier.setLocation(citiesCoordinates);
+
+            courierService.add(courier);
+
+
+
 
 
 //
 //            boolean tt = validateAddress.isValid("Воронеж, Южно-Моравская улица, 74", "Воронеж");
 //
+
+           // validateAddress.courierNearestToAddress(new LinkedList<>(), "");
+
+
 //            Object ob = new Object();
 
 

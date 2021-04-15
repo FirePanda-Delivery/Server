@@ -6,6 +6,7 @@ import org.springframework.data.repository.query.Param;
 import ru.diplom.FirePandaDelivery.model.Categories;
 import ru.diplom.FirePandaDelivery.model.Cities;
 import ru.diplom.FirePandaDelivery.model.Restaurant;
+import ru.diplom.FirePandaDelivery.model.RestaurantAddress;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -17,5 +18,7 @@ public interface RestaurantRepositories extends JpaRepository<Restaurant, Long> 
     List<Restaurant> findByIsDeletedFalse();
 
     Optional<Restaurant> findAllByCategoriesContaining(Categories categories);
+
+    List<Restaurant> findAllByCitiesAddressIn(Iterable<RestaurantAddress> citiesAddress);
 
 }

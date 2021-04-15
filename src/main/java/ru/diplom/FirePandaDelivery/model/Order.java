@@ -36,7 +36,7 @@ public class Order {
     private Double totalPrice;
 
     @ApiModelProperty
-    @OneToMany
+    @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "order_id", nullable = false)
     private Set<OrderProduct> productList;
 
@@ -65,5 +65,9 @@ public class Order {
     @Column(nullable = false)
     @ApiModelProperty
     private String address;
+
+    @Column(nullable = false)
+    @ApiModelProperty
+    private String restaurantAddress;
 
 }

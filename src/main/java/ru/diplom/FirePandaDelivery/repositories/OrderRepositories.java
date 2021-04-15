@@ -4,7 +4,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import ru.diplom.FirePandaDelivery.model.Order;
 import ru.diplom.FirePandaDelivery.model.OrderStatus;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 public interface OrderRepositories extends JpaRepository<Order, Long> {
 
@@ -16,8 +18,5 @@ public interface OrderRepositories extends JpaRepository<Order, Long> {
 
     List<Order> findAllByOrderStatus(OrderStatus orderStatus);
 
-
-
-
-
+    Optional<Order> findByCourier_IdAndOrderStatusIsNotIn(long courier_id, Iterable<OrderStatus> orderStatus);
 }

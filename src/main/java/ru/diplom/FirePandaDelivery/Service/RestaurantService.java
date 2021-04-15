@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import ru.diplom.FirePandaDelivery.model.*;
 import ru.diplom.FirePandaDelivery.repositories.CategoriesRepositories;
 import ru.diplom.FirePandaDelivery.repositories.ProductRepositories;
+import ru.diplom.FirePandaDelivery.repositories.RestaurantAddressRepositories;
 import ru.diplom.FirePandaDelivery.repositories.RestaurantRepositories;
 
 import javax.persistence.EntityNotFoundException;
@@ -17,13 +18,15 @@ public class RestaurantService {
     private final CategoriesRepositories categoriesRepositories;
     private final ProductRepositories productRepositories;
     private final CitiesServices citiesServices;
+    private final RestaurantAddressRepositories addressRepositories;
 
     @Autowired
-    public RestaurantService(RestaurantRepositories restaurantRepositories, CategoriesRepositories categoriesRepositories, ProductRepositories productRepositories, CitiesServices citiesServices) {
+    public RestaurantService(RestaurantRepositories restaurantRepositories, CategoriesRepositories categoriesRepositories, ProductRepositories productRepositories, CitiesServices citiesServices, RestaurantAddressRepositories addressRepositories) {
         this.restaurantRepositories = restaurantRepositories;
         this.categoriesRepositories = categoriesRepositories;
         this.productRepositories = productRepositories;
         this.citiesServices = citiesServices;
+        this.addressRepositories = addressRepositories;
     }
 
     public List<Restaurant> getRestaurantList() {
@@ -76,24 +79,11 @@ public class RestaurantService {
 
     public List<Restaurant> getRestaurantsByCityName(String name) {
 
-        //TODO костыль
-
-        Cities cities = citiesServices.getByName(name);
-
-        List<Restaurant> newRestaurantList = new LinkedList<>();
-
-        List<Restaurant> restaurants = restaurantRepositories.findByIsDeletedFalse();
-        for (Restaurant restaurant : restaurants) {
-            for (RestaurantAddress restaurantAddress : restaurant.getCitiesAddress()) {
-                if (restaurantAddress.getCity().equals(cities)) {
-                    newRestaurantList.add(restaurant);
-                    break;
-                }
-            }
-        }
-
-        return newRestaurantList;
-
+        return restaurantRepositories.findAllByCitiesAddressIn(
+                addressRepositories.findAllByCity_NormalizedCiti(
+                        name.toUpperCase(Locale.ROOT)
+                )
+        );
     }
 
     public List<Categories> getRestaurantCategories(long restaurantId) {

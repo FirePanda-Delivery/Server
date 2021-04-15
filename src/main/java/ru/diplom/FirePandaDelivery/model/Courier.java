@@ -49,11 +49,11 @@ public class Courier {
 
 
     @ApiModelProperty
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn
     private CitiesCoordinates location;
 
-    @Column
+    @Column(nullable = false)
     @ApiModelProperty
     private boolean active;
 

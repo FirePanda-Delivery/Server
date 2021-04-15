@@ -3,13 +3,15 @@ package ru.diplom.FirePandaDelivery.Controllers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ru.diplom.FirePandaDelivery.Service.CourierService;
 import ru.diplom.FirePandaDelivery.Service.OrderServices;
 import ru.diplom.FirePandaDelivery.Service.RestaurantService;
+import ru.diplom.FirePandaDelivery.dto.requestModel.CreateOrder;
 import ru.diplom.FirePandaDelivery.dto.requestModel.OrderProductReq;
 import ru.diplom.FirePandaDelivery.exception.AddressNotInDeliveryAreaException;
 import ru.diplom.FirePandaDelivery.model.Order;
 import ru.diplom.FirePandaDelivery.model.OrderStatus;
-import ru.diplom.FirePandaDelivery.validate.ValidateAddress;
+import ru.diplom.FirePandaDelivery.processing.AddressProcessing;
 
 import java.util.HashSet;
 import java.util.List;
@@ -20,14 +22,16 @@ import java.util.Set;
 public class OrderController {
 
     private final OrderServices orderServices;
-    private final ValidateAddress validateAddress;
+    private final AddressProcessing validateAddress;
     private final RestaurantService restaurantService;
+    private final CourierService courierService;
 
     @Autowired
-    public OrderController(OrderServices orderServices, ValidateAddress validateAddress, RestaurantService restaurantService) {
+    public OrderController(OrderServices orderServices, AddressProcessing validateAddress, RestaurantService restaurantService, CourierService courierService) {
         this.orderServices = orderServices;
         this.validateAddress = validateAddress;
         this.restaurantService = restaurantService;
+        this.courierService = courierService;
     }
 
     @GetMapping("/{id}")
@@ -50,22 +54,24 @@ public class OrderController {
         return  ResponseEntity.ok(orderServices.getRestaurantOrders(id));
     }
 
-    @PostMapping(params = {"restId", "userId"})
-    public ResponseEntity<Order> createOrder(
-            @RequestBody Set<OrderProductReq> products,
-            long restId,
-            long userId,
-            @CookieValue("address") String address) {
+    /////
+    @GetMapping("Courier/{id}")
+    public Order getordeercouriertt(@PathVariable long id) {
+        return orderServices.getActiveCourierOrder(courierService.get(id));
+    }
+    ////
 
-        //TODO разобраться с куками
+    @PostMapping
+    public ResponseEntity<Order> createOrder(@RequestBody CreateOrder createOrder) {
 
-        if (!validateAddress.isValid(address, address.split(",")[1].trim())) {
+
+        if (!validateAddress.isValid(createOrder.getAddress(), createOrder.getAddress().split(",")[1].trim())) {
             throw new AddressNotInDeliveryAreaException();
         }
 
         Set<ru.diplom.FirePandaDelivery.model.OrderProduct> orderProducts = new HashSet<>();
 
-        for (OrderProductReq product : products) {
+        for (OrderProductReq product : createOrder.getProducts()) {
             ru.diplom.FirePandaDelivery.model.OrderProduct orderProduct = new ru.diplom.FirePandaDelivery.model.OrderProduct();
             orderProduct.setCount(product.getCount());
             orderProduct.setProduct(restaurantService.getProduct(product.getProductId()));
@@ -74,7 +80,13 @@ public class OrderController {
         }
 
         return ResponseEntity.ok(
-                orderServices.createOrder(userId, restId, orderProducts, address)
+                orderServices.createOrder(
+                        createOrder.getUserId(),
+                        createOrder.getRestaurantId(),
+                        orderProducts,
+                        createOrder.getAddress(),
+                        createOrder.getCity()
+                )
         );
     }
 
