@@ -1,6 +1,7 @@
 package ru.diplom.FirePandaDelivery.Service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 import ru.diplom.FirePandaDelivery.model.*;
 import ru.diplom.FirePandaDelivery.processing.AddressProcessing;
@@ -20,6 +21,10 @@ public class OrderServices {
     private final RestaurantService restaurantService;
     private final AddressProcessing addressProcessing;
 
+    private final List<OrderStatus> FINAL_STATUSES = Arrays.asList(OrderStatus.DELIVERED, OrderStatus.CANCELED);
+
+
+
     @Autowired
     public OrderServices(OrderRepositories orderRepositories, UserService userService, CourierService courierService, RestaurantService restaurantService, AddressProcessing addressProcessing) {
         this.orderRepositories = orderRepositories;
@@ -27,6 +32,8 @@ public class OrderServices {
         this.courierService = courierService;
         this.restaurantService = restaurantService;
         this.addressProcessing = addressProcessing;
+
+
     }
 
     public List<Order> getOrderList() {
@@ -49,23 +56,15 @@ public class OrderServices {
         return orderRepositories.findAllByCourierId(id);
     }
 
-    public Order getActiveCourierOrder(Courier courier) {
+    public Order getActiveCourierOrder(long courierId) {
 
-        if (courier == null) {
-            throw new NullPointerException();
-        }
-
-        Order order = Storage.courierActiveOrder.get(courier.getId());
+        Order order = Storage.courierActiveOrder.get(courierId);
 
         if (order != null) {
             return order;
         }
 
-        List<OrderStatus> statuses = new LinkedList<>();
-        statuses.add(OrderStatus.DELIVERED);
-        statuses.add(OrderStatus.CANCELED);
-
-        Optional<Order> orderOptional = orderRepositories.findByCourier_IdAndOrderStatusIsNotIn(courier.getId(), statuses);
+        Optional<Order> orderOptional = orderRepositories.findByCourier_IdAndOrderStatusIsNotIn(courierId, FINAL_STATUSES);
 
         if (orderOptional.isEmpty()) {
             throw new EntityNotFoundException("order not found");
@@ -73,10 +72,30 @@ public class OrderServices {
 
         order = orderOptional.get();
 
-        Storage.courierActiveOrder.put(courier.getId(), order);
+        Storage.courierActiveOrder.put(courierId, order);
 
         return order;
     }
+
+    public List<Order> getActiveRestaurantOrder(long restaurantId) {
+
+        // todo додумать как сделать выгрузку из базы в локальное хранилище
+
+        List<Order> orderList = Storage.restaurantActiveOrder.get(restaurantId);
+
+        if (orderList == null || orderList.isEmpty()) {
+
+            List<Order> orders = orderRepositories.findAllByRestaurant_IdAndOrderStatusIsNotIn(restaurantId, FINAL_STATUSES);
+
+            Storage.addRestaurantActiveOrderList(restaurantId, orders);
+
+            return orderList;
+        }
+
+        return orderList;
+    }
+
+
 
     public List<Order> getRestaurantOrders(long id) {
         return orderRepositories.findAllByRestaurant_Id(id);
@@ -110,21 +129,20 @@ public class OrderServices {
                 courierService.getActiveCourierByCity(city), restaurantAddress);
 
 
-        Order order = Order.builder()
-                .address(address)
-                .user(userService.get(userId))
-                .restaurant(restaurant)
-                .orderStatus(OrderStatus.CREATED)
-                .date(new Date())
-                .productList(orderProducts)
-                .timeStart(new Time(new Date().getTime()))
-                .totalPrice(getTotalPrice(orderProducts))
-                .courier(courier)
-                .restaurantAddress(restaurantAddress)
-                .build();
+        Order order = new Order()
+                .setAddress(address)
+                .setUser(userService.get(userId))
+                .setRestaurant(restaurant)
+                .setOrderStatus(OrderStatus.CREATED)
+                .setDate(new Date())
+                .setProductList(orderProducts)
+                .setTimeStart(new Time(new Date().getTime()))
+                .setTotalPrice(getTotalPrice(orderProducts))
+                .setCourier(courier)
+                .setRestaurantAddress(restaurantAddress);
 
-        // todo добавить запись в список заказов курьера и ресторана
         Storage.courierActiveOrder.put(courier.getId(), order);
+        Storage.addRestaurantActiveOrder(restaurantId, order);
 
         return orderRepositories.save(order);
     }
@@ -156,7 +174,7 @@ public class OrderServices {
         order.setTimeEnd(new Time(new Date().getTime()));
 
         Storage.courierActiveOrder.remove(order.getCourier().getId(), order);
-        // todo
+        Storage.restaurantActiveOrder.remove(order.getRestaurant().getId(), order);
 
         return orderRepositories.save(order);
     }
@@ -173,9 +191,36 @@ public class OrderServices {
         return price;
     }
 
-    private static class Storage {
+    public static class Storage {
 
+        /**
+         * stores data about active orders and assigned couriers
+         * param Long - courier id
+         * param Order - order
+         */
         private final static Map<Long, Order> courierActiveOrder = new LinkedHashMap<>();
+
+
+        private final static Map<Long, List<Order>> restaurantActiveOrder = new LinkedHashMap<>();
+
+        public static void addRestaurantActiveOrder(long restaurantId, Order order) {
+            if (restaurantActiveOrder.get(restaurantId) == null ) {
+
+                List<Order> orderList = new LinkedList<>();
+                orderList.add(order);
+                restaurantActiveOrder.put(restaurantId, orderList);
+            } else {
+                restaurantActiveOrder.get(restaurantId).add(order);
+            }
+        }
+
+        public static void addRestaurantActiveOrderList(long restaurantId, List<Order> order) {
+            if (restaurantActiveOrder.get(restaurantId) == null ) {
+                restaurantActiveOrder.put(restaurantId, order);
+            } else {
+                restaurantActiveOrder.get(restaurantId).addAll(order);
+            }
+        }
     }
 
 

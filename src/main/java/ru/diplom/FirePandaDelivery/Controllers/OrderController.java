@@ -57,8 +57,15 @@ public class OrderController {
     /////
     @GetMapping("Courier/{id}")
     public Order getordeercouriertt(@PathVariable long id) {
-        return orderServices.getActiveCourierOrder(courierService.get(id));
+        return orderServices.getActiveCourierOrder(id);
     }
+
+    @GetMapping("rest/{id}")
+    public List<Order> getordeercouriertts(@PathVariable long id) {
+        return orderServices.getActiveRestaurantOrder(id);
+    }
+
+    
     ////
 
     @PostMapping
