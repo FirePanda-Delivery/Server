@@ -1,6 +1,7 @@
 package ru.diplom.FirePandaDelivery.repositories;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import ru.diplom.FirePandaDelivery.model.Cities;
 import ru.diplom.FirePandaDelivery.model.Order;
 import ru.diplom.FirePandaDelivery.model.OrderStatus;
 
@@ -21,4 +22,6 @@ public interface OrderRepositories extends JpaRepository<Order, Long> {
     Optional<Order> findByCourier_IdAndOrderStatusIsNotIn(long courier_id, Iterable<OrderStatus> orderStatus);
 
     List<Order> findAllByRestaurant_IdAndOrderStatusIsNotIn(long restaurant_id, Iterable<OrderStatus> orderStatus);
+
+    List<Order> findAllByCities(Cities cities);
 }

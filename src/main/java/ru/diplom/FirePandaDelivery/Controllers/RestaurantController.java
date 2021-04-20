@@ -1,29 +1,30 @@
 package ru.diplom.FirePandaDelivery.Controllers;
 
-import io.swagger.models.Response;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.diplom.FirePandaDelivery.Service.RestaurantService;
+import ru.diplom.FirePandaDelivery.service.OrderServices;
+import ru.diplom.FirePandaDelivery.service.RestaurantService;
 import ru.diplom.FirePandaDelivery.dto.responseModel.RestaurantResp;
 import ru.diplom.FirePandaDelivery.model.Categories;
+import ru.diplom.FirePandaDelivery.model.Order;
 import ru.diplom.FirePandaDelivery.model.Product;
 import ru.diplom.FirePandaDelivery.model.Restaurant;
 
 import java.util.List;
-import java.util.Objects;
 
 @RestController
 @RequestMapping("/restaurant")
 public class RestaurantController {
 
-    private RestaurantService restaurantService;
+    private final RestaurantService restaurantService;
+    private final OrderServices orderServices;
 
     @Autowired
-    public RestaurantController(RestaurantService restaurantService) {
+    public RestaurantController(RestaurantService restaurantService, OrderServices orderServices) {
         this.restaurantService = restaurantService;
+        this.orderServices = orderServices;
     }
 
     @GetMapping("/{id}")
@@ -57,6 +58,11 @@ public class RestaurantController {
     @GetMapping(value = "/getByCategory", params = {"catName"})
     public ResponseEntity<List<Restaurant>> getRestaurantByCategory(String catName) {
         return ResponseEntity.ok(restaurantService.getRestaurantsByCategoryName(catName));
+    }
+
+    @GetMapping("/{id}/order/active")
+    public ResponseEntity<List<Order>> getActiveOrder(@PathVariable long id) {
+        return ResponseEntity.ok(orderServices.getActiveRestaurantOrder(id));
     }
 
     @GetMapping(value = "/getByProduct", params = {"productName"})

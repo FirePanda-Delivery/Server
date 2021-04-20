@@ -5,10 +5,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
-import ru.diplom.FirePandaDelivery.Service.CitiesServices;
-import ru.diplom.FirePandaDelivery.Service.CourierService;
-import ru.diplom.FirePandaDelivery.Service.RestaurantService;
-import ru.diplom.FirePandaDelivery.Service.UserService;
+import ru.diplom.FirePandaDelivery.service.CitiesServices;
+import ru.diplom.FirePandaDelivery.service.CourierService;
+import ru.diplom.FirePandaDelivery.service.RestaurantService;
+import ru.diplom.FirePandaDelivery.service.UserService;
 import ru.diplom.FirePandaDelivery.model.*;
 import ru.diplom.FirePandaDelivery.processing.AddressProcessing;
 
@@ -361,7 +361,6 @@ public class DatabaseLoder {
 
             Courier courier = new Courier();
             courier.setCity(citiesServices.getByName("воронеж"));
-            courier.setActive(true);
             courier.setFirstName("Ирина");
             courier.setLastName("Хмырова");
             courier.setPhone("892038965");
@@ -370,9 +369,12 @@ public class DatabaseLoder {
             CitiesCoordinates citiesCoordinates = new CitiesCoordinates();
             citiesCoordinates.setX(39.216253);
             citiesCoordinates.setY(51.684610);
-            courier.setLocation(citiesCoordinates);
 
             courierService.add(courier);
+
+//            CourierService.Storage.addCourier(courier);
+//            courierService.courierCompletedOrder(courier);
+
 
 
 

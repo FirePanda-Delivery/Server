@@ -4,7 +4,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
-import ru.diplom.FirePandaDelivery.Service.CitiesServices;
+import ru.diplom.FirePandaDelivery.dto.ActiveCourier;
+import ru.diplom.FirePandaDelivery.service.CitiesServices;
 import ru.diplom.FirePandaDelivery.dto.Coordinates;
 import ru.diplom.FirePandaDelivery.model.*;
 
@@ -96,7 +97,7 @@ public class AddressProcessing {
         return restaurantAddress.get(restaurantAddressIndexWithMinimumDistanceToAddress).getAddress();
     }
 
-    public Courier courierNearestToAddress(List<Courier> couriers, String address) {
+    public Courier courierNearestToAddress(List<ActiveCourier> couriers, String address) {
 
        Coordinates cords = getCords(address);
 
@@ -106,7 +107,7 @@ public class AddressProcessing {
 
         for (int index = 0; index < couriers.size(); index++) {
 
-            CitiesCoordinates courierLocation = couriers.get(index).getLocation();
+            Coordinates courierLocation = couriers.get(index).getLocation();
 
             if (index == 0) {
                 minDistance = Math.sqrt(Math.pow((cords.getX() - courierLocation.getX()), 2) +
@@ -125,7 +126,7 @@ public class AddressProcessing {
 
         }
 
-        return couriers.get(courierIndexWithMinimumDistanceToAddress);
+        return couriers.get(courierIndexWithMinimumDistanceToAddress).getCourier();
     }
 
 

@@ -1,11 +1,12 @@
-package ru.diplom.FirePandaDelivery.Service;
+package ru.diplom.FirePandaDelivery.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
+import ru.diplom.FirePandaDelivery.dto.ActiveCourier;
 import ru.diplom.FirePandaDelivery.model.*;
 import ru.diplom.FirePandaDelivery.processing.AddressProcessing;
 import ru.diplom.FirePandaDelivery.repositories.OrderRepositories;
+import ru.diplom.FirePandaDelivery.thread.SearchCourierThread;
 
 import javax.persistence.EntityNotFoundException;
 import java.sql.Time;
@@ -20,13 +21,14 @@ public class OrderServices {
     private final CourierService courierService;
     private final RestaurantService restaurantService;
     private final AddressProcessing addressProcessing;
+    private final CitiesServices citiesServices;
 
     private final List<OrderStatus> FINAL_STATUSES = Arrays.asList(OrderStatus.DELIVERED, OrderStatus.CANCELED);
 
 
 
     @Autowired
-    public OrderServices(OrderRepositories orderRepositories, UserService userService, CourierService courierService, RestaurantService restaurantService, AddressProcessing addressProcessing) {
+    public OrderServices(OrderRepositories orderRepositories, UserService userService, CourierService courierService, RestaurantService restaurantService, AddressProcessing addressProcessing, CitiesServices citiesServices) {
         this.orderRepositories = orderRepositories;
         this.userService = userService;
         this.courierService = courierService;
@@ -34,6 +36,7 @@ public class OrderServices {
         this.addressProcessing = addressProcessing;
 
 
+        this.citiesServices = citiesServices;
     }
 
     public List<Order> getOrderList() {
@@ -79,8 +82,6 @@ public class OrderServices {
 
     public List<Order> getActiveRestaurantOrder(long restaurantId) {
 
-        // todo додумать как сделать выгрузку из базы в локальное хранилище
-
         List<Order> orderList = Storage.restaurantActiveOrder.get(restaurantId);
 
         if (orderList == null || orderList.isEmpty()) {
@@ -101,15 +102,30 @@ public class OrderServices {
         return orderRepositories.findAllByRestaurant_Id(id);
     }
 
-    public List<Order> getCityOrders(long id) {
-        throw new RuntimeException("Добавить логику");
-       // return orderRepositories.findAllByRestaurant_Id(id);
+    public List<Order> getCityOrders(String city) {
+        return orderRepositories.findAllByCities(citiesServices.getByName(city));
     }
 
     public List<Order> getOrdersByStatus(OrderStatus status) {
         return orderRepositories.findAllByOrderStatus(status);
     }
 
+    public Order addCourier(Order order, Courier courier) {
+        Storage.activeOrder.get(Storage.activeOrder.indexOf(order)).setCourier(courier);
+
+        List<Order> orderList = Storage.restaurantActiveOrder.get(order.getRestaurant().getId());
+        orderList.get(orderList.indexOf(order)).setCourier(courier);
+
+        order.setCourier(courier);
+
+        Storage.courierActiveOrder.put(courier.getId(), order);
+
+        orderRepositories.save(order);
+
+        courierService.courierReceivedOrder(courier);
+
+        return order;
+    }
 
     public Order createOrder(long userId, long restaurantId, Set<OrderProduct> orderProducts, String address, String city) {
 
@@ -125,9 +141,6 @@ public class OrderServices {
 
         String restaurantAddress = addressProcessing.restaurantNearestToAddress(restaurant, city, address);
 
-        Courier courier = addressProcessing.courierNearestToAddress(
-                courierService.getActiveCourierByCity(city), restaurantAddress);
-
 
         Order order = new Order()
                 .setAddress(address)
@@ -138,10 +151,30 @@ public class OrderServices {
                 .setProductList(orderProducts)
                 .setTimeStart(new Time(new Date().getTime()))
                 .setTotalPrice(getTotalPrice(orderProducts))
-                .setCourier(courier)
-                .setRestaurantAddress(restaurantAddress);
+                .setRestaurantAddress(restaurantAddress)
+                .setCities(citiesServices.getByName(city));
 
-        Storage.courierActiveOrder.put(courier.getId(), order);
+        List<ActiveCourier> activeCourierList = courierService.getActiveCourierByCity(city);
+
+        if (activeCourierList == null || activeCourierList.isEmpty()) {
+            Thread thread = new SearchCourierThread(
+                    order,
+                    citiesServices.getByName(city),
+                    addressProcessing,
+                    courierService,
+                    this);
+
+            thread.start();
+
+
+        } else {
+            Courier courier = addressProcessing.courierNearestToAddress(activeCourierList, restaurantAddress);
+            order.setCourier(courier);
+            courierService.courierReceivedOrder(courier);
+            Storage.courierActiveOrder.put(courier.getId(), order);
+        }
+
+        Storage.activeOrder.add(order);
         Storage.addRestaurantActiveOrder(restaurantId, order);
 
         return orderRepositories.save(order);
@@ -170,11 +203,17 @@ public class OrderServices {
         }
 
         Order order = orderOptional.get();
+
+
+        Storage.courierActiveOrder.remove(order.getCourier().getId(), order);
+        Storage.restaurantActiveOrder.get(order.getRestaurant().getId()).remove(order);
+       // Storage.restaurantActiveOrder.remove(order.getRestaurant().getId(), order);
+        Storage.activeOrder.remove(order);
+
         order.setOrderStatus(OrderStatus.DELIVERED);
         order.setTimeEnd(new Time(new Date().getTime()));
 
-        Storage.courierActiveOrder.remove(order.getCourier().getId(), order);
-        Storage.restaurantActiveOrder.remove(order.getRestaurant().getId(), order);
+        courierService.courierCompletedOrder(order.getCourier());
 
         return orderRepositories.save(order);
     }
@@ -191,7 +230,7 @@ public class OrderServices {
         return price;
     }
 
-    public static class Storage {
+    private static class Storage {
 
         /**
          * stores data about active orders and assigned couriers
@@ -200,8 +239,9 @@ public class OrderServices {
          */
         private final static Map<Long, Order> courierActiveOrder = new LinkedHashMap<>();
 
-
         private final static Map<Long, List<Order>> restaurantActiveOrder = new LinkedHashMap<>();
+
+        private final static List<Order> activeOrder = new LinkedList<>();
 
         public static void addRestaurantActiveOrder(long restaurantId, Order order) {
             if (restaurantActiveOrder.get(restaurantId) == null ) {

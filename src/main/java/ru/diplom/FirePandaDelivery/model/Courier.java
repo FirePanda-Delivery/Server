@@ -3,6 +3,8 @@ package ru.diplom.FirePandaDelivery.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import org.springframework.beans.factory.annotation.Autowired;
+import ru.diplom.FirePandaDelivery.service.CitiesServices;
 
 import javax.persistence.*;
 import java.util.Locale;
@@ -46,16 +48,6 @@ public class Courier {
     @JoinColumn(nullable = false)
     @ApiModelProperty
     private Cities city;
-
-
-    @ApiModelProperty
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn
-    private CitiesCoordinates location;
-
-    @Column(nullable = false)
-    @ApiModelProperty
-    private boolean active;
 
     @Column
     @JsonIgnore

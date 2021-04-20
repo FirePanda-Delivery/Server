@@ -3,9 +3,9 @@ package ru.diplom.FirePandaDelivery.Controllers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.diplom.FirePandaDelivery.Service.CourierService;
-import ru.diplom.FirePandaDelivery.Service.OrderServices;
-import ru.diplom.FirePandaDelivery.Service.RestaurantService;
+import ru.diplom.FirePandaDelivery.service.CourierService;
+import ru.diplom.FirePandaDelivery.service.OrderServices;
+import ru.diplom.FirePandaDelivery.service.RestaurantService;
 import ru.diplom.FirePandaDelivery.dto.requestModel.CreateOrder;
 import ru.diplom.FirePandaDelivery.dto.requestModel.OrderProductReq;
 import ru.diplom.FirePandaDelivery.exception.AddressNotInDeliveryAreaException;
@@ -53,20 +53,6 @@ public class OrderController {
     public ResponseEntity<List<Order>> getRestaurantOrders(@PathVariable long id) {
         return  ResponseEntity.ok(orderServices.getRestaurantOrders(id));
     }
-
-    /////
-    @GetMapping("Courier/{id}")
-    public Order getordeercouriertt(@PathVariable long id) {
-        return orderServices.getActiveCourierOrder(id);
-    }
-
-    @GetMapping("rest/{id}")
-    public List<Order> getordeercouriertts(@PathVariable long id) {
-        return orderServices.getActiveRestaurantOrder(id);
-    }
-
-    
-    ////
 
     @PostMapping
     public ResponseEntity<Order> createOrder(@RequestBody CreateOrder createOrder) {

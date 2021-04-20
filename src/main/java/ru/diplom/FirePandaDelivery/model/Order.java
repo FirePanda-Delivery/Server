@@ -1,5 +1,7 @@
 package ru.diplom.FirePandaDelivery.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Builder;
 import lombok.Data;
@@ -27,6 +29,11 @@ public class Order {
 
     @ApiModelProperty
     @JoinColumn(nullable = false)
+    @JsonIgnoreProperties({
+            "description", "workingHoursStart", "workingHoursEnd",
+            "minPrice", "ownDelivery", "categories",
+            "citiesAddress", "img"
+    })
     @ManyToOne
     private Restaurant restaurant;
 
@@ -52,7 +59,7 @@ public class Order {
     @ApiModelProperty
     private OrderStatus orderStatus;
 
-    @JoinColumn(nullable = false)
+    @JoinColumn(nullable = true)
     @ApiModelProperty
     @ManyToOne
     private Courier courier;
@@ -69,6 +76,12 @@ public class Order {
     @Column(nullable = false)
     @ApiModelProperty
     private String address;
+
+    @ManyToOne
+    @JoinColumn(nullable = false)
+    @ApiModelProperty
+    private Cities cities;
+
 
     @Column(nullable = false)
     @ApiModelProperty
@@ -127,6 +140,53 @@ public class Order {
     public Order setRestaurantAddress(String restaurantAddress) {
         this.restaurantAddress = restaurantAddress;
         return this;
+    }
+
+    public Order setCities(Cities cities) {
+        this.cities = cities;
+        return this;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Order order = (Order) o;
+
+        if (getId() != order.getId()) return false;
+        if (getRestaurant() != null ? !getRestaurant().equals(order.getRestaurant()) : order.getRestaurant() != null)
+            return false;
+        if (getUser() != null ? !getUser().equals(order.getUser()) : order.getUser() != null) return false;
+        if (getTotalPrice() != null ? !getTotalPrice().equals(order.getTotalPrice()) : order.getTotalPrice() != null)
+            return false;
+        if (getProductList() != null ? !getProductList().equals(order.getProductList()) : order.getProductList() != null)
+            return false;
+        if (getDate() != null ? !getDate().equals(order.getDate()) : order.getDate() != null) return false;
+        if (getOrderStatus() != order.getOrderStatus()) return false;
+        if (getCourier() != null ? !getCourier().equals(order.getCourier()) : order.getCourier() != null) return false;
+        if (getTimeStart() != null ? !getTimeStart().equals(order.getTimeStart()) : order.getTimeStart() != null)
+            return false;
+        if (getTimeEnd() != null ? !getTimeEnd().equals(order.getTimeEnd()) : order.getTimeEnd() != null) return false;
+        if (getAddress() != null ? !getAddress().equals(order.getAddress()) : order.getAddress() != null) return false;
+        return getRestaurantAddress() != null ? getRestaurantAddress().equals(order.getRestaurantAddress()) : order.getRestaurantAddress() == null;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = (int) (getId() ^ (getId() >>> 32));
+        result = 31 * result + (getRestaurant() != null ? getRestaurant().hashCode() : 0);
+        result = 31 * result + (getUser() != null ? getUser().hashCode() : 0);
+        result = 31 * result + (getTotalPrice() != null ? getTotalPrice().hashCode() : 0);
+        result = 31 * result + (getProductList() != null ? getProductList().hashCode() : 0);
+        result = 31 * result + (getDate() != null ? getDate().hashCode() : 0);
+        result = 31 * result + (getOrderStatus() != null ? getOrderStatus().hashCode() : 0);
+        result = 31 * result + (getCourier() != null ? getCourier().hashCode() : 0);
+        result = 31 * result + (getTimeStart() != null ? getTimeStart().hashCode() : 0);
+        result = 31 * result + (getTimeEnd() != null ? getTimeEnd().hashCode() : 0);
+        result = 31 * result + (getAddress() != null ? getAddress().hashCode() : 0);
+        result = 31 * result + (getRestaurantAddress() != null ? getRestaurantAddress().hashCode() : 0);
+        return result;
     }
 }
 

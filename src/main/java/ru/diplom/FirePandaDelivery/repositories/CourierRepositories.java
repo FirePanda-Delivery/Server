@@ -22,7 +22,6 @@ public interface CourierRepositories extends JpaRepository<Courier, Long> {
 
     List<Courier> findAllByCity_NormalizedCiti(String citi);
 
-    List<Courier> findAllByActiveTrueAndCity_NormalizedCiti(String citi);
 
 
 

@@ -2,7 +2,12 @@ package ru.diplom.FirePandaDelivery.Controllers;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.diplom.FirePandaDelivery.Service.CourierService;
+import ru.diplom.FirePandaDelivery.dto.ActiveCourier;
+import ru.diplom.FirePandaDelivery.dto.Coordinates;
+import ru.diplom.FirePandaDelivery.dto.requestModel.CourierReq;
+import ru.diplom.FirePandaDelivery.service.CitiesServices;
+import ru.diplom.FirePandaDelivery.service.CourierService;
+import ru.diplom.FirePandaDelivery.service.OrderServices;
 import ru.diplom.FirePandaDelivery.model.Courier;
 
 import java.util.List;
@@ -11,11 +16,15 @@ import java.util.List;
 @RequestMapping("/courier")
 public class CourierController {
 
-    private CourierService courierServices;
+    private final CourierService courierServices;
+    private final OrderServices orderServices;
+    private final CitiesServices citiesServices;
 
 
-    public CourierController(CourierService courierServices) {
+    public CourierController(CourierService courierServices, OrderServices orderServices, CitiesServices citiesServices) {
         this.courierServices = courierServices;
+        this.orderServices = orderServices;
+        this.citiesServices = citiesServices;
     }
 
     @GetMapping
@@ -28,14 +37,45 @@ public class CourierController {
         return ResponseEntity.ok(courierServices.get(id));
     }
 
-    @GetMapping("/order/active")
-    public ResponseEntity<Object> getActiveOrder() {
-        return ResponseEntity.ok("тут будет активный заказ данного курьера");
+    @GetMapping("/{id}/order/active")
+    public ResponseEntity<Object> getActiveOrder(@PathVariable long id) {
+        return ResponseEntity.ok(orderServices.getActiveCourierOrder(id));
     }
 
     @PostMapping()
-    public ResponseEntity<Courier> addCourier(@RequestBody Courier courier) {
+    public ResponseEntity<Courier> addCourier(@RequestBody CourierReq courierReq) {
+        Courier courier = new Courier();
+        courier.setPhone(courierReq .getPhone());
+        courier.setLastName(courierReq.getLastName());
+        courier.setFirstName(courierReq.getFirstName());
+        courier.setEmail(courierReq.getEmail());
+        courier.setCity(citiesServices.getByName(courierReq.getCity()));
+
         return ResponseEntity.ok(courierServices.add(courier));
+    }
+
+    @PostMapping(value = "/{id}/active")
+    public ResponseEntity<Object> setActive(@PathVariable long id, @RequestBody Coordinates location) {
+        CourierService.Storage.addCourier(courierServices.get(id), location);
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/{id}/location")
+    public ResponseEntity<Object> setLocation(@PathVariable long id, @RequestBody Coordinates location) {
+        courierServices.setCourierLocation(courierServices.get(id), location);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping(value = "/{id}/inactive")
+    public ResponseEntity<Object> setInactive(@PathVariable long id, boolean isActive) {
+        ActiveCourier activeCourier = CourierService.Storage.getActiveCourier(courierServices.get(id));
+
+        if (activeCourier == null) {
+            throw new NullPointerException();
+        }
+
+        CourierService.Storage.removeCourier(activeCourier);
+        return ResponseEntity.ok().build();
     }
 
     @PostMapping("/addList")

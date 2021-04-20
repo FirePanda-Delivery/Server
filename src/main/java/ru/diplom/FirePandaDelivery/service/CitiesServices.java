@@ -1,9 +1,6 @@
-package ru.diplom.FirePandaDelivery.Service;
+package ru.diplom.FirePandaDelivery.service;
 
-import org.hibernate.Criteria;
-import org.hibernate.FetchMode;
 import org.hibernate.Hibernate;
-import org.springframework.orm.hibernate5.HibernateCallback;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
