@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import javax.persistence.*;
+import java.util.Locale;
 
 @Entity
 @Data
@@ -19,6 +20,11 @@ public class Product {
     @Column(nullable = false)
     @ApiModelProperty
     private String name;
+
+    @Column(nullable = false)
+    @JsonIgnore
+    @ApiModelProperty
+    private String normalizedName;
 
     @Column
     @ApiModelProperty
@@ -40,6 +46,8 @@ public class Product {
     @JsonIgnore
     private boolean isDeleted;
 
-
-
+    public void setName(String name) {
+        this.name = name;
+        this.normalizedName = name.toUpperCase(Locale.ROOT);
+    }
 }

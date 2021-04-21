@@ -1,16 +1,13 @@
 package ru.diplom.FirePandaDelivery.Controllers;
 
 import io.swagger.annotations.Api;
-import io.swagger.models.Response;
-import org.apache.coyote.Request;
 import org.hibernate.PropertyValueException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.diplom.FirePandaDelivery.Service.UserService;
+import ru.diplom.FirePandaDelivery.service.UserService;
 import ru.diplom.FirePandaDelivery.model.User;
 
-import javax.persistence.Access;
 import javax.persistence.EntityNotFoundException;
 
 

@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import javax.persistence.*;
+import java.util.Locale;
 
 
 @Data
@@ -32,6 +33,16 @@ public class User {
     @ApiModelProperty
     @Column(name = "EMAIL", unique = true)
     private String email;
+
+    @JsonIgnore
+    @ApiModelProperty
+    @Column(unique = true)
+    private String normalizedEmail;
+
+    public void setEmail(String email) {
+        this.email = email;
+        this.normalizedEmail = email.toUpperCase(Locale.ROOT);
+    }
 
     @Column
     @JsonIgnore

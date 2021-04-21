@@ -3,8 +3,11 @@ package ru.diplom.FirePandaDelivery.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import org.springframework.beans.factory.annotation.Autowired;
+import ru.diplom.FirePandaDelivery.service.CitiesServices;
 
 import javax.persistence.*;
+import java.util.Locale;
 
 @Entity
 @Data
@@ -31,6 +34,11 @@ public class Courier {
     @Column(name = "EMAIL", unique = true)
     private String email;
 
+    @JsonIgnore
+    @ApiModelProperty
+    @Column(unique = true)
+    private String normalizedEmail;
+
     @Column
     @ApiModelProperty
     private float rating;
@@ -41,9 +49,12 @@ public class Courier {
     @ApiModelProperty
     private Cities city;
 
-
     @Column
     @JsonIgnore
     private boolean isDeleted;
 
+    public void setEmail(String email) {
+        this.email = email;
+        this.normalizedEmail = email.toUpperCase(Locale.ROOT);
+    }
 }
