@@ -42,7 +42,7 @@ public class ImageController {
         File file = new File(imagesDirectory.trim() + "/restaurant/" + fileName.trim());
 
         if (!file.exists()) {
-            throw new FileNotFoundException();
+            throw new FileNotFoundException("image not found");
         }
 
         FileInputStream fileInputStream = new FileInputStream(file);
@@ -51,14 +51,21 @@ public class ImageController {
         String fileExtension = getFileExtension(file.getName());
 
         if (fileExtension.isEmpty()){
-            throw new ImageExtensionNotSupportedException();
+            throw new ImageExtensionNotSupportedException("extension not found");
         }
 
-        switch (getFileExtension(file.getName())) {
-            case "png" : mediaType = MediaType.IMAGE_PNG;
-            case "jpeg" : mediaType = MediaType.IMAGE_JPEG;
-            case "gif" : mediaType = MediaType.IMAGE_GIF;
-            default: mediaType = MediaType.IMAGE_PNG;
+        switch (fileExtension) {
+            case "jpeg":
+                mediaType = MediaType.IMAGE_JPEG;
+                break;
+            case "gif":
+                mediaType = MediaType.IMAGE_GIF;
+                break;
+            case "png":
+                mediaType = MediaType.IMAGE_PNG;
+                break;
+            default:
+                throw new ImageExtensionNotSupportedException("extension " + fileExtension + " not supported", fileExtension);
         }
 
 
@@ -75,23 +82,30 @@ public class ImageController {
         File file = new File(imagesDirectory.trim() + "/product/" + fileName.trim());
 
         if (!file.exists()) {
-            throw new FileNotFoundException();
+            throw new FileNotFoundException("image not found");
         }
 
         FileInputStream fileInputStream = new FileInputStream(file);
 
         MediaType mediaType;
-        String fileExtension = getFileExtension(file.getName());
+        String fileExtension = getFileExtension(file.getName()).trim();
 
         if (fileExtension.isEmpty()){
-            throw new ImageExtensionNotSupportedException();
+            throw new ImageExtensionNotSupportedException("extension not found");
         }
 
-        switch (getFileExtension(file.getName())) {
-            case "png" : mediaType = MediaType.IMAGE_PNG;
-            case "jpeg" : mediaType = MediaType.IMAGE_JPEG;
-            case "gif" : mediaType = MediaType.IMAGE_GIF;
-            default: mediaType = MediaType.IMAGE_PNG;
+        switch (fileExtension) {
+            case "jpeg":
+                mediaType = MediaType.IMAGE_JPEG;
+                break;
+            case "gif":
+                mediaType = MediaType.IMAGE_GIF;
+                break;
+            case "png":
+                mediaType = MediaType.IMAGE_PNG;
+                break;
+            default:
+                throw new ImageExtensionNotSupportedException("extension " + fileExtension + " not supported", fileExtension);
         }
 
 
@@ -111,6 +125,12 @@ public class ImageController {
             throw new NullPointerException("image not set");
         }
 
+        String extension = getFileExtension(file.getOriginalFilename());
+
+        if (!extension.equals("png") && !extension.equals("jpeg") && !extension.equals("gif")) {
+            throw new ImageExtensionNotSupportedException("extension " + extension + " not supported", extension);
+        }
+
         File dir = new File(imagesDirectory.trim() + "/restaurant");
 
         if (!dir.exists()) {
@@ -120,7 +140,7 @@ public class ImageController {
         }
 
         Restaurant restaurant = restaurantService.getRestaurant(id);
-        String fileName = toLatinTrans.transliterate(restaurant.getName().replace(' ', '_')) + id + "." + getFileExtension(file.getOriginalFilename());
+        String fileName = toLatinTrans.transliterate(restaurant.getName().replace(' ', '_')) + id + "." + extension;
 
         file.transferTo(new File(imagesDirectory + "/restaurant/" + fileName));
 
@@ -133,10 +153,16 @@ public class ImageController {
 
     @PostMapping("/product/{id}")
     public ResponseEntity<String> uploadProductImage(@RequestBody MultipartFile file, @PathVariable long id)
-            throws IOException {
+            throws IOException, ImageExtensionNotSupportedException {
 
         if (file == null || file.isEmpty() || file.getOriginalFilename() == null) {
             throw new NullPointerException("image not set");
+        }
+
+        String extension = getFileExtension(file.getOriginalFilename());
+
+        if (!extension.equals("png") && !extension.equals("jpeg") && !extension.equals("gif")) {
+            throw new ImageExtensionNotSupportedException("extension " + extension + " not supported", extension);
         }
 
         File dir = new File(imagesDirectory.trim() + "/product");
@@ -149,7 +175,7 @@ public class ImageController {
 
         Product product = restaurantService.getProduct(id);
 
-        String fileName = toLatinTrans.transliterate(product.getName().replace(' ', '_')) + id +  "." + getFileExtension(file.getOriginalFilename());
+        String fileName = toLatinTrans.transliterate(product.getName().replace(' ', '_')) + id +  "." + extension;
 
         file.transferTo(new File(imagesDirectory + "/product/" + fileName));
 

@@ -218,9 +218,7 @@ public class CourierService {
 
             List<ActiveCourier> courierList = new LinkedList<>();
 
-            if (activeCouriers.get(cities) == null) {
-                throw new NullPointerException();
-            }
+            activeCouriers.computeIfAbsent(cities, k -> new LinkedList<>());
 
             for (ActiveCourier activeCourier : activeCouriers.get(cities)) {
                 if (!activeCourier.isOnOrder()) {

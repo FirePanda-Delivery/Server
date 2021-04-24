@@ -40,7 +40,7 @@ public class RestaurantService {
     public Restaurant getRestaurant(long id) {
 
         Optional<Restaurant> optionalRestaurant = restaurantRepositories.findById(id);
-        if (optionalRestaurant.isEmpty()) { throw new NullPointerException("Restaurant is not found"); }
+        if (optionalRestaurant.isEmpty()) { throw new EntityNotFoundException("Restaurant is not found"); }
         return optionalRestaurant.get();
     }
 

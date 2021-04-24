@@ -25,8 +25,8 @@ public class UserController {
 
     @GetMapping("/{id}")
     public ResponseEntity<User> getUser(@PathVariable long id) {
-
-        return ResponseEntity.ok(userService.get(id));
+        throw new NullPointerException("yyyy");
+        //return ResponseEntity.ok(userService.get(id));
     }
 
     @PostMapping
@@ -58,10 +58,10 @@ public class UserController {
     return "User not found";
     }
 
-    @ExceptionHandler(value = {NullPointerException.class})
-    public String nullError(Exception exception) {
-        return  exception.getMessage();
-    }
+//    @ExceptionHandler(value = {NullPointerException.class})
+//    public String nullError(Exception exception) {
+//        return  exception.getMessage();
+//    }
 
     @ExceptionHandler(value = {PropertyValueException.class})
     public String propertyNullError(Exception exception) {
