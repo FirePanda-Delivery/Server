@@ -46,6 +46,10 @@ public class RestaurantService {
 
     public List<Restaurant> getRestaurantsByCategoryName(String name) {
 
+        if (name == null || name.isEmpty()) {
+            throw new NullPointerException("restaurant name not set");
+        }
+
         List<Restaurant> restaurantList = new LinkedList<>();
 
         for (Categories category : categoriesRepositories.findByNormalizedName(name.toUpperCase(Locale.ROOT))) {
@@ -60,6 +64,9 @@ public class RestaurantService {
     }
 
     public List<Restaurant> getRestaurantsByProductName(String name) {
+        if (name == null || name.isEmpty()) {
+            throw new NullPointerException("product name not set");
+        }
 
         List<Restaurant> restaurantList = new LinkedList<>();
 
@@ -78,6 +85,10 @@ public class RestaurantService {
     }
 
     public List<Restaurant> getRestaurantsByCityName(String name) {
+
+        if (name == null || name.isEmpty()) {
+            throw new NullPointerException("city not set");
+        }
 
         return restaurantRepositories.findAllByCitiesAddressIn(
                 addressRepositories.findAllByCity_NormalizedCiti(
@@ -235,6 +246,11 @@ public class RestaurantService {
     }
 
     public Restaurant updateRestaurant(Restaurant restaurant) {
+
+        if (restaurant == null) {
+            throw new NullPointerException("restaurant not set");
+        }
+
         if (!restaurantRepositories.existsById(restaurant.getId())) {
             throw new EntityNotFoundException("restaurant not found!");
         }

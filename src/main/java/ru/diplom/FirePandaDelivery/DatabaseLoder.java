@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
+import ru.diplom.FirePandaDelivery.dto.Coordinates;
 import ru.diplom.FirePandaDelivery.service.CitiesServices;
 import ru.diplom.FirePandaDelivery.service.CourierService;
 import ru.diplom.FirePandaDelivery.service.RestaurantService;
@@ -387,8 +388,10 @@ public class DatabaseLoder {
 
             courierService.add(courier);
 
-//            CourierService.Storage.addCourier(courier);
-//            courierService.courierCompletedOrder(courier);
+            //CourierService.Storage.addCourier(courier, new Coordinates(39.216253, 51.684610));
+            //courierService.courierCompletedOrder(courier);
+//            boolean dd = CourierService.Storage.existActiveCourier(courier);
+//            CourierService.Storage.getActiveCourier(courier);
 
 
 

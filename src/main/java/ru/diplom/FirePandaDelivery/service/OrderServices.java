@@ -110,7 +110,16 @@ public class OrderServices {
         return orderRepositories.findAllByOrderStatus(status);
     }
 
-    public Order addCourier(Order order, Courier courier) {
+    public void addCourier(Order order, Courier courier) {
+
+        if (order == null) {
+            throw new NullPointerException("order not set");
+        }
+
+        if (courier == null) {
+            throw new NullPointerException("courier not set");
+        }
+
         Storage.activeOrder.get(Storage.activeOrder.indexOf(order)).setCourier(courier);
 
         List<Order> orderList = Storage.restaurantActiveOrder.get(order.getRestaurant().getId());
@@ -123,8 +132,6 @@ public class OrderServices {
         orderRepositories.save(order);
 
         courierService.courierReceivedOrder(courier);
-
-        return order;
     }
 
     public Order createOrder(long userId, long restaurantId, Set<OrderProduct> orderProducts, String address, String city) {
@@ -135,6 +142,10 @@ public class OrderServices {
 
         if (address == null || address.isEmpty() || address.equals(" ")) {
             throw new NullPointerException("address not set");
+        }
+
+        if (city == null || city.isEmpty() || city.equals(" ")) {
+            throw new NullPointerException("city not set");
         }
 
         Restaurant restaurant = restaurantService.getRestaurant(restaurantId);
@@ -182,6 +193,10 @@ public class OrderServices {
 
     public Order setStatus(long id, OrderStatus status){
 
+        if (status == null) {
+            throw new NullPointerException("status not set");
+        }
+
         if (status == OrderStatus.DELIVERED) {
             return completeOrder(id);
         }
@@ -220,6 +235,10 @@ public class OrderServices {
 
 
     private double getTotalPrice(Set<OrderProduct> orderProducts ) {
+
+        if (orderProducts == null || orderProducts.isEmpty()) {
+            throw new NullPointerException("products not set");
+        }
 
         double price = 0D;
 

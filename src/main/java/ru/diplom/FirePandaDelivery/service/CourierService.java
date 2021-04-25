@@ -57,7 +57,9 @@ public class CourierService {
     }
 
     public List<ActiveCourier> getActiveCourierByCity(String city) {
-        //return courierRepositories.findAllByActiveTrueAndCity_NormalizedCiti(city.toUpperCase(Locale.ROOT));
+        if (city == null || city.isEmpty()) {
+            throw new NullPointerException("city not set");
+        }
         return Storage.getNotOnOrderCouriers(citiesServices.getByName(city));
     }
 
@@ -68,10 +70,17 @@ public class CourierService {
 
     public List<Courier> getByCities(Cities cities) {
 
+        if (cities == null) {
+            throw new NullPointerException("city not set");
+        }
         return courierRepositories.findAllByCity(cities);
     }
 
     public List<Courier> getByCitiesName(String cities) {
+
+        if (cities == null || cities.isEmpty()) {
+            throw new NullPointerException("city not set");
+        }
 
         return courierRepositories.findAllByCity_NormalizedCiti(cities.toUpperCase(Locale.ROOT));
     }
@@ -129,37 +138,40 @@ public class CourierService {
 
         courierRepositories.save(courier);
 
-        finishCourierJob(courier);
+        if (Storage.existActiveCourier(courier)) {
+            finishCourierJob(courier);
+        }
     }
 
     public void finishCourierJob(Courier courier) {
 
-        ActiveCourier activeCourier = Storage.getActiveCourier(courier);
-
-        if (activeCourier == null) {
-            throw new NullPointerException();
+        if (courier == null) {
+            throw new NullPointerException("courier not set");
         }
 
+        ActiveCourier activeCourier = Storage.getActiveCourier(courier);
         Storage.removeCourier(activeCourier);
     }
 
     public ActiveCourier courierCompletedOrder(Courier courier) {
-        ActiveCourier activeCourier = Storage.getActiveCourier(courier);
 
-        if (activeCourier == null) {
-            throw new NullPointerException();
+        if (courier == null) {
+            throw new NullPointerException("courier not set");
         }
+
+        ActiveCourier activeCourier = Storage.getActiveCourier(courier);
 
         activeCourier.setOnOrder(false);
         return activeCourier;
     }
 
     public ActiveCourier courierReceivedOrder(Courier courier) {
-        ActiveCourier activeCourier = Storage.getActiveCourier(courier);
 
-        if (activeCourier == null) {
-            throw new NullPointerException();
+        if (courier == null) {
+            throw new NullPointerException("courier not set");
         }
+
+        ActiveCourier activeCourier = Storage.getActiveCourier(courier);
 
         activeCourier.setOnOrder(true);
         return activeCourier;
@@ -168,7 +180,7 @@ public class CourierService {
     public void setCourierLocation(Courier courier, Coordinates location) {
 
         if (courier == null || location == null) {
-            throw new NullPointerException();
+            throw new NullPointerException("courier or location not set");
         }
 
         Storage.getActiveCourier(courier).setLocation(location);
@@ -182,13 +194,23 @@ public class CourierService {
         public static ActiveCourier getActiveCourier(Courier courier) {
             List<ActiveCourier> storageCourier = activeCouriers.get(courier.getCity());
 
-            for (ActiveCourier activeCourier : storageCourier) {
-                if (activeCourier.getCourier().equals(courier)) {
-                    return activeCourier;
-                }
+            Optional<ActiveCourier> optionalActiveCourier = storageCourier.stream()
+                    .takeWhile(activeCourier -> activeCourier.getCourier().equals(courier)).findFirst();
+
+            if (optionalActiveCourier.isEmpty()) {
+                throw new EntityNotFoundException("courier not found");
             }
 
-            return null;
+            return optionalActiveCourier.get();
+        }
+
+        public static boolean existActiveCourier(Courier courier) {
+
+            List<ActiveCourier> activeCourierList = activeCouriers.get(courier.getCity());
+
+            if (activeCourierList == null || activeCourierList.isEmpty()) return false;
+
+            return activeCourierList.stream().anyMatch(activeCourier -> activeCourier.getCourier().equals(courier));
         }
 
         public static void addCourier(Courier courier, Coordinates location) {
