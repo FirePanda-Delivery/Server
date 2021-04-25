@@ -14,7 +14,7 @@ public class Product {
 
     @Id
     @ApiModelProperty
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
     @Column(nullable = false)
@@ -33,6 +33,10 @@ public class Product {
     @Column(nullable = false)
     @ApiModelProperty
     private double price;
+
+    @Column(nullable = false)
+    @ApiModelProperty
+    private double weight;
 
     @Column
     @ApiModelProperty

@@ -17,7 +17,7 @@ import javax.persistence.Id;
 public class CitiesCoordinates {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @ApiModelProperty
     private long id;
 
