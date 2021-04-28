@@ -16,9 +16,12 @@ import java.util.Optional;
 public interface RestaurantRepositories extends JpaRepository<Restaurant, Long> {
 
     List<Restaurant> findByIsDeletedFalse();
+    List<Restaurant> findByIsDeletedFalseAndPublishedTrue();
 
     Optional<Restaurant> findAllByCategoriesContaining(Categories categories);
+    Optional<Restaurant> findAllByCategoriesContainingAndPublishedTrue(Categories categories);
 
     List<Restaurant> findAllByCitiesAddressIn(Iterable<RestaurantAddress> citiesAddress);
+    List<Restaurant> findAllByCitiesAddressInAndPublishedTrue(Iterable<RestaurantAddress> citiesAddress);
 
 }

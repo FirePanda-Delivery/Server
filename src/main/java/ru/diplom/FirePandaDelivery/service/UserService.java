@@ -1,10 +1,13 @@
 package ru.diplom.FirePandaDelivery.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DeadlockLoserDataAccessException;
 import org.springframework.stereotype.Service;
+import ru.diplom.FirePandaDelivery.exception.EntityDeletedException;
 import ru.diplom.FirePandaDelivery.model.User;
 import ru.diplom.FirePandaDelivery.repositories.UserRepositories;
 
+import javax.persistence.EntityExistsException;
 import javax.persistence.EntityNotFoundException;
 import java.util.ArrayList;
 
@@ -53,6 +56,17 @@ public final class UserService {
         Optional<User> user = userRepositories.findById(id);
         if (user.isEmpty()) { throw new EntityNotFoundException("User is not found"); }
         return user.get();
+    }
+
+    public User getNotDeletedUser(long id) {
+        Optional<User> optionalUser = userRepositories.findById(id);
+        if (optionalUser.isEmpty()) { throw new EntityNotFoundException("User is not found"); }
+        User user = optionalUser.get();
+
+        if (user.isDeleted()) {
+            throw new EntityDeletedException("user", "user " + id + " is deleted");
+        }
+        return user;
     }
 
     public List<User> getDeletedList() {

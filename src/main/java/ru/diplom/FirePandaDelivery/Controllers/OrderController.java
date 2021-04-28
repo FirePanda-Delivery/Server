@@ -58,7 +58,7 @@ public class OrderController {
     public ResponseEntity<Order> createOrder(@RequestBody CreateOrder createOrder) throws AddressNotInDeliveryAreaException {
 
 
-        if (!validateAddress.isValid(createOrder.getAddress(), createOrder.getAddress().split(",")[1].trim())) {
+        if (!validateAddress.isValid(createOrder.getAddress(), createOrder.getCity())) {
             throw new AddressNotInDeliveryAreaException();
         }
 

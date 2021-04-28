@@ -1,18 +1,23 @@
 package ru.diplom.FirePandaDelivery.Controllers;
 
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.json.JsonParseException;
+import org.springframework.http.HttpRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.request.WebRequest;
+import ru.diplom.FirePandaDelivery.dto.requestModel.RestaurantReq;
+import ru.diplom.FirePandaDelivery.model.*;
+import ru.diplom.FirePandaDelivery.service.CitiesServices;
 import ru.diplom.FirePandaDelivery.service.OrderServices;
 import ru.diplom.FirePandaDelivery.service.RestaurantService;
 import ru.diplom.FirePandaDelivery.dto.responseModel.RestaurantResp;
-import ru.diplom.FirePandaDelivery.model.Categories;
-import ru.diplom.FirePandaDelivery.model.Order;
-import ru.diplom.FirePandaDelivery.model.Product;
-import ru.diplom.FirePandaDelivery.model.Restaurant;
 
-import java.util.List;
+import javax.persistence.EntityNotFoundException;
+import java.util.*;
 
 @RestController
 @RequestMapping("/restaurant")
@@ -20,11 +25,14 @@ public class RestaurantController {
 
     private final RestaurantService restaurantService;
     private final OrderServices orderServices;
+    private final CitiesServices citiesServices;
+    private final Log logger =  LogFactory.getLog(getClass());
 
     @Autowired
-    public RestaurantController(RestaurantService restaurantService, OrderServices orderServices) {
+    public RestaurantController(RestaurantService restaurantService, OrderServices orderServices, CitiesServices citiesServices) {
         this.restaurantService = restaurantService;
         this.orderServices = orderServices;
+        this.citiesServices = citiesServices;
     }
 
     @GetMapping("/{id}")
@@ -91,7 +99,30 @@ public class RestaurantController {
     }
 
     @PostMapping()
-    public ResponseEntity<Restaurant> addRestaurant(@RequestBody Restaurant restaurant) {
+    public ResponseEntity<Restaurant> addRestaurant(@RequestBody RestaurantReq restaurantReq) {
+        Restaurant restaurant = new Restaurant();
+
+        restaurant.setName(restaurantReq.getName());
+        restaurant.setDescription(restaurantReq.getDescription());
+        restaurant.setMinPrice(restaurantReq.getMinPrice());
+        restaurant.setOwnDelivery(restaurantReq.isOwnDelivery());
+        restaurant.setWorkingHoursEnd(restaurantReq.getWorkingHoursEnd());
+        restaurant.setWorkingHoursStart(restaurantReq.getWorkingHoursStart());
+        restaurant.setCategories(new LinkedList<>());
+
+        List<RestaurantAddress> cityAddress = new LinkedList<>();
+
+        for (Map<String, String> address : restaurantReq.getCitiesAddress()) {
+            RestaurantAddress restaurantAddress = new RestaurantAddress();
+
+            restaurantAddress.setCity(citiesServices.getByName(address.get("city")));
+            restaurantAddress.setAddress(address.get("address"));
+
+            cityAddress.add(restaurantAddress);
+        }
+
+        restaurant.setCitiesAddress(cityAddress);
+
         return ResponseEntity.ok(restaurantService.add(restaurant));
     }
 
@@ -113,6 +144,18 @@ public class RestaurantController {
     @PostMapping("/categories/{id}/products")
     public ResponseEntity<List<Product>> addProducts(@RequestBody List<Product> products, @PathVariable long id) {
         return ResponseEntity.ok(restaurantService.addProductList(id, products));
+    }
+
+    @PutMapping("/{id}/publish")
+    public ResponseEntity<Restaurant> publish(@PathVariable long id) {
+        restaurantService.setPublish(id, true);
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/{id}/hide")
+    public ResponseEntity<Restaurant> hide(@PathVariable long id) {
+        restaurantService.setPublish(id, false);
+        return ResponseEntity.ok().build();
     }
 
     @PutMapping()
@@ -158,6 +201,21 @@ public class RestaurantController {
     public ResponseEntity<Object> deleteProductList(@RequestBody long[] id) {
         restaurantService.deleteCategories(id);
         return ResponseEntity.ok().build();
+    }
+
+    @ExceptionHandler({ClassCastException.class})
+    public ResponseEntity<Object> handleClassCast(ClassCastException ex, WebRequest request) {
+
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+
+        Map<String, String> map = new LinkedHashMap<>();
+        logger.error(ex + ". " + request.toString() + ". " + Arrays.toString(ex.getStackTrace()));
+        map.put("Timestamp", new Date().toString());
+        map.put("Status",  String.valueOf(status.value()));
+        map.put("Error", status.getReasonPhrase());
+        map.put("Message", ex.getMessage());
+        map.put("Path", request.getContextPath());
+        return ResponseEntity.status(status).body(map);
     }
 
 }

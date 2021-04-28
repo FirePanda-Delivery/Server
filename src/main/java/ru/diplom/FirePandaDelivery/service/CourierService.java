@@ -194,14 +194,13 @@ public class CourierService {
         public static ActiveCourier getActiveCourier(Courier courier) {
             List<ActiveCourier> storageCourier = activeCouriers.get(courier.getCity());
 
-            Optional<ActiveCourier> optionalActiveCourier = storageCourier.stream()
-                    .takeWhile(activeCourier -> activeCourier.getCourier().equals(courier)).findFirst();
-
-            if (optionalActiveCourier.isEmpty()) {
-                throw new EntityNotFoundException("courier not found");
+            for (ActiveCourier activeCourier : storageCourier) {
+                if (activeCourier.getCourier().equals(courier)) {
+                    return activeCourier;
+                }
             }
 
-            return optionalActiveCourier.get();
+            throw new EntityNotFoundException("courier not found");
         }
 
         public static boolean existActiveCourier(Courier courier) {

@@ -200,6 +200,11 @@ public class DatabaseLoder {
                     restaurant1.getCitiesAddress().add(restaurantAddress1);
 
                 }
+
+                if (i%9 == 0) {
+                    restaurant1.setPublished(true);
+                }
+
                 List<Categories> list = new LinkedList<>();
 
                 Categories categories1 = new Categories();
@@ -373,7 +378,7 @@ public class DatabaseLoder {
 
             System.out.println("kjbn,");
 
-            List<Restaurant> restaurantList = restaurantService.getRestaurantsByProductName("Капучино");
+//            List<Restaurant> restaurantList = restaurantService.getRestaurantsByProductName("Капучино");
 
             Courier courier = new Courier();
             courier.setCity(citiesServices.getByName("воронеж"));

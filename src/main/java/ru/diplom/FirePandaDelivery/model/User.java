@@ -40,6 +40,11 @@ public class User {
     private String normalizedEmail;
 
     public void setEmail(String email) {
+
+        if (email == null || email.isEmpty()) {
+            return;
+        }
+
         this.email = email;
         this.normalizedEmail = email.toUpperCase(Locale.ROOT);
     }

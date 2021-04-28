@@ -27,6 +27,7 @@ import ru.diplom.FirePandaDelivery.exception.ImageExtensionNotSupportedException
 
 import javax.persistence.EntityNotFoundException;
 import java.io.FileNotFoundException;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -153,11 +154,12 @@ public class AdviceController extends ResponseEntityExceptionHandler {
 
     private ResponseEntity<Object> createResponse(Exception ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
         Map<String, String> map = new LinkedHashMap<>();
-        logger.error(ex + ". " + request.toString());
-        map.put("timestamp", new Date().toString());
+        logger.error(ex + ". " + request.toString() + ". " + Arrays.toString(ex.getStackTrace()));
+        map.put("Timestamp", new Date().toString());
         map.put("Status",  String.valueOf(status.value()));
         map.put("Error", status.getReasonPhrase());
         map.put("Message", ex.getMessage());
+        map.put("Path", request.getContextPath());
         return ResponseEntity.status(status).body(map);
     }
 
