@@ -1,9 +1,16 @@
 package ru.diplom.FirePandaDelivery.service;
 
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.context.request.WebRequest;
 import ru.diplom.FirePandaDelivery.dto.ActiveCourier;
 import ru.diplom.FirePandaDelivery.dto.Coordinates;
+import ru.diplom.FirePandaDelivery.exception.CourierIsAlreadyActiveException;
 import ru.diplom.FirePandaDelivery.model.Cities;
 import ru.diplom.FirePandaDelivery.model.Courier;
 import ru.diplom.FirePandaDelivery.repositories.CourierRepositories;
@@ -16,6 +23,7 @@ public class CourierService {
 
     private final CourierRepositories courierRepositories;
     private final CitiesServices citiesServices;
+    private final Log logger =  LogFactory.getLog(getClass());
 
     @Autowired
     public CourierService(CourierRepositories courierRepositories, CitiesServices citiesServices) {
@@ -186,6 +194,20 @@ public class CourierService {
         Storage.getActiveCourier(courier).setLocation(location);
     }
 
+    @ExceptionHandler({CourierIsAlreadyActiveException.class})
+    public ResponseEntity<Map<String, String>> handleCourierIsAlreadyActive(CourierIsAlreadyActiveException ex, WebRequest request) {
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+
+        Map<String, String> map = new LinkedHashMap<>();
+        logger.error(ex + ". " + request.toString() + ". " + Arrays.toString(ex.getStackTrace()));
+        map.put("Timestamp", new Date().toString());
+        map.put("Status",  String.valueOf(status.value()));
+        map.put("Error", status.getReasonPhrase());
+        map.put("Message", ex.getMessage());
+        map.put("Path", request.getContextPath());
+        return ResponseEntity.status(status).body(map);
+    }
+
 
     public static class Storage {
 
@@ -216,6 +238,10 @@ public class CourierService {
 
             if (courier == null) {
                 throw new NullPointerException();
+            }
+
+            if (existActiveCourier(courier)) {
+                throw new CourierIsAlreadyActiveException("Courier " + courier.getId() + " is already active");
             }
 
             List<ActiveCourier> courierList = activeCouriers.get(courier.getCity());

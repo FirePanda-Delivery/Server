@@ -1,5 +1,6 @@
 package ru.diplom.FirePandaDelivery.Controllers;
 
+import io.swagger.annotations.Api;
 import org.springframework.beans.ConversionNotSupportedException;
 import org.springframework.beans.TypeMismatchException;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -33,6 +34,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 @RestControllerAdvice
+@Api(value = "Обработка ошибок", tags = {"Ошибки"})
 public class AdviceController extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler({NullPointerException.class})
