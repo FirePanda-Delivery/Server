@@ -2,9 +2,11 @@ package ru.diplom.FirePandaDelivery;
 
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
+import ru.diplom.FirePandaDelivery.dto.Coordinates;
 import ru.diplom.FirePandaDelivery.service.CitiesServices;
 import ru.diplom.FirePandaDelivery.service.CourierService;
 import ru.diplom.FirePandaDelivery.service.RestaurantService;
@@ -12,6 +14,7 @@ import ru.diplom.FirePandaDelivery.service.UserService;
 import ru.diplom.FirePandaDelivery.model.*;
 import ru.diplom.FirePandaDelivery.processing.AddressProcessing;
 
+import java.io.File;
 import java.sql.Time;
 import java.util.LinkedList;
 import java.util.List;
@@ -197,6 +200,11 @@ public class DatabaseLoder {
                     restaurant1.getCitiesAddress().add(restaurantAddress1);
 
                 }
+
+                if (i%9 == 0) {
+                    restaurant1.setPublished(true);
+                }
+
                 List<Categories> list = new LinkedList<>();
 
                 Categories categories1 = new Categories();
@@ -209,6 +217,7 @@ public class DatabaseLoder {
                         Product product = new Product();
                         product.setName("Чизбургер");
                         product.setPrice(200.01);
+                        product.setWeight(5.234);
                         products.add(product);
                     }
 
@@ -217,6 +226,7 @@ public class DatabaseLoder {
                         Product product = new Product();
                         product.setName("Чикенбургер");
                         product.setPrice(200.01);
+                        product.setWeight(5.234);
                         products.add(product);
                     }
 
@@ -225,6 +235,7 @@ public class DatabaseLoder {
                         Product product = new Product();
                         product.setName("Биг Мак");
                         product.setPrice(200.01);
+                        product.setWeight(5.234);
                         products.add(product);
                     }
 
@@ -233,6 +244,7 @@ public class DatabaseLoder {
                         Product product = new Product();
                         product.setName("Биг Тейсти");
                         product.setPrice(200.01);
+                        product.setWeight(5.234);
                         products.add(product);
                     }
 
@@ -241,6 +253,7 @@ public class DatabaseLoder {
                         Product product = new Product();
                         product.setName("Филе-О-Фиш");
                         product.setPrice(200.01);
+                        product.setWeight(5.234);
                         products.add(product);
                     }
 
@@ -261,6 +274,7 @@ public class DatabaseLoder {
                         Product product = new Product();
                         product.setName("Итальянская");
                         product.setPrice(200.01);
+                        product.setWeight(5.234);
                         products.add(product);
                     }
 
@@ -269,6 +283,7 @@ public class DatabaseLoder {
                         Product product = new Product();
                         product.setName("Мексиканская");
                         product.setPrice(200.01);
+                        product.setWeight(5.234);
                         products.add(product);
                     }
 
@@ -277,6 +292,7 @@ public class DatabaseLoder {
                         Product product = new Product();
                         product.setName("Палермо");
                         product.setPrice(200.01);
+                        product.setWeight(5.234);
                         products.add(product);
                     }
 
@@ -285,6 +301,7 @@ public class DatabaseLoder {
                         Product product = new Product();
                         product.setName("пицка");
                         product.setPrice(200.01);
+                        product.setWeight(5.234);
                         products.add(product);
                     }
 
@@ -293,6 +310,7 @@ public class DatabaseLoder {
                         Product product = new Product();
                         product.setName("Иркина пицца");
                         product.setPrice(200.01);
+                        product.setWeight(5.234);
                         products.add(product);
                     }
 
@@ -313,6 +331,7 @@ public class DatabaseLoder {
                         Product product = new Product();
                         product.setName("Американо");
                         product.setPrice(200.01);
+                        product.setWeight(5.234);
                         products.add(product);
                     }
 
@@ -321,6 +340,7 @@ public class DatabaseLoder {
                         Product product = new Product();
                         product.setName("Капучино");
                         product.setPrice(200.01);
+                        product.setWeight(5.234);
                         products.add(product);
                     }
 
@@ -329,6 +349,7 @@ public class DatabaseLoder {
                         Product product = new Product();
                         product.setName("Латте");
                         product.setPrice(200.01);
+                        product.setWeight(5.234);
                         products.add(product);
                     }
 
@@ -357,7 +378,7 @@ public class DatabaseLoder {
 
             System.out.println("kjbn,");
 
-            List<Restaurant> restaurantList = restaurantService.getRestaurantsByProductName("Капучино");
+//            List<Restaurant> restaurantList = restaurantService.getRestaurantsByProductName("Капучино");
 
             Courier courier = new Courier();
             courier.setCity(citiesServices.getByName("воронеж"));
@@ -372,8 +393,10 @@ public class DatabaseLoder {
 
             courierService.add(courier);
 
-//            CourierService.Storage.addCourier(courier);
-//            courierService.courierCompletedOrder(courier);
+            //CourierService.Storage.addCourier(courier, new Coordinates(39.216253, 51.684610));
+            //courierService.courierCompletedOrder(courier);
+//            boolean dd = CourierService.Storage.existActiveCourier(courier);
+//            CourierService.Storage.getActiveCourier(courier);
 
 
 

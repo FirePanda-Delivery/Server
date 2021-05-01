@@ -15,7 +15,7 @@ public class User {
 
     @Id
     @Column(name = "ID", unique = true, nullable = false)
-    @GeneratedValue(strategy = GenerationType.TABLE)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
     @ApiModelProperty
@@ -40,6 +40,11 @@ public class User {
     private String normalizedEmail;
 
     public void setEmail(String email) {
+
+        if (email == null || email.isEmpty()) {
+            return;
+        }
+
         this.email = email;
         this.normalizedEmail = email.toUpperCase(Locale.ROOT);
     }

@@ -1,9 +1,16 @@
 package ru.diplom.FirePandaDelivery.service;
 
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.context.request.WebRequest;
 import ru.diplom.FirePandaDelivery.dto.ActiveCourier;
 import ru.diplom.FirePandaDelivery.dto.Coordinates;
+import ru.diplom.FirePandaDelivery.exception.CourierIsAlreadyActiveException;
 import ru.diplom.FirePandaDelivery.model.Cities;
 import ru.diplom.FirePandaDelivery.model.Courier;
 import ru.diplom.FirePandaDelivery.repositories.CourierRepositories;
@@ -16,6 +23,7 @@ public class CourierService {
 
     private final CourierRepositories courierRepositories;
     private final CitiesServices citiesServices;
+    private final Log logger =  LogFactory.getLog(getClass());
 
     @Autowired
     public CourierService(CourierRepositories courierRepositories, CitiesServices citiesServices) {
@@ -57,7 +65,9 @@ public class CourierService {
     }
 
     public List<ActiveCourier> getActiveCourierByCity(String city) {
-        //return courierRepositories.findAllByActiveTrueAndCity_NormalizedCiti(city.toUpperCase(Locale.ROOT));
+        if (city == null || city.isEmpty()) {
+            throw new NullPointerException("city not set");
+        }
         return Storage.getNotOnOrderCouriers(citiesServices.getByName(city));
     }
 
@@ -68,10 +78,17 @@ public class CourierService {
 
     public List<Courier> getByCities(Cities cities) {
 
+        if (cities == null) {
+            throw new NullPointerException("city not set");
+        }
         return courierRepositories.findAllByCity(cities);
     }
 
     public List<Courier> getByCitiesName(String cities) {
+
+        if (cities == null || cities.isEmpty()) {
+            throw new NullPointerException("city not set");
+        }
 
         return courierRepositories.findAllByCity_NormalizedCiti(cities.toUpperCase(Locale.ROOT));
     }
@@ -129,37 +146,40 @@ public class CourierService {
 
         courierRepositories.save(courier);
 
-        finishCourierJob(courier);
+        if (Storage.existActiveCourier(courier)) {
+            finishCourierJob(courier);
+        }
     }
 
     public void finishCourierJob(Courier courier) {
 
-        ActiveCourier activeCourier = Storage.getActiveCourier(courier);
-
-        if (activeCourier == null) {
-            throw new NullPointerException();
+        if (courier == null) {
+            throw new NullPointerException("courier not set");
         }
 
+        ActiveCourier activeCourier = Storage.getActiveCourier(courier);
         Storage.removeCourier(activeCourier);
     }
 
     public ActiveCourier courierCompletedOrder(Courier courier) {
-        ActiveCourier activeCourier = Storage.getActiveCourier(courier);
 
-        if (activeCourier == null) {
-            throw new NullPointerException();
+        if (courier == null) {
+            throw new NullPointerException("courier not set");
         }
+
+        ActiveCourier activeCourier = Storage.getActiveCourier(courier);
 
         activeCourier.setOnOrder(false);
         return activeCourier;
     }
 
     public ActiveCourier courierReceivedOrder(Courier courier) {
-        ActiveCourier activeCourier = Storage.getActiveCourier(courier);
 
-        if (activeCourier == null) {
-            throw new NullPointerException();
+        if (courier == null) {
+            throw new NullPointerException("courier not set");
         }
+
+        ActiveCourier activeCourier = Storage.getActiveCourier(courier);
 
         activeCourier.setOnOrder(true);
         return activeCourier;
@@ -168,10 +188,24 @@ public class CourierService {
     public void setCourierLocation(Courier courier, Coordinates location) {
 
         if (courier == null || location == null) {
-            throw new NullPointerException();
+            throw new NullPointerException("courier or location not set");
         }
 
         Storage.getActiveCourier(courier).setLocation(location);
+    }
+
+    @ExceptionHandler({CourierIsAlreadyActiveException.class})
+    public ResponseEntity<Map<String, String>> handleCourierIsAlreadyActive(CourierIsAlreadyActiveException ex, WebRequest request) {
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+
+        Map<String, String> map = new LinkedHashMap<>();
+        logger.error(ex + ". " + request.toString() + ". " + Arrays.toString(ex.getStackTrace()));
+        map.put("Timestamp", new Date().toString());
+        map.put("Status",  String.valueOf(status.value()));
+        map.put("Error", status.getReasonPhrase());
+        map.put("Message", ex.getMessage());
+        map.put("Path", request.getContextPath());
+        return ResponseEntity.status(status).body(map);
     }
 
 
@@ -188,13 +222,26 @@ public class CourierService {
                 }
             }
 
-            return null;
+            throw new EntityNotFoundException("courier not found");
+        }
+
+        public static boolean existActiveCourier(Courier courier) {
+
+            List<ActiveCourier> activeCourierList = activeCouriers.get(courier.getCity());
+
+            if (activeCourierList == null || activeCourierList.isEmpty()) return false;
+
+            return activeCourierList.stream().anyMatch(activeCourier -> activeCourier.getCourier().equals(courier));
         }
 
         public static void addCourier(Courier courier, Coordinates location) {
 
             if (courier == null) {
                 throw new NullPointerException();
+            }
+
+            if (existActiveCourier(courier)) {
+                throw new CourierIsAlreadyActiveException("Courier " + courier.getId() + " is already active");
             }
 
             List<ActiveCourier> courierList = activeCouriers.get(courier.getCity());
@@ -218,9 +265,7 @@ public class CourierService {
 
             List<ActiveCourier> courierList = new LinkedList<>();
 
-            if (activeCouriers.get(cities) == null) {
-                throw new NullPointerException();
-            }
+            activeCouriers.computeIfAbsent(cities, k -> new LinkedList<>());
 
             for (ActiveCourier activeCourier : activeCouriers.get(cities)) {
                 if (!activeCourier.isOnOrder()) {

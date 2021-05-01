@@ -15,7 +15,7 @@ import java.util.Locale;
 public class Categories {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @ApiModelProperty
     private long id;
 
