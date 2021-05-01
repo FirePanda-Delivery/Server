@@ -44,6 +44,17 @@ public class RestaurantService {
         return optionalRestaurant.get();
     }
 
+
+    public Restaurant getRestaurantByName(String name) {
+        Optional<Restaurant> optionalRestaurant = restaurantRepositories.findByNormalizedNameAndPublishedTrue(name.toUpperCase(Locale.ROOT));
+
+        if (optionalRestaurant.isEmpty()) {
+            throw new EntityNotFoundException("restaurant not found");
+        }
+
+        return optionalRestaurant.get();
+    }
+
     public List<Restaurant> getRestaurantsByCategoryName(String name) {
 
         if (name == null || name.isEmpty()) {

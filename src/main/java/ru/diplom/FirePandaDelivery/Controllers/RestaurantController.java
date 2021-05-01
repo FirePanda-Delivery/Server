@@ -3,8 +3,6 @@ package ru.diplom.FirePandaDelivery.Controllers;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.json.JsonParseException;
-import org.springframework.http.HttpRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,7 +14,6 @@ import ru.diplom.FirePandaDelivery.service.OrderServices;
 import ru.diplom.FirePandaDelivery.service.RestaurantService;
 import ru.diplom.FirePandaDelivery.dto.responseModel.RestaurantResp;
 
-import javax.persistence.EntityNotFoundException;
 import java.util.*;
 
 @RestController
@@ -96,6 +93,31 @@ public class RestaurantController {
     @GetMapping("/product")
     public ResponseEntity<List<Product>> getProductList() {
         return ResponseEntity.ok(restaurantService.getProductList());
+    }
+
+    @GetMapping(value = "/search", params = {"value"})
+    public ResponseEntity<List<Restaurant>> search(String value) {
+
+        try {
+            Restaurant restaurant = restaurantService.getRestaurantByName(value);
+            return ResponseEntity.ok(Collections.singletonList(restaurant));
+        } catch (Exception ignored) {
+
+        }
+
+        List<Restaurant> list = restaurantService.getRestaurantsByCategoryName(value);
+
+        if (list != null && !list.isEmpty()) {
+            return ResponseEntity.ok(list);
+        }
+
+        list = restaurantService.getRestaurantsByProductName(value);
+
+        if (list != null && !list.isEmpty()) {
+            return ResponseEntity.ok(list);
+        }
+
+        return ResponseEntity.ok(new ArrayList<>());
     }
 
     @PostMapping()
