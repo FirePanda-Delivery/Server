@@ -1,6 +1,6 @@
 package ru.diplom.FirePandaDelivery.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.*;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
@@ -16,7 +16,7 @@ import java.util.Locale;
 public class Restaurant {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
     @Column(unique = true, nullable = false)
@@ -52,15 +52,11 @@ public class Restaurant {
     @ApiModelProperty
     private boolean ownDelivery;
 
+    // fetch = FetchType.EAGER коряво работает
     @ApiModelProperty
-    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    @JoinColumn(name = "restaurant_id", nullable = false)
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "restaurant_id")
     private List<Categories> categories;
-
-//    @JoinColumn
-//    @ManyToMany
-//    @ApiModelProperty
-//    private List<Cities> Cities;
 
     @JoinColumn(name = "restaurant_id")
     @OneToMany(cascade = CascadeType.ALL)
@@ -73,6 +69,10 @@ public class Restaurant {
 
     @Column
     private String img;
+
+    @Column
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    private boolean published = false;
 
     public void setName(String name) {
         this.name = name;

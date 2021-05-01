@@ -25,13 +25,13 @@ public class UserController {
 
     @GetMapping("/{id}")
     public ResponseEntity<User> getUser(@PathVariable long id) {
-
-        return ResponseEntity.ok(userService.get(id));
+        return ResponseEntity.ok(userService.getNotDeletedUser(id));
     }
+    
+
 
     @PostMapping
     public ResponseEntity<User> addUser(@RequestBody User user) {
-//        if (user == null) { throw new NullPointerException("User not set"); }
         user.setId(0);
         return ResponseEntity.ok(userService.add(user));
     }
@@ -45,26 +45,5 @@ public class UserController {
     public ResponseEntity<User> deleteUser(@PathVariable long id) {
         userService.delete(id);
         return ResponseEntity.ok().build();
-    }
-
-    ///////////////////////////////////////////////////////////////////////////////////
-    ///////////////////////////////////////////////////////////////////////////////////
-    /////////////////////// Exception /////////////////////////////////////////////////
-    ///////////////////////////////////////////////////////////////////////////////////
-    ///////////////////////////////////////////////////////////////////////////////////
-
-    @ExceptionHandler(value = {EntityNotFoundException.class})
-    public String notFoundError() {
-    return "User not found";
-    }
-
-    @ExceptionHandler(value = {NullPointerException.class})
-    public String nullError(Exception exception) {
-        return  exception.getMessage();
-    }
-
-    @ExceptionHandler(value = {PropertyValueException.class})
-    public String propertyNullError(Exception exception) {
-        return  "user not set";
     }
 }
