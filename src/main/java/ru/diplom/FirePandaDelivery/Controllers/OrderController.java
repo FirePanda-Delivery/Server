@@ -13,9 +13,7 @@ import ru.diplom.FirePandaDelivery.model.Order;
 import ru.diplom.FirePandaDelivery.model.OrderStatus;
 import ru.diplom.FirePandaDelivery.processing.AddressProcessing;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @RestController
 @RequestMapping("/order")
@@ -32,6 +30,13 @@ public class OrderController {
         this.validateAddress = validateAddress;
         this.restaurantService = restaurantService;
         this.courierService = courierService;
+    }
+
+    @GetMapping("/CostDelivery")
+    public ResponseEntity<Map<String, Double>> getCostDelivery() {
+        Map<String, Double> map = new LinkedHashMap<>();
+        map.put("cost", 200D);
+        return ResponseEntity.ok(map);
     }
 
     @GetMapping("/{id}")
