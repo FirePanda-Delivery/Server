@@ -3,6 +3,7 @@ package ru.diplom.FirePandaDelivery.model;
 import com.fasterxml.jackson.annotation.*;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import org.springframework.boot.autoconfigure.web.ServerProperties;
 
 import javax.persistence.*;
 import java.sql.Time;
@@ -68,7 +69,7 @@ public class Restaurant {
     private boolean isDeleted;
 
     @Column
-    private String img;
+    private String img = "\\defaultImage\\restaurantDefault.png";
 
     @Column
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
