@@ -33,9 +33,14 @@ public class DatabaseLoder {
     @Autowired
     CourierService courierService;
 
+    @Value("${image.upload.path}")
+    private String imagesDirectory;
+
     @Bean
     CommandLineRunner initDatabase(){
         return args -> {
+
+            System.out.println(imagesDirectory);
 
             User user = new User();
             user.setFirstName("Вадим");
