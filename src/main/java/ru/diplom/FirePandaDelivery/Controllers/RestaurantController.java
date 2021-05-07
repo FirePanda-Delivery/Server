@@ -45,6 +45,22 @@ public class RestaurantController {
         return ResponseEntity.ok(restaurantService.getRestaurantsByCityName(city));
     }
 
+    @GetMapping("/only/{id}")
+    public ResponseEntity<RestaurantResp> getOnlyRestaurant(@PathVariable long id) {
+
+        return ResponseEntity.ok(RestaurantResp.toRestaurantResponse(restaurantService.getRestaurant(id)));
+    }
+
+
+    @GetMapping("/{id}/categories")
+    public ResponseEntity<List<Categories>> getRestaurantCategories(@PathVariable long id) {
+
+        return ResponseEntity.ok(restaurantService.getRestaurant(id).getCategories());
+    }
+
+
+
+
     @GetMapping(value = "/only", params = {"city"})
     public ResponseEntity<List<RestaurantResp>> getOnlyRestaurantList(String city) {
 
