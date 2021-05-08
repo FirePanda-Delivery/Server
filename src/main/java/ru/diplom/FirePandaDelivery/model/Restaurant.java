@@ -69,7 +69,7 @@ public class Restaurant {
     private boolean isDeleted;
 
     @Column
-    private String img = "\\defaultImage\\restaurantDefault.png";
+    private String img = "/defaultImage/restaurantDefault.png";
 
     @Column
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
