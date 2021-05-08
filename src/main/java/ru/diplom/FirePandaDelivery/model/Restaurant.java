@@ -29,7 +29,7 @@ public class Restaurant {
     @ApiModelProperty
     private String normalizedName;
 
-    @Column
+    @Column(length = 1000)
     @ApiModelProperty
     private String description;
 
