@@ -26,7 +26,7 @@ public class Product {
     @ApiModelProperty
     private String normalizedName;
 
-    @Column
+    @Column(length = 1000)
     @ApiModelProperty
     private String description;
 
@@ -44,7 +44,7 @@ public class Product {
 
     @Column
     @ApiModelProperty
-    private String img;
+    private String img = "/defaultImage/productDefault.png";
 
     @Column
     @JsonIgnore
