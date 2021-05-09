@@ -217,7 +217,7 @@ public class DatabaseLoder {
                         Product product = new Product();
                         product.setName("Чизбургер");
                         product.setPrice(200.01);
-                        product.setWeight(5.234);
+                        product.setWeight(234);
                         products.add(product);
                     }
 
@@ -226,7 +226,7 @@ public class DatabaseLoder {
                         Product product = new Product();
                         product.setName("Чикенбургер");
                         product.setPrice(200.01);
-                        product.setWeight(5.234);
+                        product.setWeight(234);
                         products.add(product);
                     }
 
@@ -235,7 +235,7 @@ public class DatabaseLoder {
                         Product product = new Product();
                         product.setName("Биг Мак");
                         product.setPrice(200.01);
-                        product.setWeight(5.234);
+                        product.setWeight(234);
                         products.add(product);
                     }
 
@@ -244,7 +244,7 @@ public class DatabaseLoder {
                         Product product = new Product();
                         product.setName("Биг Тейсти");
                         product.setPrice(200.01);
-                        product.setWeight(5.234);
+                        product.setWeight(234);
                         products.add(product);
                     }
 
@@ -253,7 +253,7 @@ public class DatabaseLoder {
                         Product product = new Product();
                         product.setName("Филе-О-Фиш");
                         product.setPrice(200.01);
-                        product.setWeight(5.234);
+                        product.setWeight(234);
                         products.add(product);
                     }
 
@@ -274,7 +274,7 @@ public class DatabaseLoder {
                         Product product = new Product();
                         product.setName("Итальянская");
                         product.setPrice(200.01);
-                        product.setWeight(5.234);
+                        product.setWeight(234);
                         products.add(product);
                     }
 
@@ -283,7 +283,7 @@ public class DatabaseLoder {
                         Product product = new Product();
                         product.setName("Мексиканская");
                         product.setPrice(200.01);
-                        product.setWeight(5.234);
+                        product.setWeight(234);
                         products.add(product);
                     }
 
@@ -292,7 +292,7 @@ public class DatabaseLoder {
                         Product product = new Product();
                         product.setName("Палермо");
                         product.setPrice(200.01);
-                        product.setWeight(5.234);
+                        product.setWeight(234);
                         products.add(product);
                     }
 
@@ -301,7 +301,7 @@ public class DatabaseLoder {
                         Product product = new Product();
                         product.setName("пицка");
                         product.setPrice(200.01);
-                        product.setWeight(5.234);
+                        product.setWeight(234);
                         products.add(product);
                     }
 
@@ -310,7 +310,7 @@ public class DatabaseLoder {
                         Product product = new Product();
                         product.setName("Иркина пицца");
                         product.setPrice(200.01);
-                        product.setWeight(5.234);
+                        product.setWeight(234);
                         products.add(product);
                     }
 
@@ -331,7 +331,7 @@ public class DatabaseLoder {
                         Product product = new Product();
                         product.setName("Американо");
                         product.setPrice(200.01);
-                        product.setWeight(5.234);
+                        product.setWeight(234);
                         products.add(product);
                     }
 
@@ -340,7 +340,7 @@ public class DatabaseLoder {
                         Product product = new Product();
                         product.setName("Капучино");
                         product.setPrice(200.01);
-                        product.setWeight(5.234);
+                        product.setWeight(234);
                         products.add(product);
                     }
 
@@ -349,7 +349,7 @@ public class DatabaseLoder {
                         Product product = new Product();
                         product.setName("Латте");
                         product.setPrice(200.01);
-                        product.setWeight(5.234);
+                        product.setWeight(234);
                         products.add(product);
                     }
 

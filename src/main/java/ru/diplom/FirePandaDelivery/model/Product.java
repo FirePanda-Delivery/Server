@@ -36,7 +36,7 @@ public class Product {
 
     @Column(nullable = false)
     @ApiModelProperty
-    private double weight;
+    private int weight;
 
     @Column
     @ApiModelProperty

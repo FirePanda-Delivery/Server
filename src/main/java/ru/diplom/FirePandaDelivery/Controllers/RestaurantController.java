@@ -58,6 +58,13 @@ public class RestaurantController {
         return ResponseEntity.ok(restaurantService.getRestaurant(id).getCategories());
     }
 
+    @GetMapping("/exist/{id}")
+    public ResponseEntity<Object> existRestaurant(@PathVariable long id) {
+        Map<String, Boolean> map = new HashMap<>();
+        map.put("value", restaurantService.exist(id));
+        return ResponseEntity.ok(map);
+    }
+
 
 
 
