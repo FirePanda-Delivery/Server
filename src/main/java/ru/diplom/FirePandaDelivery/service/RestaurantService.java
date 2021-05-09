@@ -164,6 +164,10 @@ public class RestaurantService {
         return optionalProduct.get();
     }
 
+    public boolean exist(long id) {
+        return restaurantRepositories.existsByIdAndPublishedTrueAndIsDeletedFalse(id);
+    }
+
     public Restaurant add(Restaurant restaurant) {
 
 

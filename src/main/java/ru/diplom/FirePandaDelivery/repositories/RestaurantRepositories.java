@@ -18,6 +18,8 @@ public interface RestaurantRepositories extends JpaRepository<Restaurant, Long> 
     List<Restaurant> findByIsDeletedFalse();
     List<Restaurant> findByIsDeletedFalseAndPublishedTrue();
 
+    boolean existsByIdAndPublishedTrueAndIsDeletedFalse(long id);
+
 
 
     Optional<Restaurant> findAllByCategoriesContaining(Categories categories);
