@@ -118,23 +118,23 @@ public class RestaurantController {
         return ResponseEntity.ok(restaurantService.getProductList());
     }
 
-    @GetMapping(value = "/search", params = {"value"})
-    public ResponseEntity<List<Restaurant>> search(String value) {
+    @GetMapping(value = "/search", params = {"value", "city"})
+    public ResponseEntity<List<Restaurant>> search(String value, String city) {
 
         try {
-            Restaurant restaurant = restaurantService.getRestaurantByName(value);
+            Restaurant restaurant = restaurantService.getRestaurantByNameAndCity(value, city);
             return ResponseEntity.ok(Collections.singletonList(restaurant));
         } catch (Exception ignored) {
 
         }
 
-        List<Restaurant> list = restaurantService.getRestaurantsByCategoryName(value);
+        List<Restaurant> list = restaurantService.getRestaurantsByCategoryNameAndCity(value, city);
 
         if (list != null && !list.isEmpty()) {
             return ResponseEntity.ok(list);
         }
 
-        list = restaurantService.getRestaurantsByProductName(value);
+        list = restaurantService.getRestaurantsByProductNameAndCity(value, city);
 
         if (list != null && !list.isEmpty()) {
             return ResponseEntity.ok(list);
