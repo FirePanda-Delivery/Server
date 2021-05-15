@@ -8,10 +8,7 @@ import ru.diplom.FirePandaDelivery.model.Cities;
 import ru.diplom.FirePandaDelivery.model.Restaurant;
 import ru.diplom.FirePandaDelivery.model.RestaurantAddress;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 public interface RestaurantRepositories extends JpaRepository<Restaurant, Long> {
 
@@ -24,8 +21,10 @@ public interface RestaurantRepositories extends JpaRepository<Restaurant, Long> 
 
     Optional<Restaurant> findAllByCategoriesContaining(Categories categories);
     Optional<Restaurant> findAllByCategoriesContainingAndPublishedTrue(Categories categories);
+    Optional<Restaurant> findAllByCategoriesContainingAndPublishedTrueAndCitiesAddressIn(Categories categories, Iterable<RestaurantAddress> citiesAddress);
 
     Optional<Restaurant> findByNormalizedNameAndPublishedTrue(String normalizedName);
+    Optional<Restaurant> findByNormalizedNameAndPublishedTrueAndCitiesAddressIn(String normalizedName, Iterable<RestaurantAddress> citiesAddress);
 
     List<Restaurant> findAllByCitiesAddressIn(Iterable<RestaurantAddress> citiesAddress);
     List<Restaurant> findAllByCitiesAddressInAndPublishedTrue(Iterable<RestaurantAddress> citiesAddress);

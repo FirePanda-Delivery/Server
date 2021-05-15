@@ -55,6 +55,21 @@ public class RestaurantService {
         return optionalRestaurant.get();
     }
 
+    public Restaurant getRestaurantByNameAndCity(String name, String city) {
+
+        Optional<Restaurant> optionalRestaurant =
+                restaurantRepositories.findByNormalizedNameAndPublishedTrueAndCitiesAddressIn(
+                        name.toUpperCase(Locale.ROOT),
+                        addressRepositories.findAllByCity_NormalizedCiti(city.toUpperCase(Locale.ROOT))
+                );
+
+        if (optionalRestaurant.isEmpty()) {
+            throw new EntityNotFoundException("restaurant not found");
+        }
+
+        return optionalRestaurant.get();
+    }
+
     public List<Restaurant> getRestaurantsByCategoryName(String name) {
 
         if (name == null || name.isEmpty()) {
@@ -66,6 +81,31 @@ public class RestaurantService {
         for (Categories category : categoriesRepositories.findByNormalizedName(name.toUpperCase(Locale.ROOT))) {
 
             Optional<Restaurant> optionalRestaurant = restaurantRepositories.findAllByCategoriesContainingAndPublishedTrue(category);
+            if (optionalRestaurant.isEmpty()) {
+                continue;
+                //throw new EntityNotFoundException("Restaurant is not found");
+            }
+
+            restaurantList.add(optionalRestaurant.get());
+        }
+
+        return restaurantList;
+    }
+
+    public List<Restaurant> getRestaurantsByCategoryNameAndCity(String name, String city) {
+
+        if (name == null || name.isEmpty()) {
+            throw new NullPointerException("Category name not set");
+        }
+
+        List<Restaurant> restaurantList = new LinkedList<>();
+
+        for (Categories category : categoriesRepositories.findByNormalizedName(name.toUpperCase(Locale.ROOT))) {
+
+            Optional<Restaurant> optionalRestaurant = restaurantRepositories.findAllByCategoriesContainingAndPublishedTrueAndCitiesAddressIn(
+                    category,
+                    addressRepositories.findAllByCity_NormalizedCiti(city.toUpperCase(Locale.ROOT))
+            );
             if (optionalRestaurant.isEmpty()) {
                 continue;
                 //throw new EntityNotFoundException("Restaurant is not found");
@@ -92,6 +132,33 @@ public class RestaurantService {
             }
 
             Optional<Restaurant> optionalRestaurant = restaurantRepositories.findAllByCategoriesContainingAndPublishedTrue(optionalCategory.get());
+            if (optionalRestaurant.isEmpty()) {
+                continue;
+            }
+
+            restaurantList.add(optionalRestaurant.get());
+        }
+
+        return restaurantList;
+    }
+
+    public List<Restaurant> getRestaurantsByProductNameAndCity(String name, String city) {
+        if (name == null || name.isEmpty()) {
+            throw new NullPointerException("product name not set");
+        }
+
+        List<Restaurant> restaurantList = new LinkedList<>();
+
+        for (Product product : productRepositories.findByNormalizedNameAndIsDeletedFalse(name.toUpperCase(Locale.ROOT).trim())) {
+
+            Optional<Categories> optionalCategory = categoriesRepositories.findByProductsContaining(product);
+            if (optionalCategory.isEmpty()) {
+                continue;
+            }
+
+            Optional<Restaurant> optionalRestaurant = restaurantRepositories.findAllByCategoriesContainingAndPublishedTrueAndCitiesAddressIn(
+                    optionalCategory.get(),
+                    addressRepositories.findAllByCity_NormalizedCiti(city.toUpperCase(Locale.ROOT)));
             if (optionalRestaurant.isEmpty()) {
                 continue;
             }
