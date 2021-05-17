@@ -1,5 +1,6 @@
 package ru.diplom.FirePandaDelivery.service;
 
+import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.diplom.FirePandaDelivery.model.*;
@@ -98,21 +99,40 @@ public class RestaurantService {
             throw new NullPointerException("Category name not set");
         }
 
+        Cities cities = citiesServices.getByName(city);
+
         List<Restaurant> restaurantList = new LinkedList<>();
 
-        for (Categories category : categoriesRepositories.findByNormalizedName(name.toUpperCase(Locale.ROOT))) {
+        for (Categories categories : categoriesRepositories.findByNormalizedName(name.toUpperCase(Locale.ROOT))) {
+            Restaurant restaurant = categories.getRestaurant();
+            if (restaurant.isPublished() && !restaurant.isDeleted()) {
+                for (RestaurantAddress citiesAddress : restaurant.getCitiesAddress()) {
+                    if (citiesAddress.getCity().equals(cities)) {
+                       // Hibernate.initialize(list);
+                        restaurant.getDescription();
+                        restaurantList.add(restaurant);
 
-            Optional<Restaurant> optionalRestaurant = restaurantRepositories.findAllByCategoriesContainingAndPublishedTrueAndCitiesAddressIn(
-                    category,
-                    addressRepositories.findAllByCity_NormalizedCiti(city.toUpperCase(Locale.ROOT))
-            );
-            if (optionalRestaurant.isEmpty()) {
-                continue;
-                //throw new EntityNotFoundException("Restaurant is not found");
+                        break;
+                    }
+                }
             }
-
-            restaurantList.add(optionalRestaurant.get());
         }
+
+
+
+//        for (Categories category : categoriesRepositories.findByNormalizedName(name.toUpperCase(Locale.ROOT))) {
+//
+//            Optional<Restaurant> optionalRestaurant = restaurantRepositories.findAllByCategoriesContainingAndPublishedTrueAndCitiesAddressIn(
+//                    category,
+//                    addressRepositories.findAllByCity_NormalizedCiti(city.toUpperCase(Locale.ROOT))
+//            );
+//            if (optionalRestaurant.isEmpty()) {
+//                continue;
+//                //throw new EntityNotFoundException("Restaurant is not found");
+//            }
+//
+//            restaurantList.add(optionalRestaurant.get());
+//        }
 
         return restaurantList;
     }
@@ -147,24 +167,39 @@ public class RestaurantService {
             throw new NullPointerException("product name not set");
         }
 
+
+        Cities cities = citiesServices.getByName(city);
+
         List<Restaurant> restaurantList = new LinkedList<>();
 
         for (Product product : productRepositories.findByNormalizedNameAndIsDeletedFalse(name.toUpperCase(Locale.ROOT).trim())) {
-
-            Optional<Categories> optionalCategory = categoriesRepositories.findByProductsContaining(product);
-            if (optionalCategory.isEmpty()) {
-                continue;
+            Restaurant restaurant = product.getCategory().getRestaurant();
+            if (restaurant.isPublished() && !restaurant.isDeleted()) {
+                for (RestaurantAddress citiesAddress : restaurant.getCitiesAddress()) {
+                    if (citiesAddress.getCity().equals(cities)) {
+                        restaurantList.add(product.getCategory().getRestaurant());
+                        break;
+                    }
+                }
             }
-
-            Optional<Restaurant> optionalRestaurant = restaurantRepositories.findAllByCategoriesContainingAndPublishedTrueAndCitiesAddressIn(
-                    optionalCategory.get(),
-                    addressRepositories.findAllByCity_NormalizedCiti(city.toUpperCase(Locale.ROOT)));
-            if (optionalRestaurant.isEmpty()) {
-                continue;
-            }
-
-            restaurantList.add(optionalRestaurant.get());
         }
+
+//        for (Product product : productRepositories.findByNormalizedNameAndIsDeletedFalse(name.toUpperCase(Locale.ROOT).trim())) {
+//
+//            Optional<Categories> optionalCategory = categoriesRepositories.findByProductsContaining(product);
+//            if (optionalCategory.isEmpty()) {
+//                continue;
+//            }
+//
+//            Optional<Restaurant> optionalRestaurant = restaurantRepositories.findAllByCategoriesContainingAndPublishedTrueAndCitiesAddressIn(
+//                    optionalCategory.get(),
+//                    addressRepositories.findAllByCity_NormalizedCiti(city.toUpperCase(Locale.ROOT)));
+//            if (optionalRestaurant.isEmpty()) {
+//                continue;
+//            }
+//
+//            restaurantList.add(optionalRestaurant.get());
+//        }
 
         return restaurantList;
     }
