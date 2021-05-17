@@ -29,14 +29,15 @@ public class Categories {
     private String normalizedName;
 
     @ApiModelProperty
-    @JoinColumn(name = "cat_id")
-    @OneToMany(fetch = FetchType.EAGER, cascade = {
-            CascadeType.PERSIST,
-            CascadeType.MERGE,
-            CascadeType.REFRESH,
-            CascadeType.DETACH
-    })
+    @JoinColumn(name = "category_id")
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private List<Product> products;
+
+
+    @ManyToOne(targetEntity = Restaurant.class)
+    @JsonIgnore
+    @JoinColumn
+    private Restaurant restaurant;
 
     @Column
     @JsonIgnore

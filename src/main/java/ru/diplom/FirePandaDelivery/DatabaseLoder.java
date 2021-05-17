@@ -398,6 +398,8 @@ public class DatabaseLoder {
 
             courierService.add(courier);
 
+            Restaurant redasd = restaurantService.getCategories(1).getRestaurant();
+
             //CourierService.Storage.addCourier(courier, new Coordinates(39.216253, 51.684610));
             //courierService.courierCompletedOrder(courier);
 //            boolean dd = CourierService.Storage.existActiveCourier(courier);
