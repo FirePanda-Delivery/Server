@@ -26,6 +26,11 @@ public class Product {
     @ApiModelProperty
     private String normalizedName;
 
+    @ManyToOne(targetEntity = Categories.class)
+    @JsonIgnore
+    @JoinColumn(name = "category_id")
+    private Categories category;
+
     @Column(length = 1000)
     @ApiModelProperty
     private String description;
