@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 import ru.diplom.FirePandaDelivery.dto.Coordinates;
 import ru.diplom.FirePandaDelivery.service.CitiesServices;
@@ -32,6 +33,8 @@ public class DatabaseLoder {
     CitiesServices citiesServices;
     @Autowired
     CourierService courierService;
+    @Autowired
+    BCryptPasswordEncoder passwordEncoder;
 
     @Bean
     CommandLineRunner initDatabase(){
@@ -50,7 +53,10 @@ public class DatabaseLoder {
                 User users = new User();
                 users.setFirstName("name" + i);
                 users.setLastName("name" + i);
+                users.setUserName("name" + i);
+                users.setRole("ROLE_user");
                 users.setPhone("83247893245767" + i);
+                users.setPassword(passwordEncoder.encode("123qweasd123"));
 
                 if (i % 2 == 0) { users.setDeleted(true); }
 

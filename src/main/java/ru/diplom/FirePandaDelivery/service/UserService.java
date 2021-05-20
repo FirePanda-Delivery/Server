@@ -1,13 +1,13 @@
 package ru.diplom.FirePandaDelivery.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DeadlockLoserDataAccessException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import ru.diplom.FirePandaDelivery.dto.requestModel.UserReq;
 import ru.diplom.FirePandaDelivery.exception.EntityDeletedException;
 import ru.diplom.FirePandaDelivery.model.User;
 import ru.diplom.FirePandaDelivery.repositories.UserRepositories;
 
-import javax.persistence.EntityExistsException;
 import javax.persistence.EntityNotFoundException;
 import java.util.ArrayList;
 
@@ -20,8 +20,9 @@ public final class UserService {
 
     private final UserRepositories userRepositories;
 
+
     @Autowired
-    public UserService(UserRepositories userRepositories) {
+    public UserService(UserRepositories userRepositories, BCryptPasswordEncoder passwordEncoder) {
         this.userRepositories = userRepositories;
     }
 
@@ -69,6 +70,16 @@ public final class UserService {
         return user;
     }
 
+    public User getByUserName(String name) {
+       Optional<User> userOptional = userRepositories.findByUserName(name);
+
+       if (userOptional.isEmpty()) {
+           throw new EntityNotFoundException("user is not found");
+       }
+
+       return userOptional.get();
+    }
+
     public List<User> getDeletedList() {
 
         return userRepositories.findByIsDeletedTrue();
@@ -84,10 +95,17 @@ public final class UserService {
         return userRepositories.saveAll(users);
     }
 
+
     public User update(User user) {
         if (!userRepositories.existsById(user.getId())) {
             throw new EntityNotFoundException("user not found!");
         }
+
+        User oldUser = get(user.getId());
+        user.setPassword(oldUser.getPassword());
+        user.setUserName(oldUser.getUserName());
+        user.setRole(oldUser.getRole());
+
         return userRepositories.save(user);
     }
 
