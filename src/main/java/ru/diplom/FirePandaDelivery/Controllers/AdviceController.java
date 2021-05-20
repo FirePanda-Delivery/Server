@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.http.converter.HttpMessageNotWritableException;
+import org.springframework.security.access.AuthorizationServiceException;
 import org.springframework.validation.BindException;
 import org.springframework.web.HttpMediaTypeNotAcceptableException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
@@ -42,9 +43,10 @@ public class AdviceController extends ResponseEntityExceptionHandler {
         return createResponse(ex, new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR, request);
     }
 
-    @ExceptionHandler({AddressNotInDeliveryAreaException.class})
-    protected ResponseEntity<Object> handleAddressNotInDeliveryArea(AddressNotInDeliveryAreaException ex, WebRequest request) {
-        return createResponse(ex, new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
+
+    @ExceptionHandler({AuthorizationServiceException.class})
+    protected ResponseEntity<Object> handleAuthorizationService(AuthorizationServiceException ex, WebRequest request) {
+        return createResponse(ex, new HttpHeaders(), HttpStatus.FORBIDDEN, request);
     }
 
     @ExceptionHandler({ImageExtensionNotSupportedException.class})
