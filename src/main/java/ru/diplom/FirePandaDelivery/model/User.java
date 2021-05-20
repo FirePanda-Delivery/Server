@@ -18,6 +18,16 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
+    @JsonIgnore
+    private String userName;
+
+    @JsonIgnore
+    @Column
+    private String password;
+
+    @JsonIgnore
+    private String role;
+
     @ApiModelProperty
     @Column(name = "FIRST_NAME", nullable = false)
     private String firstName;
