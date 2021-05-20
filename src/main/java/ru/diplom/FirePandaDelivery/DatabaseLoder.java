@@ -36,9 +36,14 @@ public class DatabaseLoder {
     @Autowired
     BCryptPasswordEncoder passwordEncoder;
 
+    @Value("${image.upload.path}")
+    private String imagesDirectory;
+
     @Bean
     CommandLineRunner initDatabase(){
         return args -> {
+
+            System.out.println(imagesDirectory);
 
             User user = new User();
             user.setFirstName("Вадим");
