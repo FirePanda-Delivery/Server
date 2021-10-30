@@ -20,13 +20,13 @@ public interface RestaurantRepositories extends JpaRepository<Restaurant, Long> 
 
 
     Optional<Restaurant> findAllByCategoriesContaining(Categories categories);
-    Optional<Restaurant> findAllByCategoriesContainingAndPublishedTrue(Categories categories);
+    Optional<Restaurant> findAllByCategoriesContainingAndPublishedTrueAndIsDeletedFalse(Categories categories);
     Optional<Restaurant> findAllByCategoriesContainingAndPublishedTrueAndCitiesAddressIn(Categories categories, Iterable<RestaurantAddress> citiesAddress);
 
-    Optional<Restaurant> findByNormalizedNameAndPublishedTrue(String normalizedName);
-    Optional<Restaurant> findByNormalizedNameAndPublishedTrueAndCitiesAddressIn(String normalizedName, Iterable<RestaurantAddress> citiesAddress);
+    Optional<Restaurant> findByNormalizedNameAndPublishedTrueAndIsDeletedFalse(String normalizedName);
+    Optional<Restaurant> findByNormalizedNameAndPublishedTrueAndCitiesAddressInAndIsDeletedFalse(String normalizedName, Iterable<RestaurantAddress> citiesAddress);
 
     List<Restaurant> findAllByCitiesAddressIn(Iterable<RestaurantAddress> citiesAddress);
-    List<Restaurant> findAllByCitiesAddressInAndPublishedTrue(Iterable<RestaurantAddress> citiesAddress);
+    List<Restaurant> findAllByCitiesAddressInAndPublishedTrueAndIsDeletedFalse(Iterable<RestaurantAddress> citiesAddress);
 
 }

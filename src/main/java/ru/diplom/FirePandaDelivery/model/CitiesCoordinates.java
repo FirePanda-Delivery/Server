@@ -25,4 +25,6 @@ public class CitiesCoordinates {
 
     private double y;
 
+    private int index;
+
 }

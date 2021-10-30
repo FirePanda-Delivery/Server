@@ -54,6 +54,29 @@ public class AuthController {
         return ResponseEntity.ok(map);
     }
 
+    @PostMapping("/register/restaurantAdmin")
+    public ResponseEntity<Object> registerAdminRestaurant(@RequestBody RegistrationUser registrationUser) {
+
+        User user = new User();
+
+        user.setPassword(passwordEncoder.encode(registrationUser.getPassword()));
+        user.setPhone(registrationUser.getPhone());
+        user.setLastName(registrationUser.getLastName());
+        user.setFirstName(registrationUser.getFirstName());
+        user.setEmail(registrationUser.getEmail());
+        user.setUserName(registrationUser.getUserName());
+        user.setRole("ROLE_restaurant_admin");
+
+        user = userService.add(user);
+
+        String token = jwtProvider.generateToken(user.getUserName());
+        Map<String, String> map = new LinkedHashMap<>();
+        map.put("token", token);
+        map.put("id", user.getId()+"");
+
+        return ResponseEntity.ok(map);
+    }
+
     @PostMapping("/login/user")
     public ResponseEntity<Object> auth(@RequestBody UserLogin userLogin) {
 
