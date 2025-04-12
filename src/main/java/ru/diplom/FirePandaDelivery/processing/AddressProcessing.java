@@ -114,7 +114,6 @@ public class AddressProcessing {
                         Math.pow((cords.getY() - courierLocation.getY()), 2));
             }
 
-
             double distance = Math.sqrt(Math.pow((cords.getX() - courierLocation.getX()), 2) +
                     Math.pow((cords.getY() - courierLocation.getY()), 2));
 

@@ -39,8 +39,6 @@ public class UserController {
 
         return ResponseEntity.ok(userService.getNotDeletedUser(id));
     }
-    
-
 
 //    @PostMapping
 //    public ResponseEntity<User> addUser(@RequestBody User user) {
@@ -50,6 +48,10 @@ public class UserController {
 
     @PutMapping("/{id}")
     public ResponseEntity<User> updateUser(@RequestBody User user) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (user.getId() != ((CustomUserDetails) auth.getPrincipal()).getId()) {
+            throw new AuthorizationServiceException("access is denied");
+        }
         return ResponseEntity.ok(userService.update(user));
     }
 

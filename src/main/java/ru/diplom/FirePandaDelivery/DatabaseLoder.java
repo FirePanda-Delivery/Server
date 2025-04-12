@@ -70,9 +70,13 @@ public class DatabaseLoder {
             List<User> userList = userService.getDeletedList();
 
             Restaurant restaurant = new Restaurant();
-            restaurant.setName("mak");
-            restaurant.setWorkingHoursStart(new Time(5000));
-            restaurant.setWorkingHoursEnd(new Time(60000));
+            restaurant.setName("Макдоналдс");
+            restaurant.setWorkingHoursStart(new Time(10,0, 0));
+            restaurant.setWorkingHoursEnd(new Time(23,0, 0));
+            restaurant.setMinPrice(300);
+            restaurant.setPublished(true);
+            restaurant.setDescription("«Макдоналдс» - самая большая ресторанная компания в мире. В ее составе более 30 тыс. ресторанов, которые только за один день обслуживают 46 млн. человек в 110 странах. В ежегодных рейтингах самых дорогих брэндов, проводимых компанией Interbrand, «Макдоналдс» традиционно занимает место в первой десятке. Авторитетный международный журнал Global Finance Magazine назвал «Макдоналдс» «одной из лучших глобальных компаний».");
+            restaurant.setImg("/image/restaurant/Makdonalds1.png");
 
             List<CitiesCoordinates> coordinates = new LinkedList<>();
 
@@ -190,6 +194,144 @@ public class DatabaseLoder {
 
             cities1.setCiti("Курск");
             citiesServices.add(cities1);
+
+            RestaurantAddress restaurantAddress2 = new RestaurantAddress();
+            restaurantAddress2.setCity(cities);
+            restaurantAddress2.setAddress("ленина 0");
+            restaurant.setCitiesAddress(new LinkedList<>());
+            restaurant.getCitiesAddress().add(restaurantAddress2);
+
+            RestaurantAddress restaurantAddress3 = new RestaurantAddress();
+            restaurantAddress3.setCity(cities);
+            restaurantAddress3.setAddress("Ленина 40Б");
+            restaurant.setCitiesAddress(new LinkedList<>());
+            restaurant.getCitiesAddress().add(restaurantAddress3);
+
+            List<Categories> list1 = new LinkedList<>();
+
+            {
+                Categories categories = new Categories();
+                categories.setName("Десерты и выпечка");
+
+                {
+                    List<Product> products = new LinkedList<>();
+
+                    {
+                        Product product = new Product();
+                        product.setName("Макфлурри Спелое манго");
+                        product.setDescription("Натуральные кусочки и сочный топпинг из спелого манго, взбитые с мороженым из цельного молока");
+                        product.setPrice(109);
+                        product.setWeight(200);
+                        product.setImg("/image/product/Makflurri_Speloye_mango664.png");
+                        products.add(product);
+                    }
+
+                    {
+                        Product product = new Product();
+                        product.setName("Чизбургер");
+                        product.setPrice(200.01);
+                        product.setWeight(234);
+                        products.add(product);
+                    }
+
+                    {
+                        Product product = new Product();
+                        product.setName("Чизбургер");
+                        product.setPrice(200.01);
+                        product.setWeight(234);
+                        products.add(product);
+                    }
+
+
+                    {
+                        Product product = new Product();
+                        product.setName("Чикенбургер");
+                        product.setPrice(200.01);
+                        product.setWeight(234);
+                        products.add(product);
+                    }
+
+
+                    {
+                        Product product = new Product();
+                        product.setName("Биг Мак");
+                        product.setPrice(200.01);
+                        product.setWeight(234);
+                        products.add(product);
+                    }
+
+
+                    {
+                        Product product = new Product();
+                        product.setName("Биг Тейсти");
+                        product.setPrice(200.01);
+                        product.setWeight(234);
+                        products.add(product);
+                    }
+
+
+                    {
+                        Product product = new Product();
+                        product.setName("Филе-О-Фиш");
+                        product.setPrice(200.01);
+                        product.setWeight(234);
+                        products.add(product);
+                    }
+
+                    categories.setProducts(products);
+
+                }
+
+                list1.add(categories);
+            }
+
+            {
+                Categories categories = new Categories();
+                categories.setName("Бургеры");
+
+                {
+                    List<Product> products = new LinkedList<>();
+
+                    {
+                        Product product = new Product();
+                        product.setName("Чизбургер");
+                        product.setPrice(200.01);
+                        product.setWeight(234);
+                        products.add(product);
+                    }
+
+                    categories.setProducts(products);
+
+                }
+
+                list1.add(categories);
+            }
+
+            {
+                Categories categories = new Categories();
+                categories.setName("Картофель");
+
+                {
+                    List<Product> products = new LinkedList<>();
+
+                    {
+                        Product product = new Product();
+                        product.setName("Чизбургер");
+                        product.setPrice(200.01);
+                        product.setWeight(234);
+                        products.add(product);
+                    }
+
+                    categories.setProducts(products);
+
+                }
+
+                list1.add(categories);
+            }
+
+
+
+
 
             for (int i = 0; i <= 50; i++) {
 

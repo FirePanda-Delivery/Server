@@ -47,7 +47,7 @@ public class RestaurantService {
 
 
     public Restaurant getRestaurantByName(String name) {
-        Optional<Restaurant> optionalRestaurant = restaurantRepositories.findByNormalizedNameAndPublishedTrue(name.toUpperCase(Locale.ROOT));
+        Optional<Restaurant> optionalRestaurant = restaurantRepositories.findByNormalizedNameAndPublishedTrueAndIsDeletedFalse(name.toUpperCase(Locale.ROOT));
 
         if (optionalRestaurant.isEmpty()) {
             throw new EntityNotFoundException("restaurant not found");
@@ -59,7 +59,7 @@ public class RestaurantService {
     public Restaurant getRestaurantByNameAndCity(String name, String city) {
 
         Optional<Restaurant> optionalRestaurant =
-                restaurantRepositories.findByNormalizedNameAndPublishedTrueAndCitiesAddressIn(
+                restaurantRepositories.findByNormalizedNameAndPublishedTrueAndCitiesAddressInAndIsDeletedFalse(
                         name.toUpperCase(Locale.ROOT),
                         addressRepositories.findAllByCity_NormalizedCiti(city.toUpperCase(Locale.ROOT))
                 );
@@ -81,7 +81,7 @@ public class RestaurantService {
 
         for (Categories category : categoriesRepositories.findByNormalizedName(name.toUpperCase(Locale.ROOT))) {
 
-            Optional<Restaurant> optionalRestaurant = restaurantRepositories.findAllByCategoriesContainingAndPublishedTrue(category);
+            Optional<Restaurant> optionalRestaurant = restaurantRepositories.findAllByCategoriesContainingAndPublishedTrueAndIsDeletedFalse(category);
             if (optionalRestaurant.isEmpty()) {
                 continue;
                 //throw new EntityNotFoundException("Restaurant is not found");
@@ -151,7 +151,7 @@ public class RestaurantService {
                 continue;
             }
 
-            Optional<Restaurant> optionalRestaurant = restaurantRepositories.findAllByCategoriesContainingAndPublishedTrue(optionalCategory.get());
+            Optional<Restaurant> optionalRestaurant = restaurantRepositories.findAllByCategoriesContainingAndPublishedTrueAndIsDeletedFalse(optionalCategory.get());
             if (optionalRestaurant.isEmpty()) {
                 continue;
             }
@@ -210,7 +210,7 @@ public class RestaurantService {
             throw new NullPointerException("city not set");
         }
 
-        return restaurantRepositories.findAllByCitiesAddressInAndPublishedTrue(
+        return restaurantRepositories.findAllByCitiesAddressInAndPublishedTrueAndIsDeletedFalse(
                 addressRepositories.findAllByCity_NormalizedCiti(
                         name.toUpperCase(Locale.ROOT)
                 )

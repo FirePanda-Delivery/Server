@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.WebRequest;
 import ru.diplom.FirePandaDelivery.dto.requestModel.RestaurantReq;
+import ru.diplom.FirePandaDelivery.dto.requestModel.UpdateRestaurantReq;
 import ru.diplom.FirePandaDelivery.model.*;
 import ru.diplom.FirePandaDelivery.service.CitiesServices;
 import ru.diplom.FirePandaDelivery.service.OrderServices;
@@ -15,6 +16,7 @@ import ru.diplom.FirePandaDelivery.service.RestaurantService;
 import ru.diplom.FirePandaDelivery.dto.responseModel.RestaurantResp;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/restaurant")
@@ -55,7 +57,14 @@ public class RestaurantController {
     @GetMapping("/{id}/categories")
     public ResponseEntity<List<Categories>> getRestaurantCategories(@PathVariable long id) {
 
-        return ResponseEntity.ok(restaurantService.getRestaurant(id).getCategories());
+        return ResponseEntity.ok(restaurantService.getRestaurant(id).getCategories().stream().filter(item -> {
+            if (!item.isDeleted()){
+                item.setProducts(item.getProducts().stream().filter(product -> !product.isDeleted())
+                       .collect(Collectors.toList()));
+                return true;
+            }
+            return false;
+        }).collect(Collectors.toList()));
     }
 
     @GetMapping("/exist/{id}")
@@ -204,7 +213,14 @@ public class RestaurantController {
     }
 
     @PutMapping()
-    public ResponseEntity<Restaurant> updateRestaurant(@RequestBody Restaurant restaurant) {
+    public ResponseEntity<Restaurant> updateRestaurant(@RequestBody UpdateRestaurantReq restaurantReq) {
+        Restaurant restaurant = restaurantService.getRestaurant(restaurantReq.getId());
+        restaurant.setName(restaurantReq.getName());
+        restaurant.setWorkingHoursStart(restaurantReq.getWorkingHoursStart());
+        restaurant.setWorkingHoursEnd(restaurantReq.getWorkingHoursEnd());
+        restaurant.setOwnDelivery(restaurantReq.isOwnDelivery());
+        restaurant.setMinPrice(restaurantReq.getMinPrice());
+        restaurant.setDescription(restaurantReq.getDescription());
         return ResponseEntity.ok(restaurantService.updateRestaurant(restaurant));
     }
 
