@@ -1,4 +1,4 @@
-package ru.diplom.fpd.Controllers;
+package ru.diplom.fpd.controllers;
 
 import com.ibm.icu.text.Transliterator;
 import org.apache.tomcat.util.http.fileupload.FileUploadException;

@@ -1,4 +1,4 @@
-package ru.diplom.fpd.Controllers;
+package ru.diplom.fpd.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

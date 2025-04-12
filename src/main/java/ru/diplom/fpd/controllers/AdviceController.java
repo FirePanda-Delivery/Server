@@ -1,4 +1,4 @@
-package ru.diplom.fpd.Controllers;
+package ru.diplom.fpd.controllers;
 
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.dao.DataIntegrityViolationException;

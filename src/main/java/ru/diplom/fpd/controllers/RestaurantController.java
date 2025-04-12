@@ -1,4 +1,4 @@
-package ru.diplom.fpd.Controllers;
+package ru.diplom.fpd.controllers;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;

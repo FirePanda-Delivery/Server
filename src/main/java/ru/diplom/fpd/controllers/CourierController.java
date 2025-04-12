@@ -1,4 +1,4 @@
-package ru.diplom.fpd.Controllers;
+package ru.diplom.fpd.controllers;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
