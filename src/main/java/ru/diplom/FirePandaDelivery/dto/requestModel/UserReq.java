@@ -1,10 +1,7 @@
 package ru.diplom.FirePandaDelivery.dto.requestModel;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
 
-import javax.persistence.Column;
+import lombok.Data;
 
 @Data
 public class UserReq {

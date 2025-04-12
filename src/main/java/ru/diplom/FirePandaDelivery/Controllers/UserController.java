@@ -1,6 +1,5 @@
 package ru.diplom.FirePandaDelivery.Controllers;
 
-import io.swagger.annotations.Api;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AuthorizationServiceException;
@@ -16,7 +15,6 @@ import ru.diplom.FirePandaDelivery.model.User;
 
 @RestController
 @RequestMapping("/user")
-@Api(value = "Работа с пользователем", tags = {"Пользователи"})
 public class UserController {
 
     private final UserService userService;

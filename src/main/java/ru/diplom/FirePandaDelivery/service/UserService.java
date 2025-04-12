@@ -8,7 +8,7 @@ import ru.diplom.FirePandaDelivery.exception.EntityDeletedException;
 import ru.diplom.FirePandaDelivery.model.User;
 import ru.diplom.FirePandaDelivery.repositories.UserRepositories;
 
-import javax.persistence.EntityNotFoundException;
+import jakarta.persistence.EntityNotFoundException;
 import java.util.ArrayList;
 
 import java.util.List;

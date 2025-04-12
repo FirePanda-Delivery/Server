@@ -1,10 +1,9 @@
 package ru.diplom.FirePandaDelivery.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.util.Locale;
 
 @Entity
@@ -13,17 +12,14 @@ import java.util.Locale;
 public class Product {
 
     @Id
-    @ApiModelProperty
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
     @Column(nullable = false)
-    @ApiModelProperty
     private String name;
 
     @Column(nullable = false)
     @JsonIgnore
-    @ApiModelProperty
     private String normalizedName;
 
     @ManyToOne(targetEntity = Categories.class)
@@ -32,23 +28,18 @@ public class Product {
     private Categories category;
 
     @Column(length = 1000)
-    @ApiModelProperty
     private String description;
 
     @Column(nullable = false)
-    @ApiModelProperty
     private double price;
 
     @Column(nullable = false)
-    @ApiModelProperty
     private int weight;
 
     @Column
-    @ApiModelProperty
     private float popularity;
 
     @Column
-    @ApiModelProperty
     private String img = "/defaultImage/productDefault.png";
 
     @Column

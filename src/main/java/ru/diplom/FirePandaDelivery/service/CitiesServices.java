@@ -7,7 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.diplom.FirePandaDelivery.model.Cities;
 import ru.diplom.FirePandaDelivery.repositories.CitiesRepositories;
 
-import javax.persistence.EntityNotFoundException;
+import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;

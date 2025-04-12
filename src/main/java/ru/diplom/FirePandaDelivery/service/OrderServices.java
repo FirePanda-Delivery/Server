@@ -8,7 +8,7 @@ import ru.diplom.FirePandaDelivery.processing.AddressProcessing;
 import ru.diplom.FirePandaDelivery.repositories.OrderRepositories;
 import ru.diplom.FirePandaDelivery.thread.SearchCourierThread;
 
-import javax.persistence.EntityNotFoundException;
+import jakarta.persistence.EntityNotFoundException;
 import java.sql.Time;
 import java.util.*;
 

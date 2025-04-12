@@ -1,11 +1,18 @@
 package ru.diplom.FirePandaDelivery.model;
 
 import com.fasterxml.jackson.annotation.*;
-import io.swagger.annotations.ApiModelProperty;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 import lombok.Data;
 import org.springframework.boot.autoconfigure.web.ServerProperties;
 
-import javax.persistence.*;
 import java.sql.Time;
 import java.util.LinkedList;
 import java.util.List;
@@ -21,47 +28,38 @@ public class Restaurant {
     private long id;
 
     @Column(unique = true, nullable = false)
-    @ApiModelProperty
     private String name;
 
     @Column(unique = true, nullable = false)
     @JsonIgnore
-    @ApiModelProperty
     private String normalizedName;
 
     @Column(length = 1000)
-    @ApiModelProperty
     private String description;
 
     @Column(nullable = false)
-    @ApiModelProperty
     private Time workingHoursStart;
 
     @Column(nullable = false)
-    @ApiModelProperty
     private Time workingHoursEnd;
 
     @Column
-    @ApiModelProperty
     private double minPrice;
 
     @Column
-    @ApiModelProperty
+    
     private float rating;
 
     @Column
-    @ApiModelProperty
     private boolean ownDelivery;
 
     // fetch = FetchType.EAGER коряво работает
-    @ApiModelProperty
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "restaurant_id")
     private List<Categories> categories;
 
     @JoinColumn(name = "restaurant_id")
     @OneToMany(cascade = CascadeType.ALL)
-    @ApiModelProperty
     private List<RestaurantAddress> citiesAddress;
 
     @Column

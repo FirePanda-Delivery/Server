@@ -2,10 +2,9 @@ package ru.diplom.FirePandaDelivery.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonValue;
-import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.util.List;
 import java.util.Locale;
 
@@ -20,11 +19,9 @@ public class Cities {
 
     @JsonValue
     @Column
-    @ApiModelProperty
     private String citi;
 
     @Column
-    @ApiModelProperty
     @JsonIgnore
     private String normalizedCiti;
 
@@ -38,7 +35,6 @@ public class Cities {
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @Column(nullable = false, unique = true)
     @JoinColumn(name = "cityId")
-    @ApiModelProperty
     private List<CitiesCoordinates> Cords;
 
     @Override

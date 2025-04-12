@@ -2,7 +2,6 @@ package ru.diplom.FirePandaDelivery.dto.requestModel;
 
 import lombok.Data;
 
-import javax.persistence.*;
 import java.sql.Time;
 import java.util.List;
 import java.util.Map;

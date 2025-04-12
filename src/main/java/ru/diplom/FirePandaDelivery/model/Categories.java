@@ -1,11 +1,9 @@
 package ru.diplom.FirePandaDelivery.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.util.List;
 import java.util.Locale;
 
@@ -16,19 +14,15 @@ public class Categories {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @ApiModelProperty
     private long id;
 
     @Column(nullable = false)
-    @ApiModelProperty
     private String name;
 
     @JsonIgnore
     @Column(nullable = false)
-    @ApiModelProperty
     private String normalizedName;
 
-    @ApiModelProperty
     @JoinColumn(name = "category_id")
     @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private List<Product> products;

@@ -9,7 +9,7 @@ import ru.diplom.FirePandaDelivery.repositories.ProductRepositories;
 import ru.diplom.FirePandaDelivery.repositories.RestaurantAddressRepositories;
 import ru.diplom.FirePandaDelivery.repositories.RestaurantRepositories;
 
-import javax.persistence.EntityNotFoundException;
+import jakarta.persistence.EntityNotFoundException;
 import java.util.*;
 
 @Service

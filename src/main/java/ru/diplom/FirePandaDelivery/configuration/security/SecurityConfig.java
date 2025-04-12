@@ -3,42 +3,46 @@ package ru.diplom.FirePandaDelivery.configuration.security;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import ru.diplom.FirePandaDelivery.configuration.security.jwt.JwtFilter;
 
 @Configuration
-@EnableWebSecurity
-public class SecurityConfig extends WebSecurityConfigurerAdapter {
+//@EnableWebSecurity
+public class SecurityConfig {
 
+    @Lazy
     private final JwtFilter jwtFilter;
 
     @Autowired
-    public SecurityConfig(JwtFilter jwtFilter) {
+    public SecurityConfig(@Lazy JwtFilter jwtFilter) {
         this.jwtFilter = jwtFilter;
     }
 
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
-        http
+    @Bean
+    protected SecurityFilterChain configure(HttpSecurity http) throws Exception {
+        return http
                 .httpBasic().disable()
                 .csrf().disable()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeRequests()
-                .antMatchers("/user/*").hasRole("user")
-                .antMatchers("/register", "/auth").permitAll()
-                .mvcMatchers(HttpMethod.POST, "/restaurant").hasRole("restaurant_admin")
-                .mvcMatchers(HttpMethod.PUT, "/restaurant").hasRole("restaurant_admin")
-                .mvcMatchers(HttpMethod.DELETE, "/restaurant").hasRole("restaurant_admin")
+                .requestMatchers("/user/*").hasRole("user")
+                .requestMatchers("/register/user", "/login/user").permitAll()
+                .requestMatchers(HttpMethod.POST, "/restaurant").hasRole("restaurant_admin")
+                .requestMatchers(HttpMethod.PUT, "/restaurant").hasRole("restaurant_admin")
+                .requestMatchers(HttpMethod.DELETE, "/restaurant").hasRole("restaurant_admin")
+                .anyRequest().permitAll()
                 .and()
-                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
+                .build();
     }
 
     @Bean

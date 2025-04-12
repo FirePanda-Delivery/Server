@@ -15,7 +15,7 @@ import ru.diplom.FirePandaDelivery.model.Cities;
 import ru.diplom.FirePandaDelivery.model.Courier;
 import ru.diplom.FirePandaDelivery.repositories.CourierRepositories;
 
-import javax.persistence.EntityNotFoundException;
+import jakarta.persistence.EntityNotFoundException;
 import java.util.*;
 
 @Service

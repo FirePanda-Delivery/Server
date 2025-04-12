@@ -1,6 +1,6 @@
 package ru.diplom.FirePandaDelivery.Controllers;
 
-import io.swagger.annotations.Api;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.ConversionNotSupportedException;
 import org.springframework.beans.TypeMismatchException;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -27,7 +27,6 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 import ru.diplom.FirePandaDelivery.exception.AddressNotInDeliveryAreaException;
 import ru.diplom.FirePandaDelivery.exception.ImageExtensionNotSupportedException;
 
-import javax.persistence.EntityNotFoundException;
 import java.io.FileNotFoundException;
 import java.util.Arrays;
 import java.util.Date;
@@ -35,7 +34,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 @RestControllerAdvice
-@Api(value = "Обработка ошибок", tags = {"Ошибки"})
+//@Api(value = "Обработка ошибок", tags = {"Ошибки"})
 public class AdviceController extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler({NullPointerException.class})
@@ -76,85 +75,85 @@ public class AdviceController extends ResponseEntityExceptionHandler {
 
 
 
-    @Override
-    protected ResponseEntity<Object> handleHttpRequestMethodNotSupported(
-            HttpRequestMethodNotSupportedException ex,
-            HttpHeaders headers,
-            HttpStatus status,
-            WebRequest request
-    ) {
-        return createResponse(ex, headers, status, request);
-    }
-
-    @Override
-    protected ResponseEntity<Object> handleHttpMediaTypeNotAcceptable(HttpMediaTypeNotAcceptableException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
-        return createResponse(ex, headers, status, request);
-    }
-
-    @Override
-    protected ResponseEntity<Object> handleMissingPathVariable(MissingPathVariableException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
-        return createResponse(ex, headers, status, request);
-    }
-
-    @Override
-    protected ResponseEntity<Object> handleMissingServletRequestParameter(MissingServletRequestParameterException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
-        return createResponse(ex, headers, status, request);
-    }
-
-    @Override
-    protected ResponseEntity<Object> handleServletRequestBindingException(ServletRequestBindingException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
-        return createResponse(ex, headers, status, request);
-    }
-
-    @Override
-    protected ResponseEntity<Object> handleConversionNotSupported(ConversionNotSupportedException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
-        return createResponse(ex, headers, status, request);
-    }
-
-    @Override
-    protected ResponseEntity<Object> handleTypeMismatch(TypeMismatchException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
-        return createResponse(ex, headers, status, request);
-    }
-
-    @Override
-    protected ResponseEntity<Object> handleHttpMessageNotReadable(HttpMessageNotReadableException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
-        return createResponse(ex, headers, status, request);
-    }
-
-    @Override
-    protected ResponseEntity<Object> handleHttpMessageNotWritable(HttpMessageNotWritableException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
-        return createResponse(ex, headers, status, request);
-    }
-
-    @Override
-    protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
-        return createResponse(ex, headers, status, request);
-    }
-
-    @Override
-    protected ResponseEntity<Object> handleMissingServletRequestPart(MissingServletRequestPartException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
-        return createResponse(ex, headers, status, request);
-    }
-
-    @Override
-    protected ResponseEntity<Object> handleBindException(BindException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
-        return createResponse(ex, headers, status, request);
-    }
-
-    @Override
-    protected ResponseEntity<Object> handleNoHandlerFoundException(NoHandlerFoundException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
-        return createResponse(ex, headers, status, request);
-    }
-
-    @Override
-    protected ResponseEntity<Object> handleAsyncRequestTimeoutException(AsyncRequestTimeoutException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
-        return createResponse(ex, headers, status, request);
-    }
-
-    @Override
-    protected ResponseEntity<Object> handleExceptionInternal(Exception ex, Object body, HttpHeaders headers, HttpStatus status, WebRequest request) {
-        return createResponse(ex, headers, status, request);
-    }
+//    @Override
+//    protected ResponseEntity<Object> handleHttpRequestMethodNotSupported(
+//            HttpRequestMethodNotSupportedException ex,
+//            HttpHeaders headers,
+//            HttpStatus status,
+//            WebRequest request
+//    ) {
+//        return createResponse(ex, headers, status, request);
+//    }
+//
+//    @Override
+//    protected ResponseEntity<Object> handleHttpMediaTypeNotAcceptable(HttpMediaTypeNotAcceptableException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
+//        return createResponse(ex, headers, status, request);
+//    }
+//
+//    @Override
+//    protected ResponseEntity<Object> handleMissingPathVariable(MissingPathVariableException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
+//        return createResponse(ex, headers, status, request);
+//    }
+//
+//    @Override
+//    protected ResponseEntity<Object> handleMissingServletRequestParameter(MissingServletRequestParameterException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
+//        return createResponse(ex, headers, status, request);
+//    }
+//
+//    @Override
+//    protected ResponseEntity<Object> handleServletRequestBindingException(ServletRequestBindingException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
+//        return createResponse(ex, headers, status, request);
+//    }
+//
+//    @Override
+//    protected ResponseEntity<Object> handleConversionNotSupported(ConversionNotSupportedException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
+//        return createResponse(ex, headers, status, request);
+//    }
+//
+//    @Override
+//    protected ResponseEntity<Object> handleTypeMismatch(TypeMismatchException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
+//        return createResponse(ex, headers, status, request);
+//    }
+//
+//    @Override
+//    protected ResponseEntity<Object> handleHttpMessageNotReadable(HttpMessageNotReadableException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
+//        return createResponse(ex, headers, status, request);
+//    }
+//
+//    @Override
+//    protected ResponseEntity<Object> handleHttpMessageNotWritable(HttpMessageNotWritableException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
+//        return createResponse(ex, headers, status, request);
+//    }
+//
+//    @Override
+//    protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
+//        return createResponse(ex, headers, status, request);
+//    }
+//
+//    @Override
+//    protected ResponseEntity<Object> handleMissingServletRequestPart(MissingServletRequestPartException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
+//        return createResponse(ex, headers, status, request);
+//    }
+//
+//    @Override
+//    protected ResponseEntity<Object> handleBindException(BindException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
+//        return createResponse(ex, headers, status, request);
+//    }
+//
+//    @Override
+//    protected ResponseEntity<Object> handleNoHandlerFoundException(NoHandlerFoundException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
+//        return createResponse(ex, headers, status, request);
+//    }
+//
+//    @Override
+//    protected ResponseEntity<Object> handleAsyncRequestTimeoutException(AsyncRequestTimeoutException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
+//        return createResponse(ex, headers, status, request);
+//    }
+//
+//    @Override
+//    protected ResponseEntity<Object> handleExceptionInternal(Exception ex, Object body, HttpHeaders headers, HttpStatus status, WebRequest request) {
+//        return createResponse(ex, headers, status, request);
+//    }
 
     private ResponseEntity<Object> createResponse(Exception ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
         Map<String, String> map = new LinkedHashMap<>();

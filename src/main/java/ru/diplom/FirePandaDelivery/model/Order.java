@@ -2,12 +2,11 @@ package ru.diplom.FirePandaDelivery.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import io.swagger.annotations.ApiModelProperty;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.sql.Time;
 import java.util.Date;
 import java.util.Set;
@@ -26,8 +25,6 @@ public class Order {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-
-    @ApiModelProperty
     @JoinColumn(nullable = false)
     @JsonIgnoreProperties({
             "description", "workingHoursStart", "workingHoursEnd",
@@ -37,54 +34,43 @@ public class Order {
     @ManyToOne
     private Restaurant restaurant;
 
-    @ApiModelProperty
     @JoinColumn(nullable = false)
     @ManyToOne
     private User user;
 
     @Column(nullable = false)
-    @ApiModelProperty()
     private Double totalPrice;
 
-    @ApiModelProperty
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "order_id", nullable = false)
     private Set<OrderProduct> productList;
 
     @Column(nullable = false)
-    @ApiModelProperty
     private Date date;
 
     @Column(nullable = false)
-    @ApiModelProperty
     private OrderStatus orderStatus;
 
     @JoinColumn(nullable = true)
-    @ApiModelProperty
     @ManyToOne
     private Courier courier;
 
     @Column(nullable = false)
-    @ApiModelProperty
     private Time timeStart;
 
     @Column
-    @ApiModelProperty
     private Time timeEnd;
 
 
     @Column(nullable = false)
-    @ApiModelProperty
     private String address;
 
     @ManyToOne
     @JoinColumn(nullable = false)
-    @ApiModelProperty
     private Cities cities;
 
 
     @Column(nullable = false)
-    @ApiModelProperty
     private String restaurantAddress;
 
     public Order setRestaurant(Restaurant restaurant) {
