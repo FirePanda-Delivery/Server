@@ -1,32 +1,39 @@
 package ru.diplom.fpd.processing;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
-import org.springframework.web.reactive.function.client.WebClient;
-import ru.diplom.fpd.dto.ActiveCourier;
-import ru.diplom.fpd.service.CitiesServices;
-import ru.diplom.fpd.dto.Coordinates;
-import ru.diplom.fpd.model.*;
-
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Optional;
+import java.util.function.Predicate;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.RequestEntity;
+import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestTemplate;
+import ru.diplom.fpd.dto.ActiveCourier;
+import ru.diplom.fpd.dto.Coordinates;
+import ru.diplom.fpd.dto.yandex.GeoObject;
+import ru.diplom.fpd.model.Cities;
+import ru.diplom.fpd.model.CitiesCoordinates;
+import ru.diplom.fpd.model.Courier;
+import ru.diplom.fpd.model.Restaurant;
+import ru.diplom.fpd.model.RestaurantAddress;
+import ru.diplom.fpd.service.CitiesServices;
 
 @Component
+@RequiredArgsConstructor()
 public class AddressProcessing {
 
-    final CitiesServices citiesServices;
+    private final CitiesServices citiesServices;
 
-    WebClient webClient = WebClient.create("https://geocode-maps.yandex.ru/1.x");
+    @Qualifier("yandexMapsRestTemplate")
+    private final RestTemplate restTemplate;
 
     @Value("${yandex.api.key}")
     String apiKey;
-
-    @Autowired
-    public AddressProcessing(CitiesServices citiesServices) {
-        this.citiesServices = citiesServices;
-    }
 
     public boolean isValid(String address, String city) {
 
@@ -34,19 +41,18 @@ public class AddressProcessing {
     }
 
 
-
     public boolean isValid(String address, Cities city) {
 
         Coordinates cords = getCords(address);
         List<Coordinates> list = new LinkedList<>();
 
-        for (CitiesCoordinates cord : city.getCords()) {
+        for (CitiesCoordinates cord : city.getCoordinates()) {
             list.add(new Coordinates(cord.getX(), cord.getY()));
         }
         return horizontalTracing(list, cords);
     }
 
-    public String restaurantNearestToAddress(Restaurant restaurant, String city, String address) {
+    public RestaurantAddress restaurantNearestToAddress(Restaurant restaurant, String city, String address) {
 
         if (restaurant == null) {
             throw new NullPointerException();
@@ -65,13 +71,13 @@ public class AddressProcessing {
         List<RestaurantAddress> restaurantAddress = new LinkedList<>();
 
         for (RestaurantAddress citiesAddress : restaurant.getCitiesAddress()) {
-            if (citiesAddress.getCity().getNormalizedCiti().equals(city.toUpperCase(Locale.ROOT))) {
+            if (citiesAddress.getCity().getCity().toUpperCase().equals(city.toUpperCase(Locale.ROOT))) {
                 restaurantAddress.add(citiesAddress);
             }
         }
 
-        if (restaurantAddress.size()<= 1) {
-            return restaurantAddress.get(0).getAddress();
+        if (restaurantAddress.size() <= 1) {
+            return restaurantAddress.get(0);
         }
 
         for (int index = 0; index < restaurantAddress.size(); index++) {
@@ -94,12 +100,12 @@ public class AddressProcessing {
             }
 
         }
-        return restaurantAddress.get(restaurantAddressIndexWithMinimumDistanceToAddress).getAddress();
+        return restaurantAddress.get(restaurantAddressIndexWithMinimumDistanceToAddress);
     }
 
     public Courier courierNearestToAddress(List<ActiveCourier> couriers, String address) {
 
-       Coordinates cords = getCords(address);
+        Coordinates cords = getCords(address);
 
         int courierIndexWithMinimumDistanceToAddress = 0;
 
@@ -129,8 +135,6 @@ public class AddressProcessing {
     }
 
 
-
-
     private boolean horizontalTracing(List<Coordinates> cords, Coordinates objectCords) {
 
         int numberIntersections = 0;
@@ -139,7 +143,7 @@ public class AddressProcessing {
         double x = objectCords.getX();
         double y = objectCords.getY();
 
-        for (int i = 0, j = 1; i < size; i++, j = i == size - 1 ? 0 : j+1) {
+        for (int i = 0, j = 1; i < size; i++, j = i == size - 1 ? 0 : j + 1) {
 
             double x1 = cords.get(i).getX(); // координаты х начала отрезка
             double y1 = cords.get(i).getY(); // координата y начала отрезка
@@ -148,7 +152,7 @@ public class AddressProcessing {
             double y2 = cords.get(j).getY(); // координата y конца отрезка
 
 
-            if ((x-x1) * (y2-y1) - (y-y1) * (x2-x1) == 0){
+            if ((x - x1) * (y2 - y1) - (y - y1) * (x2 - x1) == 0) {
                 if (((x1 < x2) && (x1 <= x) && (x <= x2))
                         || ((x1 > x2) && (x2 <= x) && (x <= x1))
                         || ((x1 == x2) && (y1 < y2) && (y1 < y) && (y < y2))
@@ -158,8 +162,8 @@ public class AddressProcessing {
                 }
             }
 
-            if ((y-y1) * (y-y2) < 0) {
-                if (x<((y-y1)*(x2-x1)/(y2-y1)+x1)) {
+            if ((y - y1) * (y - y2) < 0) {
+                if (x < ((y - y1) * (x2 - x1) / (y2 - y1) + x1)) {
                     numberIntersections++;
                 }
 
@@ -168,13 +172,19 @@ public class AddressProcessing {
                 Coordinates lastStartCords; // вершина начала предыдущего отрезка
                 Coordinates nextEndCords; // вершина конца следуюшего отрезка
 
-                if (i == 0) { lastStartCords = cords.get(size-1); }
-                else { lastStartCords = cords.get(i - 1); }
+                if (i == 0) {
+                    lastStartCords = cords.get(size - 1);
+                } else {
+                    lastStartCords = cords.get(i - 1);
+                }
 
-                if(i==size-2) { nextEndCords = cords.get(1); }
-                else { nextEndCords = cords.get(j + 1); }
+                if (i == size - 2) {
+                    nextEndCords = cords.get(1);
+                } else {
+                    nextEndCords = cords.get(j + 1);
+                }
 
-                if((y - lastStartCords.getY()) * (y - nextEndCords.getY()) < 0) {
+                if ((y - lastStartCords.getY()) * (y - nextEndCords.getY()) < 0) {
                     numberIntersections++;
                 } else {
                     numberIntersections += 2;
@@ -184,11 +194,14 @@ public class AddressProcessing {
 
                 Coordinates lastCords; // предыдущая вершина
 
-                if (i == 1) { lastCords = cords.get(size-1); }
-                else { lastCords = cords.get(i - 1); }
+                if (i == 1) {
+                    lastCords = cords.get(size - 1);
+                } else {
+                    lastCords = cords.get(i - 1);
+                }
 
                 if ((y - lastCords.getY()) * (y - y2) < 0) {
-                    numberIntersections ++;
+                    numberIntersections++;
                 } else {
                     numberIntersections += 2;
                 }
@@ -205,26 +218,23 @@ public class AddressProcessing {
             throw new NullPointerException("address not set");
         }
 
-        String result = webClient.get()
-                .uri(uriBuilder -> uriBuilder
-                        .queryParam("apikey", apiKey)
-                        .queryParam("format", "json")
-                        .queryParam("results", 1)
-                        .queryParam("geocode", address)
-                        .build())
-                .retrieve()
-                .bodyToMono(String.class)
-                .block();
+        RequestEntity<Void> requestEntity = RequestEntity.get("/", Map.of(
+                        "apikey", apiKey,
+                        "format", "json",
+                        "results", 1,
+                        "geocode", address))
+                .build();
 
-        if (result == null || result.isEmpty()) {
-            throw new NullPointerException("the result of a query to the yandex geocoder api is null");
-        }
+        List<GeoObject> result = restTemplate
+                .exchange(requestEntity, new ParameterizedTypeReference<List<GeoObject>>() {})
+                .getBody();
 
-
-        int beginIndex = result.indexOf('"', result.indexOf("\"pos\":") + 6) + 1;
-        int endIndex = result.indexOf('"', beginIndex);
-
-        return Coordinates.toCoordinates(result.substring(beginIndex, endIndex));
+        return Optional.ofNullable(result)
+                .filter(Predicate.not(List::isEmpty))
+                .map(list -> list.get(0))
+                .map(GeoObject::getPoint)
+                .map(Coordinates::toCoordinates)
+                .orElseThrow();
     }
 
 }

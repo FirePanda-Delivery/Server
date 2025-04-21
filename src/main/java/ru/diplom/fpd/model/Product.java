@@ -12,18 +12,14 @@ import java.util.Locale;
 public class Product {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQUENCE")
+    @SequenceGenerator(name = "SEQUENCE", sequenceName = "product_id_sequence", allocationSize = 1)
     private long id;
 
     @Column(nullable = false)
     private String name;
 
-    @Column(nullable = false)
-    @JsonIgnore
-    private String normalizedName;
-
     @ManyToOne(targetEntity = Categories.class)
-    @JsonIgnore
     @JoinColumn(name = "category_id")
     private Categories category;
 
@@ -43,11 +39,5 @@ public class Product {
     private String img = "/defaultImage/productDefault.png";
 
     @Column
-    @JsonIgnore
     private boolean isDeleted;
-
-    public void setName(String name) {
-        this.name = name;
-        this.normalizedName = name.toUpperCase(Locale.ROOT);
-    }
 }

@@ -1,16 +1,35 @@
 package ru.diplom.fpd.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.persistence.EntityNotFoundException;
+import jakarta.persistence.criteria.Predicate;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Optional;
+import lombok.AllArgsConstructor;
+import lombok.NonNull;
 import org.springframework.stereotype.Service;
-import ru.diplom.fpd.model.*;
+import ru.diplom.fpd.dto.CategoriesDto;
+import ru.diplom.fpd.dto.CategoriesUpdateDto;
+import ru.diplom.fpd.dto.ProductDto;
+import ru.diplom.fpd.dto.RestaurantDto;
+import ru.diplom.fpd.dto.filter.RestaurantFilterDto;
+import ru.diplom.fpd.dto.requestModel.CreateRestaurantDto;
+import ru.diplom.fpd.mapper.CategoriesMapper;
+import ru.diplom.fpd.mapper.ProductMapper;
+import ru.diplom.fpd.mapper.RestaurantMapper;
+import ru.diplom.fpd.model.Categories;
+import ru.diplom.fpd.model.Cities;
+import ru.diplom.fpd.model.Product;
+import ru.diplom.fpd.model.Restaurant;
+import ru.diplom.fpd.model.RestaurantAddress;
 import ru.diplom.fpd.repositories.CategoriesRepositories;
 import ru.diplom.fpd.repositories.ProductRepositories;
 import ru.diplom.fpd.repositories.RestaurantAddressRepositories;
 import ru.diplom.fpd.repositories.RestaurantRepositories;
 
-import jakarta.persistence.EntityNotFoundException;
-import java.util.*;
-
+@AllArgsConstructor
 @Service
 public class RestaurantService {
 
@@ -19,15 +38,9 @@ public class RestaurantService {
     private final ProductRepositories productRepositories;
     private final CitiesServices citiesServices;
     private final RestaurantAddressRepositories addressRepositories;
-
-    @Autowired
-    public RestaurantService(RestaurantRepositories restaurantRepositories, CategoriesRepositories categoriesRepositories, ProductRepositories productRepositories, CitiesServices citiesServices, RestaurantAddressRepositories addressRepositories) {
-        this.restaurantRepositories = restaurantRepositories;
-        this.categoriesRepositories = categoriesRepositories;
-        this.productRepositories = productRepositories;
-        this.citiesServices = citiesServices;
-        this.addressRepositories = addressRepositories;
-    }
+    private final RestaurantMapper restaurantMapper;
+    private final CategoriesMapper categoriesMapper;
+    private final ProductMapper productMapper;
 
     public List<Restaurant> getRestaurantList() {
         return restaurantRepositories.findByIsDeletedFalseAndPublishedTrue();
@@ -37,16 +50,20 @@ public class RestaurantService {
         return restaurantRepositories.findAll();
     }
 
-    public Restaurant getRestaurant(long id) {
+    public RestaurantDto getRestaurant(long id) {
+        return restaurantRepositories.findById(id)
+                .map(restaurantMapper::toDto)
+                .orElseThrow(EntityNotFoundException::new);
+    }
 
-        Optional<Restaurant> optionalRestaurant = restaurantRepositories.findById(id);
-        if (optionalRestaurant.isEmpty()) { throw new EntityNotFoundException("Restaurant is not found"); }
-        return optionalRestaurant.get();
+    public Restaurant getRestaurantEntity(long id) {
+        return restaurantRepositories.findById(id)
+                .orElseThrow(EntityNotFoundException::new);
     }
 
 
     public Restaurant getRestaurantByName(String name) {
-        Optional<Restaurant> optionalRestaurant = restaurantRepositories.findByNormalizedNameAndPublishedTrueAndIsDeletedFalse(name.toUpperCase(Locale.ROOT));
+        Optional<Restaurant> optionalRestaurant = restaurantRepositories.findByNameIgnoreCaseAndPublishedTrueAndIsDeletedFalse(name.toUpperCase(Locale.ROOT));
 
         if (optionalRestaurant.isEmpty()) {
             throw new EntityNotFoundException("restaurant not found");
@@ -58,9 +75,9 @@ public class RestaurantService {
     public Restaurant getRestaurantByNameAndCity(String name, String city) {
 
         Optional<Restaurant> optionalRestaurant =
-                restaurantRepositories.findByNormalizedNameAndPublishedTrueAndCitiesAddressInAndIsDeletedFalse(
+                restaurantRepositories.findByNameIgnoreCaseAndPublishedTrueAndCitiesAddressInAndIsDeletedFalse(
                         name.toUpperCase(Locale.ROOT),
-                        addressRepositories.findAllByCity_NormalizedCiti(city.toUpperCase(Locale.ROOT))
+                        addressRepositories.findAllByCityIgnoreCase(city)
                 );
 
         if (optionalRestaurant.isEmpty()) {
@@ -78,7 +95,7 @@ public class RestaurantService {
 
         List<Restaurant> restaurantList = new LinkedList<>();
 
-        for (Categories category : categoriesRepositories.findByNormalizedName(name.toUpperCase(Locale.ROOT))) {
+        for (Categories category : categoriesRepositories.findByNameIgnoreCase(name.toUpperCase(Locale.ROOT))) {
 
             Optional<Restaurant> optionalRestaurant = restaurantRepositories.findAllByCategoriesContainingAndPublishedTrueAndIsDeletedFalse(category);
             if (optionalRestaurant.isEmpty()) {
@@ -102,12 +119,12 @@ public class RestaurantService {
 
         List<Restaurant> restaurantList = new LinkedList<>();
 
-        for (Categories categories : categoriesRepositories.findByNormalizedName(name.toUpperCase(Locale.ROOT))) {
+        for (Categories categories : categoriesRepositories.findByNameIgnoreCase(name.toUpperCase(Locale.ROOT))) {
             Restaurant restaurant = categories.getRestaurant();
             if (restaurant.isPublished() && !restaurant.isDeleted()) {
                 for (RestaurantAddress citiesAddress : restaurant.getCitiesAddress()) {
                     if (citiesAddress.getCity().equals(cities)) {
-                       // Hibernate.initialize(list);
+                        // Hibernate.initialize(list);
                         restaurant.getDescription();
                         restaurantList.add(restaurant);
 
@@ -116,7 +133,6 @@ public class RestaurantService {
                 }
             }
         }
-
 
 
 //        for (Categories category : categoriesRepositories.findByNormalizedName(name.toUpperCase(Locale.ROOT))) {
@@ -143,7 +159,7 @@ public class RestaurantService {
 
         List<Restaurant> restaurantList = new LinkedList<>();
 
-        for (Product product : productRepositories.findByNormalizedNameAndIsDeletedFalse(name.toUpperCase(Locale.ROOT).trim())) {
+        for (Product product : productRepositories.findByNameIgnoreCaseAndIsDeletedFalse(name.trim())) {
 
             Optional<Categories> optionalCategory = categoriesRepositories.findByProductsContaining(product);
             if (optionalCategory.isEmpty()) {
@@ -171,7 +187,7 @@ public class RestaurantService {
 
         List<Restaurant> restaurantList = new LinkedList<>();
 
-        for (Product product : productRepositories.findByNormalizedNameAndIsDeletedFalse(name.toUpperCase(Locale.ROOT).trim())) {
+        for (Product product : productRepositories.findByNameIgnoreCaseAndIsDeletedFalse(name.trim())) {
             Restaurant restaurant = product.getCategory().getRestaurant();
             if (restaurant.isPublished() && !restaurant.isDeleted()) {
                 for (RestaurantAddress citiesAddress : restaurant.getCitiesAddress()) {
@@ -203,24 +219,30 @@ public class RestaurantService {
         return restaurantList;
     }
 
-    public List<Restaurant> getRestaurantsByCityName(String name) {
+    public List<RestaurantDto> getRestaurantList(RestaurantFilterDto filter) {
 
-        if (name == null || name.isEmpty()) {
-            throw new NullPointerException("city not set");
-        }
-
-        return restaurantRepositories.findAllByCitiesAddressInAndPublishedTrueAndIsDeletedFalse(
-                addressRepositories.findAllByCity_NormalizedCiti(
-                        name.toUpperCase(Locale.ROOT)
-                )
-        );
+        return restaurantRepositories.findAll((root, query, cb) -> {
+                    List<Predicate> predicates = new ArrayList<>();
+                    Optional.ofNullable(filter.getCity()).ifPresent(city ->
+                            predicates.add(cb.equal(root.join("citiesAddress").get("city"), city)));
+                    Optional.ofNullable(filter.getCategories()).ifPresent(categories ->
+                            predicates.add(root.join("categories").get("name").in(categories)));
+                    Optional.ofNullable(filter.getProducts()).ifPresent(products ->
+                            predicates.add(root.join("categories").join("products").get("name").in(products)));
+                    return cb.and(predicates.toArray(Predicate[]::new));
+                }).stream()
+                .map(restaurantMapper::toDto)
+                .toList();
     }
 
-    public List<Categories> getRestaurantCategories(long restaurantId) {
+    public List<CategoriesDto> getRestaurantCategories(long restaurantId) {
 
-        Optional<Restaurant> optionalRestaurant = restaurantRepositories.findById(restaurantId);
-        if (optionalRestaurant.isEmpty()) { throw new EntityNotFoundException("Restaurant is not found"); }
-        return optionalRestaurant.get().getCategories();
+        return restaurantRepositories.findById(restaurantId)
+                .map(Restaurant::getCategories)
+                .stream()
+                .flatMap(List::stream)
+                .map(categoriesMapper::toDto)
+                .toList();
     }
 
     public List<Categories> getAllCategories() {
@@ -228,25 +250,16 @@ public class RestaurantService {
         return categoriesRepositories.findAll();
     }
 
-    public List<Categories> getCategoriesList() {
-        return categoriesRepositories.findByIsDeletedFalse();
+    public List<CategoriesDto> getCategoriesList() {
+        return categoriesRepositories.findByIsDeletedFalse().stream()
+                .map(categoriesMapper::toDto)
+                .toList();
     }
 
-    public Categories getCategories(long id) {
-        Optional<Categories> optionalCategories = categoriesRepositories.findById(id);
-        if (optionalCategories.isEmpty()) {
-            throw new EntityNotFoundException("Categories is not found");
-        }
-        return optionalCategories.get();
-    }
-
-    public List<Product> getProductsFromCategory(long catId) {
-
-        Optional<Categories> optionalCategory = categoriesRepositories.findById(catId);
-
-        if (optionalCategory.isEmpty()) { throw new NullPointerException("Category is not found"); }
-
-        return optionalCategory.get().getProducts();
+    public CategoriesDto getCategories(long id) {
+        return categoriesRepositories.findById(id)
+                .map(categoriesMapper::toDto)
+                .orElseThrow(EntityNotFoundException::new);
     }
 
     public List<Product> getProductList() {
@@ -257,39 +270,34 @@ public class RestaurantService {
         return productRepositories.findAll();
     }
 
-    public Product getProduct(long id) {
-        Optional<Product> optionalProduct = productRepositories.findById(id);
-        if (optionalProduct.isEmpty()) {
-            throw new EntityNotFoundException("Product is not found");
-        }
-        return optionalProduct.get();
+    public ProductDto getProduct(long id) {
+        return productRepositories.findById(id)
+                .map(productMapper::toDto)
+                .orElseThrow(EntityNotFoundException::new);
     }
 
-    public boolean exist(long id) {
-        return restaurantRepositories.existsByIdAndPublishedTrueAndIsDeletedFalse(id);
+    public Product getProductEntity(long id) {
+        return productRepositories.findById(id)
+                .orElseThrow(EntityNotFoundException::new);
     }
 
-    public Restaurant add(Restaurant restaurant) {
+    public Restaurant add(CreateRestaurantDto restaurantDto) {
+        Restaurant restaurant = restaurantMapper.creteDtoToEntity(restaurantDto);
+        restaurant.setCategories(new LinkedList<>());
 
-
-
-        if (restaurant == null) {
-            throw new NullPointerException("restaurant not set");
-        }
+        restaurant.setCitiesAddress(restaurantDto
+                .getCitiesAddress()
+                .stream()
+                .map(dto -> RestaurantAddress.builder()
+                        .address(dto.getAddress())
+                        .city(citiesServices.getByName(dto.getCity()))
+                        .build())
+                .toList());
         return restaurantRepositories.save(restaurant);
     }
 
-    public List<Restaurant> addList(List<Restaurant> restaurants) {
-        if (restaurants == null) {
-            throw new NullPointerException("restaurants not set");
-        }
-        if (restaurants.isEmpty()) {
-            throw new NullPointerException("restaurant list is empty");
-        }
-        return restaurantRepositories.saveAll(restaurants);
-    }
 
-    public List<Categories> addCategory(long restId, Categories category) {
+    public List<CategoriesDto> addCategory(long restId, CategoriesDto category) {
         if (category == null) {
             throw new NullPointerException("category not set");
         }
@@ -298,16 +306,16 @@ public class RestaurantService {
             throw new EntityNotFoundException("Restaurant is not found");
         }
 
-        Optional<Restaurant> optionalRestaurant = restaurantRepositories.findById(restId);
-        if (optionalRestaurant.isEmpty()) { throw new NullPointerException("Restaurant is not found"); }
-        Restaurant restaurant = optionalRestaurant.get();
-        restaurant.getCategories().add(category);
+        Restaurant restaurant = restaurantRepositories.findById(restId).orElseThrow(EntityNotFoundException::new);
+        restaurant.getCategories().add(categoriesMapper.toEntity(category));
         restaurant = restaurantRepositories.save(restaurant);
-        return restaurant.getCategories();
+        return restaurant.getCategories().stream()
+                .map(categoriesMapper::toDto)
+                .toList();
     }
 
 
-    public List<Categories> addCategoryList(long restId, List<Categories> categories) {
+    public List<CategoriesDto> addCategoryList(long restId, List<Categories> categories) {
 
         if (categories == null) {
             throw new NullPointerException("categories not set");
@@ -321,15 +329,15 @@ public class RestaurantService {
             throw new EntityNotFoundException("Restaurant is not found");
         }
 
-        Optional<Restaurant> optionalRestaurant = restaurantRepositories.findById(restId);
-        if (optionalRestaurant.isEmpty()) { throw new NullPointerException("Restaurant is not found"); }
-        Restaurant restaurant = optionalRestaurant.get();
+        Restaurant restaurant = restaurantRepositories.findById(restId).orElseThrow(EntityNotFoundException::new);
         restaurant.getCategories().addAll(categories);
         restaurant = restaurantRepositories.save(restaurant);
-        return restaurant.getCategories();
+        return restaurant.getCategories().stream()
+                .map(categoriesMapper::toDto)
+                .toList();
     }
 
-    public List<Product> addProduct(long catId, Product product) {
+    public List<ProductDto> addProduct(long catId, ProductDto product) {
         if (product == null) {
             throw new NullPointerException("products not set");
         }
@@ -338,15 +346,15 @@ public class RestaurantService {
             throw new EntityNotFoundException("Categories is not found");
         }
 
-        Optional<Categories> optionalCategories = categoriesRepositories.findById(catId);
-        if (optionalCategories.isEmpty()) { throw new NullPointerException("Restaurant is not found"); }
-        Categories category = optionalCategories.get();
-        category.getProducts().add(product);
+        Categories category = categoriesRepositories.findById(catId).orElseThrow(EntityNotFoundException::new);
+        category.getProducts().add(productMapper.toEntity(product));
         category = categoriesRepositories.save(category);
-        return category.getProducts();
+        return category.getProducts().stream()
+                .map(productMapper::toDto)
+                .toList();
     }
 
-    public List<Product> addProductList(long catId, List<Product> products) {
+    public List<ProductDto> addProductList(long catId, List<ProductDto> products) {
 
         if (products == null) {
             throw new NullPointerException("products not set");
@@ -360,12 +368,13 @@ public class RestaurantService {
             throw new EntityNotFoundException("Categories is not found");
         }
 
-        Optional<Categories> optionalCategories = categoriesRepositories.findById(catId);
-        if (optionalCategories.isEmpty()) { throw new NullPointerException("Categories is not found"); }
-        Categories categories = optionalCategories.get();
-        categories.getProducts().addAll(products);
+
+        Categories categories = categoriesRepositories.findById(catId).orElseThrow(EntityNotFoundException::new);
+        categories.getProducts().addAll(products.stream().map(productMapper::toEntity).toList());
         categories = categoriesRepositories.save(categories);
-        return categories.getProducts();
+        return categories.getProducts().stream()
+                .map(productMapper::toDto)
+                .toList();
     }
 
     public void setPublish(long id, boolean value) {
@@ -380,30 +389,28 @@ public class RestaurantService {
         restaurantRepositories.save(restaurant);
     }
 
-    public Restaurant updateRestaurant(Restaurant restaurant) {
+    public RestaurantDto updateRestaurant(@NonNull CreateRestaurantDto restaurantDto) {
 
-        if (restaurant == null) {
-            throw new NullPointerException("restaurant not set");
-        }
+        Restaurant restaurant = getRestaurantEntity(restaurantDto.getId());
+        restaurantMapper.updateEntity(restaurant, restaurantDto);
 
-        if (!restaurantRepositories.existsById(restaurant.getId())) {
-            throw new EntityNotFoundException("restaurant not found!");
-        }
-        return restaurantRepositories.save(restaurant);
+        return restaurantMapper.toDto(restaurantRepositories.save(restaurant));
     }
 
-    public Categories updateCategory(Categories categories) {
-        if (!categoriesRepositories.existsById(categories.getId())) {
-            throw new EntityNotFoundException("Category not found!");
-        }
-        return categoriesRepositories.save(categories);
+    public CategoriesDto updateCategory(CategoriesUpdateDto categoryDto) {
+
+        Categories category = categoriesRepositories.findById(categoryDto.getId())
+                .orElseThrow(EntityNotFoundException::new);
+        categoriesMapper.updateCategory(category, categoryDto);
+        return categoriesMapper.toDto(categoriesRepositories.save(category));
     }
 
-    public Product updateProduct(Product product) {
-        if (!productRepositories.existsById(product.getId())) {
-            throw new EntityNotFoundException("Product not found!");
-        }
-        return productRepositories.save(product);
+    public ProductDto updateProduct(ProductDto productdto) {
+        Product product = productRepositories.findById(productdto.getId())
+                .orElseThrow(EntityNotFoundException::new);
+
+        productMapper.updateProduct(product, productdto);
+        return productMapper.toDto(productRepositories.save(product));
     }
 
     public void deleteRestaurant(long id) {
@@ -413,7 +420,9 @@ public class RestaurantService {
 
 
         Optional<Restaurant> optionalRestaurant = restaurantRepositories.findById(id);
-        if (optionalRestaurant.isEmpty()) { throw new NullPointerException("Restaurant is not found"); }
+        if (optionalRestaurant.isEmpty()) {
+            throw new NullPointerException("Restaurant is not found");
+        }
         Restaurant restaurant = optionalRestaurant.get();
 
         if (restaurant.getCategories() != null || !restaurant.getCategories().isEmpty()) {
@@ -444,7 +453,7 @@ public class RestaurantService {
 
     public void deleteCategories(long[] idList) {
 
-        List<Categories> categories = new ArrayList<>(idList.length+1);
+        List<Categories> categories = new ArrayList<>(idList.length + 1);
 
         for (long id : idList) {
             Optional<Categories> categoriesOptional = categoriesRepositories.findById(id);
@@ -474,7 +483,6 @@ public class RestaurantService {
         }
 
     }
-
 
 
     public void deleteProduct(long id) {

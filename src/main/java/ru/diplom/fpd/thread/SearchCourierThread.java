@@ -42,12 +42,12 @@ public class SearchCourierThread extends Thread {
 
         super.run();
 
-        boolean complete = true;
+        boolean complete = false;
 
         do {
             sleep(60000);
 
-            List<ActiveCourier> activeCouriers = courierService.getActiveCourierByCity(city.getCiti());
+            List<ActiveCourier> activeCouriers = courierService.getActiveCourierByCity(city.getCity());
 
             if (activeCouriers == null || activeCouriers.isEmpty()) {
                 complete = true;
@@ -55,9 +55,9 @@ public class SearchCourierThread extends Thread {
             }
 
 //          order.setCourier(addressProcessing.courierNearestToAddress(activeCouriers, city.getCiti()));
-            orderServices.addCourier(order, addressProcessing.courierNearestToAddress(activeCouriers, city.getCiti()));
-            complete = false;
+            orderServices.addCourier(order, addressProcessing.courierNearestToAddress(activeCouriers, city.getCity()));
+            complete = true;
 
-        } while (complete);
+        } while (!complete);
     }
 }

@@ -3,13 +3,14 @@ package ru.diplom.fpd.dto.requestModel;
 import lombok.Data;
 
 import java.util.Set;
+import ru.diplom.fpd.dto.OrderProductDto;
 
 @Data
-public class CreateOrder {
+public class CreateOrderDto {
 
     private String address;
 
-    private Set<OrderProductReq> products;
+    private Set<OrderProductDto> products;
 
     private long restaurantId;
 

@@ -1,15 +1,27 @@
 package ru.diplom.fpd.processing;
 
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.function.Predicate;
+import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.RequestEntity;
+import org.springframework.web.client.RestTemplate;
 import ru.diplom.fpd.dto.Coordinates;
+import ru.diplom.fpd.dto.yandex.GeoObject;
 
+@RequiredArgsConstructor
 public class MoneyProcessing {
 
     @Value("${delivery.cost.coefficient}")
     private double coefficient;
 
-    WebClient webClient = WebClient.create("https://geocode-maps.yandex.ru/1.x");
+    private final AddressProcessing addressProcessing;
+
 
     @Value("${yandex.api.key}")
     String apiKey;
@@ -17,40 +29,14 @@ public class MoneyProcessing {
 
     public double getCostDelivery(String restAddress, String address) {
 
-        Coordinates addressCords = getCords(address);
-        Coordinates coordinates = getCords(restAddress);
+        Coordinates addressCords = addressProcessing.getCords(address);
+        Coordinates coordinates = addressProcessing.getCords(restAddress);
 
         return Math.sqrt(Math.pow((addressCords.getX() - coordinates.getX()), 2) +
                 Math.pow((addressCords.getY() - coordinates.getY()), 2)) *
                 coefficient;
     }
 
-    public final Coordinates getCords(String address) {
 
-        if (address == null || address.isEmpty()) {
-            throw new NullPointerException("address not set");
-        }
-
-        String result = webClient.get()
-                .uri(uriBuilder -> uriBuilder
-                        .queryParam("apikey", apiKey)
-                        .queryParam("format", "json")
-                        .queryParam("results", 1)
-                        .queryParam("geocode", address)
-                        .build())
-                .retrieve()
-                .bodyToMono(String.class)
-                .block();
-
-        if (result == null || result.isEmpty()) {
-            throw new NullPointerException("the result of a query to the yandex geocoder api is null");
-        }
-
-
-        int beginIndex = result.indexOf('"', result.indexOf("\"pos\":") + 6) + 1;
-        int endIndex = result.indexOf('"', beginIndex);
-
-        return Coordinates.toCoordinates(result.substring(beginIndex, endIndex));
-    }
 
 }

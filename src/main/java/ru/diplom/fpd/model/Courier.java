@@ -1,18 +1,23 @@
 package ru.diplom.fpd.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import jakarta.persistence.*;
 import java.util.Locale;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 @Table
 public class Courier {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQUENCE")
+    @SequenceGenerator(name = "SEQUENCE", sequenceName = "courier_id_sequence", allocationSize = 1)
     private long id;
 
     @Column(name = "FIRST_NAME", nullable = false)
@@ -27,24 +32,20 @@ public class Courier {
     @Column(name = "EMAIL", unique = true)
     private String email;
 
-    @JsonIgnore
-    @Column(unique = true)
-    private String normalizedEmail;
-
-    @Column
+    @Column(name = "rating")
     private float rating;
+
+    @Column(name = "status")
+    @Enumerated(EnumType.STRING)
+    private CourierStatus status = CourierStatus.NOT_ACTIVE;
 
 
     @ManyToOne
-    @JoinColumn(nullable = false)
+    @JoinColumn(name = "city_id", nullable = false)
     private Cities city;
 
     @Column
     @JsonIgnore
     private boolean isDeleted;
 
-    public void setEmail(String email) {
-        this.email = email;
-        this.normalizedEmail = email.toUpperCase(Locale.ROOT);
-    }
 }

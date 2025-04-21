@@ -9,12 +9,14 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import lombok.Data;
 
 import java.sql.Time;
 import java.util.List;
 import java.util.Locale;
+import org.hibernate.annotations.SQLRestriction;
 
 @Entity
 @Table
@@ -22,15 +24,12 @@ import java.util.Locale;
 public class Restaurant {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQUENCE")
+    @SequenceGenerator(name = "SEQUENCE", sequenceName = "restaurant_id_sequence", allocationSize = 1)
     private long id;
 
     @Column(unique = true, nullable = false)
     private String name;
-
-    @Column(unique = true, nullable = false)
-    @JsonIgnore
-    private String normalizedName;
 
     @Column(length = 1000)
     private String description;
@@ -54,6 +53,7 @@ public class Restaurant {
     // fetch = FetchType.EAGER коряво работает
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "restaurant_id")
+    @SQLRestriction("isDeleted = FALSE")
     private List<Categories> categories;
 
     @JoinColumn(name = "restaurant_id")
@@ -70,9 +70,4 @@ public class Restaurant {
     @Column
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private boolean published = false;
-
-    public void setName(String name) {
-        this.name = name;
-        this.normalizedName = name.toUpperCase(Locale.ROOT);
-    }
 }

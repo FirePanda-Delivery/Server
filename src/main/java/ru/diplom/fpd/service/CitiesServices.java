@@ -1,6 +1,5 @@
 package ru.diplom.fpd.service;
 
-import org.hibernate.Hibernate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -9,7 +8,6 @@ import ru.diplom.fpd.repositories.CitiesRepositories;
 
 import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
-import java.util.Locale;
 import java.util.Optional;
 
 @Service
@@ -37,15 +35,7 @@ public class CitiesServices {
         if (name == null || name.isEmpty()) {
             throw new NullPointerException("city name not set");
         }
-
-        Optional<Cities> citiesOptional = citiesRepositories.findByNormalizedCiti(name.toUpperCase(Locale.ROOT));
-        if (citiesOptional.isEmpty()) {
-            throw new EntityNotFoundException("Cities not found");
-        }
-
-        Cities cities = citiesOptional.get();
-        Hibernate.initialize(cities.getCords());
-        return cities;
+        return citiesRepositories.findByCityIgnoreCase(name).orElseThrow(EntityNotFoundException::new);
     }
 
     public List<Cities> getAll() {

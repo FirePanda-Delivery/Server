@@ -7,54 +7,24 @@ import lombok.Data;
 import jakarta.persistence.*;
 import java.util.List;
 import java.util.Locale;
+import lombok.EqualsAndHashCode;
 
 @Entity
 @Data
+@EqualsAndHashCode
 public class Cities {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @JsonIgnore
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQUENCE")
+    @SequenceGenerator(name = "SEQUENCE", sequenceName = "city_id_sequence", allocationSize = 1)
     private long id;
 
     @JsonValue
     @Column
-    private String citi;
-
-    @Column
-    @JsonIgnore
-    private String normalizedCiti;
-
-    public void setCiti(String citi) {
-        this.citi = citi;
-        normalizedCiti = citi.toUpperCase(Locale.ROOT);
-    }
-//    @ElementCollection
-//    @CollectionTable()
+    private String city;
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @Column(nullable = false, unique = true)
-    @JoinColumn(name = "cityId")
-    private List<CitiesCoordinates> Cords;
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        Cities cities = (Cities) o;
-
-        if (cities.citi == null || cities.normalizedCiti == null) {
-            return false;
-        }
-
-        return cities.citi.equals(this.citi) && cities.normalizedCiti.equals(this.normalizedCiti);
-    }
-
-    @Override
-    public int hashCode() {
-        int result = citi != null ? citi.hashCode() : 0;
-        result = 31 * result + (normalizedCiti != null ? normalizedCiti.hashCode() : 0);
-        return result;
-    }
+    @JoinColumn(name = "city_id")
+    private List<CitiesCoordinates> coordinates;
 }

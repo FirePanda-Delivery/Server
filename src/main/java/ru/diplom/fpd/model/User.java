@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 import jakarta.persistence.*;
-import java.util.Locale;
 
 
 @Data
@@ -14,17 +13,15 @@ public class User {
 
     @Id
     @Column(name = "ID", unique = true, nullable = false)
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQUENCE")
+    @SequenceGenerator(name = "SEQUENCE", sequenceName = "user_id_sequence", allocationSize = 1)
     private long id;
 
-    @JsonIgnore
     private String userName;
 
-    @JsonIgnore
     @Column
     private String password;
 
-    @JsonIgnore
     private String role;
 
     @Column(name = "FIRST_NAME", nullable = false)
@@ -38,20 +35,6 @@ public class User {
 
     @Column(name = "EMAIL", unique = true)
     private String email;
-
-    @JsonIgnore
-    @Column(unique = true)
-    private String normalizedEmail;
-
-    public void setEmail(String email) {
-
-        if (email == null || email.isEmpty()) {
-            return;
-        }
-
-        this.email = email;
-        this.normalizedEmail = email.toUpperCase(Locale.ROOT);
-    }
 
     @Column
     @JsonIgnore

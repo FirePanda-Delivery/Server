@@ -1,82 +1,52 @@
 package ru.diplom.fpd.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import jakarta.persistence.EntityNotFoundException;
+import java.util.List;
+import java.util.Optional;
+import java.util.function.Predicate;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
-import ru.diplom.fpd.exception.EntityDeletedException;
+import ru.diplom.fpd.dto.UserDto;
+import ru.diplom.fpd.mapper.UserMapper;
 import ru.diplom.fpd.model.User;
 import ru.diplom.fpd.repositories.UserRepositories;
 
-import jakarta.persistence.EntityNotFoundException;
-import java.util.ArrayList;
-
-import java.util.List;
-import java.util.Optional;
-
+@AllArgsConstructor
 @Service
 public final class UserService {
 
 
     private final UserRepositories userRepositories;
+    private final UserMapper userMapper;
 
-
-    @Autowired
-    public UserService(UserRepositories userRepositories, BCryptPasswordEncoder passwordEncoder) {
-        this.userRepositories = userRepositories;
-    }
-
-
-    /**
-     * get all users except deleted ones
-     * @return list of users without deleted
-     */
-    public List<User> getUserList() {
-
-        return userRepositories.findByIsDeletedFalse();
-    }
-
-    /**
-     * get all users
-     * @return list of users together with deleted ones
-     */
-    public List<User> getAll() {
-        return userRepositories.findAll();
-    }
-
-    public User getByPhone(String phone) {
-        if (phone.isEmpty()) { throw new NullPointerException("phone not set"); }
-
-        // тут будет проверка телефона(может быть)
-
-        return userRepositories.findFirstByPhone(phone);
-    }
 
     public User get(long id) {
-        if (id == 0) { throw new NullPointerException("id not set"); }
+        if (id == 0) {
+            throw new NullPointerException("id not set");
+        }
         Optional<User> user = userRepositories.findById(id);
-        if (user.isEmpty()) { throw new EntityNotFoundException("User is not found"); }
+        if (user.isEmpty()) {
+            throw new EntityNotFoundException("User is not found");
+        }
         return user.get();
     }
 
-    public User getNotDeletedUser(long id) {
-        Optional<User> optionalUser = userRepositories.findById(id);
-        if (optionalUser.isEmpty()) { throw new EntityNotFoundException("User is not found"); }
-        User user = optionalUser.get();
+    public UserDto getNotDeletedUser(long id) {
+        return userRepositories.findById(id)
+                .filter(Predicate.not(User::isDeleted))
+                .map(userMapper::toDto)
+                .orElseThrow(EntityNotFoundException::new);
 
-        if (user.isDeleted()) {
-            throw new EntityDeletedException("user", "user " + id + " is deleted");
-        }
-        return user;
     }
 
     public User getByUserName(String name) {
-       Optional<User> userOptional = userRepositories.findByUserName(name);
+        Optional<User> userOptional = userRepositories.findByUserName(name);
 
-       if (userOptional.isEmpty()) {
-           throw new EntityNotFoundException("user is not found");
-       }
+        if (userOptional.isEmpty()) {
+            throw new EntityNotFoundException("user is not found");
+        }
 
-       return userOptional.get();
+        return userOptional.get();
     }
 
     public List<User> getDeletedList() {
@@ -85,60 +55,37 @@ public final class UserService {
     }
 
     public User add(User user) {
-        if (user == null) { throw new NullPointerException("user not set"); }
+        if (user == null) {
+            throw new NullPointerException("user not set");
+        }
         return userRepositories.save(user);
     }
 
     public List<User> addUserList(List<User> users) {
-        if (users == null || users.isEmpty()) {  throw new NullPointerException("users not set"); }
+        if (users == null || users.isEmpty()) {
+            throw new NullPointerException("users not set");
+        }
         return userRepositories.saveAll(users);
     }
 
 
-    public User update(User user) {
-        if (!userRepositories.existsById(user.getId())) {
-            throw new EntityNotFoundException("user not found!");
-        }
+    public UserDto update(UserDto userDto) {
 
-        User oldUser = get(user.getId());
-        user.setPassword(oldUser.getPassword());
-        user.setUserName(oldUser.getUserName());
-        user.setRole(oldUser.getRole());
-
-        return userRepositories.save(user);
-    }
-
-    public List<User> updateUserList(List<User> users) {
-        if (users == null) {
-            throw new NullPointerException("users not set");
-        }
-
-        List<User> list = new ArrayList<User>();
-
-        for (User user: users) {
-            list.add(update(user));
-        }
-
-        return list;
-    }
-
-    public User userRecovery(long id) {
-        if (id == 0) { throw new NullPointerException("id not set"); }
-        Optional<User> userOptional = userRepositories.findById(id);
-
-        if (userOptional.isEmpty()) { throw new EntityNotFoundException("user not found!"); }
-
-        User user = userOptional.get();
-        user.setDeleted(false);
-        return userRepositories.save(user);
+        User user = get(userDto.getId());
+        userMapper.update(userDto, user);
+        return userMapper.toDto(userRepositories.save(user));
     }
 
     public void delete(long id) {
 
-        if (id == 0) { throw new NullPointerException("id not set"); }
+        if (id == 0) {
+            throw new NullPointerException("id not set");
+        }
         Optional<User> userOptional = userRepositories.findById(id);
 
-        if (userOptional.isEmpty()) { throw new EntityNotFoundException("user not found!"); }
+        if (userOptional.isEmpty()) {
+            throw new EntityNotFoundException("user not found!");
+        }
 
         User user = userOptional.get();
         user.setDeleted(true);

@@ -1,5 +1,6 @@
 package ru.diplom.fpd.service;
 
+import java.util.stream.Collectors;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,7 +11,10 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import ru.diplom.fpd.dto.ActiveCourier;
 import ru.diplom.fpd.dto.Coordinates;
+import ru.diplom.fpd.dto.CourierDto;
+import ru.diplom.fpd.dto.requestModel.CourierReq;
 import ru.diplom.fpd.exception.CourierIsAlreadyActiveException;
+import ru.diplom.fpd.mapper.CourierMapper;
 import ru.diplom.fpd.model.Cities;
 import ru.diplom.fpd.model.Courier;
 import ru.diplom.fpd.repositories.CourierRepositories;
@@ -24,11 +28,14 @@ public class CourierService {
     private final CourierRepositories courierRepositories;
     private final CitiesServices citiesServices;
     private final Log logger =  LogFactory.getLog(getClass());
+    private final CourierMapper courierMapper;
 
     @Autowired
-    public CourierService(CourierRepositories courierRepositories, CitiesServices citiesServices) {
+    public CourierService(CourierRepositories courierRepositories, CitiesServices citiesServices,
+                          CourierMapper courierMapper) {
         this.courierRepositories = courierRepositories;
         this.citiesServices = citiesServices;
+        this.courierMapper = courierMapper;
     }
 
 
@@ -36,9 +43,11 @@ public class CourierService {
      * get all users except deleted ones
      * @return list of users without deleted
      */
-    public List<Courier> getCourierList() {
+    public List<CourierDto> getCourierList() {
 
-        return courierRepositories.findByIsDeletedFalse();
+        return courierRepositories.findByIsDeletedFalse().stream()
+                .map(courierMapper::toDto)
+                .toList();
     }
 
     /**
@@ -49,19 +58,10 @@ public class CourierService {
         return courierRepositories.findAll();
     }
 
-    public Courier getByPhone(String phone) {
-        if (phone.isEmpty()) { throw new NullPointerException("phone not set"); }
-
-        // тут будет проверка телефона(может быть)
-
-        return courierRepositories.findFirstByPhone(phone);
-    }
-
-    public Courier get(long id) {
+    public CourierDto get(long id) {
         if (id == 0) { throw new NullPointerException("id not set"); }
-        Optional<Courier> courier = courierRepositories.findById(id);
-        if (courier.isEmpty()) { throw new EntityNotFoundException("Courier is not found"); }
-        return courier.get();
+        return courierMapper.toDto(courierRepositories.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Courier is not found")));
     }
 
     public List<ActiveCourier> getActiveCourierByCity(String city) {
@@ -90,12 +90,11 @@ public class CourierService {
             throw new NullPointerException("city not set");
         }
 
-        return courierRepositories.findAllByCity_NormalizedCiti(cities.toUpperCase(Locale.ROOT));
+        return courierRepositories.findAllByCityCityIgnoreCase(cities);
     }
 
-    public Courier add(Courier courier) {
-        if (courier == null) { throw new NullPointerException("courier not set"); }
-        return courierRepositories.save(courier);
+    public CourierDto add(CourierReq courier) {
+        return courierMapper.toDto(courierRepositories.save(courierMapper.requestToEntity(courier)));
     }
 
     public List<Courier> addCourierList(List<Courier> couriers) {
@@ -103,25 +102,11 @@ public class CourierService {
         return courierRepositories.saveAll(couriers);
     }
 
-    public Courier update(Courier courier) {
+    public CourierDto update(CourierDto courier) {
         if (!courierRepositories.existsById(courier.getId())) {
             throw new EntityNotFoundException("courier not found!");
         }
-        return courierRepositories.save(courier);
-    }
-
-    public List<Courier> updateCourierList(List<Courier> couriers) {
-        if (couriers == null || couriers.isEmpty()) {
-            throw new NullPointerException("Courier not set");
-        }
-
-        List<Courier> list = new ArrayList<Courier>();
-
-        for (Courier courier: couriers) {
-            list.add(update(courier));
-        }
-
-        return list;
+        return courierMapper.toDto(courierRepositories.save(courierMapper.toEntity(courier)));
     }
 
     public Courier courierRecovery(long id) {
@@ -185,13 +170,14 @@ public class CourierService {
         return activeCourier;
     }
 
-    public void setCourierLocation(Courier courier, Coordinates location) {
+    public void setCourierLocation(long id, Coordinates location) {
 
-        if (courier == null || location == null) {
-            throw new NullPointerException("courier or location not set");
+        if (location == null) {
+            throw new NullPointerException("Location not set");
         }
 
-        Storage.getActiveCourier(courier).setLocation(location);
+        Storage.getActiveCourier(courierRepositories.findById(id).orElseThrow(NullPointerException::new))
+                .setLocation(location);
     }
 
     @ExceptionHandler({CourierIsAlreadyActiveException.class})
@@ -206,6 +192,17 @@ public class CourierService {
         map.put("Message", ex.getMessage());
         map.put("Path", request.getContextPath());
         return ResponseEntity.status(status).body(map);
+    }
+
+    public void setActive(long id, Coordinates location) {
+        CourierService.Storage.addCourier(courierRepositories.findById(id)
+                .orElseThrow(EntityNotFoundException::new), location);
+    }
+
+    public void setInactive(long id) {
+        ActiveCourier activeCourier = CourierService.Storage.getActiveCourier(courierRepositories.findById(id)
+                .orElseThrow(EntityNotFoundException::new));
+        CourierService.Storage.removeCourier(activeCourier);
     }
 
 

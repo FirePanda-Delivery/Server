@@ -1,5 +1,6 @@
 package ru.diplom.fpd.model;
 
+import jakarta.persistence.SequenceGenerator;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -16,7 +17,8 @@ import jakarta.persistence.Id;
 public class CitiesCoordinates {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQUENCE")
+    @SequenceGenerator(name = "SEQUENCE", sequenceName = "coordinates_id_sequence", allocationSize = 1)
     private long id;
 
     private double x;

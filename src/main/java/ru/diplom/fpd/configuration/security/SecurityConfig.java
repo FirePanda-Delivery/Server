@@ -4,9 +4,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -27,19 +26,15 @@ public class SecurityConfig {
     @Bean
     protected SecurityFilterChain configure(HttpSecurity http) throws Exception {
         return http
-                .httpBasic().disable()
-                .csrf().disable()
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and()
-                .authorizeRequests()
-                .requestMatchers("/user/*").hasRole("user")
-                .requestMatchers("/register/user", "/login/user").permitAll()
-                .requestMatchers(HttpMethod.POST, "/restaurant").hasRole("restaurant_admin")
-                .requestMatchers(HttpMethod.PUT, "/restaurant").hasRole("restaurant_admin")
-                .requestMatchers(HttpMethod.DELETE, "/restaurant").hasRole("restaurant_admin")
-                .anyRequest().permitAll()
-                .and()
+                .httpBasic(AbstractHttpConfigurer::disable)
+                .authorizeHttpRequests(config ->
+                        config.requestMatchers("/register/user", "/login/user").permitAll()
+                                .anyRequest().permitAll())
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
+//                .requestMatchers("/user/*").hasRole("user")
+//                .requestMatchers(HttpMethod.POST, "/restaurant").hasRole("restaurant_admin")
+//                .requestMatchers(HttpMethod.PUT, "/restaurant").hasRole("restaurant_admin")
+//                .requestMatchers(HttpMethod.DELETE, "/restaurant").hasRole("restaurant_admin")
                 .build();
     }
 

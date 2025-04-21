@@ -6,6 +6,10 @@ import lombok.Data;
 import jakarta.persistence.*;
 import java.util.List;
 import java.util.Locale;
+import org.hibernate.annotations.DialectOverride;
+import org.hibernate.annotations.Filter;
+import org.hibernate.annotations.SQLRestriction;
+import org.hibernate.annotations.Where;
 
 @Data
 @Entity
@@ -13,18 +17,16 @@ import java.util.Locale;
 public class Categories {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQUENCE")
+    @SequenceGenerator(name = "SEQUENCE", sequenceName = "category_id_sequence", allocationSize = 1)
     private long id;
 
     @Column(nullable = false)
     private String name;
 
-    @JsonIgnore
-    @Column(nullable = false)
-    private String normalizedName;
-
     @JoinColumn(name = "category_id")
     @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @SQLRestriction("isDeleted = FALSE")
     private List<Product> products;
 
 
@@ -37,8 +39,4 @@ public class Categories {
     @JsonIgnore
     private boolean isDeleted;
 
-    public void setName(String name) {
-        this.name = name;
-        this.normalizedName = name.toUpperCase(Locale.ROOT);
-    }
 }

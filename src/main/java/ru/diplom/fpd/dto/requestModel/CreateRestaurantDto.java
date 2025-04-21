@@ -5,9 +5,12 @@ import lombok.Data;
 import java.sql.Time;
 import java.util.List;
 import java.util.Map;
+import ru.diplom.fpd.dto.RestaurantAddressDto;
 
 @Data
-public class RestaurantReq {
+public class CreateRestaurantDto {
+
+    private long id;
 
     private String name;
 
@@ -21,6 +24,6 @@ public class RestaurantReq {
 
     private boolean ownDelivery;
 
-    private List<Map<String, String>> citiesAddress;
+    private List<RestaurantAddressDto> citiesAddress;
 
 }

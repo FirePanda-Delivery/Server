@@ -1,111 +1,73 @@
 package ru.diplom.fpd.controllers;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import ru.diplom.fpd.service.CourierService;
-import ru.diplom.fpd.service.OrderServices;
-import ru.diplom.fpd.service.RestaurantService;
-import ru.diplom.fpd.dto.requestModel.CreateOrder;
-import ru.diplom.fpd.dto.requestModel.OrderProductReq;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import ru.diplom.fpd.dto.OrderDto;
+import ru.diplom.fpd.dto.requestModel.CreateOrderDto;
 import ru.diplom.fpd.exception.AddressNotInDeliveryAreaException;
-import ru.diplom.fpd.model.Order;
 import ru.diplom.fpd.model.OrderStatus;
 import ru.diplom.fpd.processing.AddressProcessing;
-
-import java.util.*;
+import ru.diplom.fpd.service.OrderServices;
 
 @RestController
 @RequestMapping("/order")
+@AllArgsConstructor
 public class OrderController {
 
     private final OrderServices orderServices;
     private final AddressProcessing validateAddress;
-    private final RestaurantService restaurantService;
-    private final CourierService courierService;
 
-    @Autowired
-    public OrderController(OrderServices orderServices, AddressProcessing validateAddress, RestaurantService restaurantService, CourierService courierService) {
-        this.orderServices = orderServices;
-        this.validateAddress = validateAddress;
-        this.restaurantService = restaurantService;
-        this.courierService = courierService;
-    }
 
-    @GetMapping("/CostDelivery")
+    @GetMapping("/delivery/cost")
     public ResponseEntity<Map<String, Double>> getCostDelivery() {
         Map<String, Double> map = new LinkedHashMap<>();
-        map.put("cost", 200D);
+        map.put("cost", 400D);
         return ResponseEntity.ok(map);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Order> getOrder(@PathVariable long id) {
+    public ResponseEntity<OrderDto> getOrder(@PathVariable long id) {
         return ResponseEntity.ok(orderServices.getOrder(id));
     }
 
     @GetMapping("/user/{id}")
-    public ResponseEntity<List<Order>> getUserOrders(@PathVariable long id) {
-        return  ResponseEntity.ok(orderServices.getUserOrders(id));
+    public ResponseEntity<List<OrderDto>> getUserOrders(@PathVariable long id) {
+        return ResponseEntity.ok(orderServices.getUserOrders(id));
     }
 
     @GetMapping("/courier/{id}")
-    public ResponseEntity<List<Order>> getCourierOrders(@PathVariable long id) {
-        return  ResponseEntity.ok(orderServices.getCourierOrders(id));
+    public ResponseEntity<List<OrderDto>> getCourierOrders(@PathVariable long id) {
+        return ResponseEntity.ok(orderServices.getCourierOrders(id));
     }
 
     @GetMapping("/restaurant/{id}")
-    public ResponseEntity<List<Order>> getRestaurantOrders(@PathVariable long id) {
-        return  ResponseEntity.ok(orderServices.getRestaurantOrders(id));
+    public ResponseEntity<List<OrderDto>> getRestaurantOrders(@PathVariable long id) {
+        return ResponseEntity.ok(orderServices.getRestaurantOrders(id));
     }
 
     @PostMapping
-    public ResponseEntity<Order> createOrder(@RequestBody CreateOrder createOrder) throws AddressNotInDeliveryAreaException {
-
+    public ResponseEntity<OrderDto> createOrder(@RequestBody CreateOrderDto createOrder)
+            throws AddressNotInDeliveryAreaException {
 
         if (!validateAddress.isValid(createOrder.getAddress(), createOrder.getCity())) {
             throw new AddressNotInDeliveryAreaException();
         }
 
-        Set<ru.diplom.fpd.model.OrderProduct> orderProducts = new HashSet<>();
-
-        for (OrderProductReq product : createOrder.getProducts()) {
-            ru.diplom.fpd.model.OrderProduct orderProduct = new ru.diplom.fpd.model.OrderProduct();
-            orderProduct.setCount(product.getCount());
-            orderProduct.setProduct(restaurantService.getProduct(product.getProductId()));
-
-            orderProducts.add(orderProduct);
-        }
-
-        return ResponseEntity.ok(
-                orderServices.createOrder(
-                        createOrder.getUserId(),
-                        createOrder.getRestaurantId(),
-                        orderProducts,
-                        createOrder.getAddress(),
-                        createOrder.getCity()
-                )
-        );
+        return ResponseEntity.ok(orderServices.createOrder(createOrder));
     }
 
     @PutMapping("/{id}/status")
-    public ResponseEntity<Order> updateStatus(@PathVariable long id, @RequestBody OrderStatus status) {
+    public ResponseEntity<OrderDto> updateStatus(@PathVariable long id, @RequestBody OrderStatus status) {
         return ResponseEntity.ok(orderServices.setStatus(id, status));
     }
-
-
-    ///////////////////////////////////////////////////////////////////////////////////
-    ///////////////////////////////////////////////////////////////////////////////////
-    /////////////////////// Exception handling /////////////////////////////////////////////////
-    ///////////////////////////////////////////////////////////////////////////////////
-    ///////////////////////////////////////////////////////////////////////////////////
-
-
-    @ExceptionHandler({AddressNotInDeliveryAreaException.class})
-    public ResponseEntity<String> AddressException() {
-        return ResponseEntity.ok("the address is not in the delivery area");
-    }
-
-
-
 }

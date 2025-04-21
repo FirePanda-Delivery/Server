@@ -52,7 +52,7 @@ public class RestaurantResp {
         Map<String, String> map = new HashMap<>();
 
         for (RestaurantAddress restaurantAddress : restaurant.getCitiesAddress()) {
-            map.put(restaurantAddress.getCity().getCiti(), restaurantAddress.getAddress());
+            map.put(restaurantAddress.getCity().getCity(), restaurantAddress.getAddress());
         }
 
         restaurantResp.setCitiesAddress(map);

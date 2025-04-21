@@ -9,8 +9,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import ru.diplom.fpd.exception.ImageExtensionNotSupportedException;
+import ru.diplom.fpd.mapper.ProductMapper;
 import ru.diplom.fpd.model.Product;
 import ru.diplom.fpd.model.Restaurant;
+import ru.diplom.fpd.repositories.RestaurantRepositories;
 import ru.diplom.fpd.service.RestaurantService;
 
 import javax.imageio.ImageIO;
@@ -23,16 +25,21 @@ import java.io.*;
 @RequestMapping("/image")
 public class ImageController {
 
+    private final RestaurantRepositories restaurantRepositories;
     @Value("${image.upload.path}")
     private String imagesDirectory;
 
     private final RestaurantService restaurantService;
 
     private final Transliterator toLatinTrans = Transliterator.getInstance("Russian-Latin/BGN");
+    private final ProductMapper productMapper;
 
     @Autowired
-    public ImageController(RestaurantService restaurantService) {
+    public ImageController(RestaurantService restaurantService,
+                           ProductMapper productMapper, RestaurantRepositories restaurantRepositories) {
         this.restaurantService = restaurantService;
+        this.productMapper = productMapper;
+        this.restaurantRepositories = restaurantRepositories;
     }
 
 
@@ -139,14 +146,15 @@ public class ImageController {
             }
         }
 
-        Restaurant restaurant = restaurantService.getRestaurant(id);
+        Restaurant restaurant = restaurantService.getRestaurantEntity(id);
         String fileName = toLatinTrans.transliterate(restaurant.getName().replace(' ', '_')) + id + ".png";
 
         convertToPng(file.getInputStream(), new File(imagesDirectory + "/restaurant/" + fileName));
 
         restaurant.setImg( "/image/restaurant/" + fileName);
 
-        restaurantService.updateRestaurant(restaurant);
+
+        restaurantRepositories.save(restaurant);
 
       return ResponseEntity.ok("/image/restaurant/" + fileName);
     }
@@ -173,7 +181,7 @@ public class ImageController {
             }
         }
 
-        Product product = restaurantService.getProduct(id);
+        Product product = restaurantService.getProductEntity(id);
 
         String fileName = toLatinTrans.transliterate(product.getName().replace(' ', '_')) + id +  ".png";
 
@@ -183,7 +191,7 @@ public class ImageController {
 
         product.setImg("/image/product/" + fileName);
 
-        restaurantService.updateProduct(product);
+        restaurantService.updateProduct(productMapper.toDto(product));
 
         return ResponseEntity.ok("/image/product/" + fileName);
     }
