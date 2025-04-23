@@ -1,11 +1,10 @@
 package ru.diplom.fpd.repositories;
 
-import org.springframework.data.jpa.repository.JpaRepository;
-import ru.diplom.fpd.model.Cities;
-
 import java.util.Optional;
+import org.springframework.data.jpa.repository.JpaRepository;
+import ru.diplom.fpd.model.City;
 
-public interface CitiesRepositories extends JpaRepository<Cities, Long> {
+public interface CitiesRepositories extends JpaRepository<City, Long> {
 
-    Optional<Cities> findByCityIgnoreCase(String name);
+    Optional<City> findByCityIgnoreCase(String name);
 }

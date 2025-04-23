@@ -5,16 +5,15 @@ import org.mapstruct.Mapper;
 import org.mapstruct.MappingConstants;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.NullValuePropertyMappingStrategy;
-import org.mapstruct.ReportingPolicy;
 import ru.diplom.fpd.dto.CitiesDto;
-import ru.diplom.fpd.model.Cities;
+import ru.diplom.fpd.model.City;
 
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
 public interface CitiesMapper {
-    Cities toEntity(CitiesDto citiesDto);
+    City toEntity(CitiesDto citiesDto);
 
-    CitiesDto toDto(Cities cities);
+    CitiesDto toDto(City city);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    Cities partialUpdate(CitiesDto citiesDto, @MappingTarget Cities cities);
+    City partialUpdate(CitiesDto citiesDto, @MappingTarget City city);
 }

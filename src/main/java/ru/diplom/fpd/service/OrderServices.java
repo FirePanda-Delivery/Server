@@ -1,5 +1,15 @@
 package ru.diplom.fpd.service;
 
+import jakarta.persistence.EntityNotFoundException;
+import java.sql.Time;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -8,14 +18,15 @@ import ru.diplom.fpd.dto.OrderDto;
 import ru.diplom.fpd.dto.requestModel.CreateOrderDto;
 import ru.diplom.fpd.mapper.OrderMapper;
 import ru.diplom.fpd.mapper.ProductMapper;
-import ru.diplom.fpd.model.*;
+import ru.diplom.fpd.model.Courier;
+import ru.diplom.fpd.model.Order;
+import ru.diplom.fpd.model.OrderProduct;
+import ru.diplom.fpd.model.OrderStatus;
+import ru.diplom.fpd.model.Restaurant;
+import ru.diplom.fpd.model.RestaurantAddress;
 import ru.diplom.fpd.processing.AddressProcessing;
 import ru.diplom.fpd.repositories.OrderRepositories;
 import ru.diplom.fpd.thread.SearchCourierThread;
-
-import jakarta.persistence.EntityNotFoundException;
-import java.sql.Time;
-import java.util.*;
 
 @Service
 @AllArgsConstructor
@@ -97,7 +108,7 @@ public class OrderServices {
                 .toList();
     }
 
-//    public List<Order> getCityOrders(String city) {
+    //    public List<Order> getCityOrders(String city) {
 //        return orderRepositories.findAllByCities(citiesServices.getByName(city));
 //    }
 //
@@ -164,7 +175,7 @@ public class OrderServices {
                 .productList(orderProducts)
                 .timeStart(new Time(new Date().getTime()))
                 .restaurantAddress(restaurantAddress)
-                .cities(citiesServices.getByName(city))
+                .city(citiesServices.getByName(city))
                 .build();
 
         List<ActiveCourier> activeCourierList = courierService.getActiveCourierByCity(city);
@@ -194,7 +205,7 @@ public class OrderServices {
         return orderMapper.toDto(orderRepositories.save(order));
     }
 
-    public OrderDto setStatus(long id, OrderStatus status){
+    public OrderDto setStatus(long id, OrderStatus status) {
 
         if (status == null) {
             throw new NullPointerException("status not set");
@@ -225,7 +236,7 @@ public class OrderServices {
 
         Storage.courierActiveOrder.remove(order.getCourier().getId(), order);
         Storage.restaurantActiveOrder.get(order.getRestaurant().getId()).remove(order);
-       // Storage.restaurantActiveOrder.remove(order.getRestaurant().getId(), order);
+        // Storage.restaurantActiveOrder.remove(order.getRestaurant().getId(), order);
         Storage.activeOrder.remove(order);
 
         order.setOrderStatus(OrderStatus.DELIVERED);
@@ -250,7 +261,7 @@ public class OrderServices {
         private final static List<Order> activeOrder = new LinkedList<>();
 
         public static void addRestaurantActiveOrder(long restaurantId, Order order) {
-            if (restaurantActiveOrder.get(restaurantId) == null ) {
+            if (restaurantActiveOrder.get(restaurantId) == null) {
 
                 List<Order> orderList = new LinkedList<>();
                 orderList.add(order);
@@ -261,18 +272,13 @@ public class OrderServices {
         }
 
         public static void addRestaurantActiveOrderList(long restaurantId, List<Order> order) {
-            if (restaurantActiveOrder.get(restaurantId) == null ) {
+            if (restaurantActiveOrder.get(restaurantId) == null) {
                 restaurantActiveOrder.put(restaurantId, order);
             } else {
                 restaurantActiveOrder.get(restaurantId).addAll(order);
             }
         }
     }
-
-
-
-
-
 
 
 }

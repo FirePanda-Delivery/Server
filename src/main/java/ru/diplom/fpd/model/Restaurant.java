@@ -1,21 +1,19 @@
 package ru.diplom.fpd.model;
 
-import com.fasterxml.jackson.annotation.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
-import lombok.Data;
-
 import java.sql.Time;
 import java.util.List;
-import java.util.Locale;
+import lombok.Data;
 import org.hibernate.annotations.SQLRestriction;
 
 @Entity
@@ -44,20 +42,18 @@ public class Restaurant {
     private double minPrice;
 
     @Column
-    
+
     private float rating;
 
     @Column
     private boolean ownDelivery;
 
     // fetch = FetchType.EAGER коряво работает
-    @OneToMany(cascade = CascadeType.ALL)
-    @JoinColumn(name = "restaurant_id")
-    @SQLRestriction("isDeleted = FALSE")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "restaurant")
+    @SQLRestriction("is_deleted = FALSE")
     private List<Categories> categories;
 
-    @JoinColumn(name = "restaurant_id")
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "restaurant", cascade = {CascadeType.ALL})
     private List<RestaurantAddress> citiesAddress;
 
     @Column

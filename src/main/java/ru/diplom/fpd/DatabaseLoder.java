@@ -180,27 +180,27 @@
 //            coordinates.add(cord20);
 //
 //
-//            Cities cities = new Cities();
+//            City city = new City();
 //
 //
-//            cities.setCiti("Воронеж");
-//            cities.setCords(coordinates);
-//            citiesServices.add(cities);
+//            city.setCiti("Воронеж");
+//            city.setCords(coordinates);
+//            citiesServices.add(city);
 //
-//            Cities cities1 = new Cities();
+//            City cities1 = new City();
 //
 //
 //            cities1.setCiti("Курск");
 //            citiesServices.add(cities1);
 //
 //            RestaurantAddress restaurantAddress2 = new RestaurantAddress();
-//            restaurantAddress2.setCity(cities);
+//            restaurantAddress2.setCity(city);
 //            restaurantAddress2.setAddress("ленина 0");
 //            restaurant.setCitiesAddress(new LinkedList<>());
 //            restaurant.getCitiesAddress().add(restaurantAddress2);
 //
 //            RestaurantAddress restaurantAddress3 = new RestaurantAddress();
-//            restaurantAddress3.setCity(cities);
+//            restaurantAddress3.setCity(city);
 //            restaurantAddress3.setAddress("Ленина 40Б");
 //            restaurant.setCitiesAddress(new LinkedList<>());
 //            restaurant.getCitiesAddress().add(restaurantAddress3);
@@ -340,7 +340,7 @@
 //                restaurant1.setCitiesAddress(new LinkedList<>());
 //
 //                RestaurantAddress restaurantAddress = new RestaurantAddress();
-//                restaurantAddress.setCity(cities);
+//                restaurantAddress.setCity(city);
 //                restaurantAddress.setAddress("пупкино " + i);
 //                restaurant1.getCitiesAddress().add(restaurantAddress);
 //

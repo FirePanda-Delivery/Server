@@ -1,10 +1,9 @@
 package ru.diplom.fpd.repositories;
 
-import org.springframework.data.jpa.repository.JpaRepository;
-import ru.diplom.fpd.model.Cities;
-import ru.diplom.fpd.model.Courier;
-
 import java.util.List;
+import org.springframework.data.jpa.repository.JpaRepository;
+import ru.diplom.fpd.model.City;
+import ru.diplom.fpd.model.Courier;
 
 public interface CourierRepositories extends JpaRepository<Courier, Long> {
 
@@ -14,16 +13,11 @@ public interface CourierRepositories extends JpaRepository<Courier, Long> {
 
     List<Courier> findByIsDeletedTrue();
 
-    List<Courier> findAllByCity(Cities city);
+    List<Courier> findAllByCity(City city);
 
-  //  List<Courier> findAllByCity_Citi(String citi);
+    //  List<Courier> findAllByCity_Citi(String citi);
 
     List<Courier> findAllByCityCityIgnoreCase(String citi);
-
-
-
-
-
 
 
 }

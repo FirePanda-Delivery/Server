@@ -1,26 +1,25 @@
 package ru.diplom.fpd.thread;
 
+import java.util.List;
 import lombok.Setter;
 import lombok.SneakyThrows;
 import ru.diplom.fpd.dto.ActiveCourier;
-import ru.diplom.fpd.model.Cities;
+import ru.diplom.fpd.model.City;
 import ru.diplom.fpd.model.Order;
 import ru.diplom.fpd.processing.AddressProcessing;
 import ru.diplom.fpd.service.CourierService;
 import ru.diplom.fpd.service.OrderServices;
 
-import java.util.List;
-
 @Setter
 public class SearchCourierThread extends Thread {
 
     private Order order;
-    private Cities city;
+    private City city;
     private AddressProcessing addressProcessing;
     private CourierService courierService;
     private OrderServices orderServices;
 
-    public SearchCourierThread(Order order, Cities city, AddressProcessing addressProcessing, CourierService courierService, OrderServices orderServices) {
+    public SearchCourierThread(Order order, City city, AddressProcessing addressProcessing, CourierService courierService, OrderServices orderServices) {
         this.order = order;
         this.city = city;
         this.addressProcessing = addressProcessing;
@@ -32,7 +31,7 @@ public class SearchCourierThread extends Thread {
         this.order = order;
     }
 
-    public void setCity(Cities city) {
+    public void setCity(City city) {
         this.city = city;
     }
 

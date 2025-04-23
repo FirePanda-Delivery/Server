@@ -23,7 +23,6 @@ public class ApplicationConfig {
     @Bean(name = "yandexMapsRestTemplate")
     RestTemplate createYMapsRestTemplate() {
         return new RestTemplateBuilder()
-                .rootUri("https://geocode-maps.yandex.ru/1.x")
                 .build();
 
     }

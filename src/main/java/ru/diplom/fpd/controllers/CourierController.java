@@ -1,5 +1,8 @@
 package ru.diplom.fpd.controllers;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -28,21 +31,29 @@ public class CourierController {
     private final CitiesServices citiesServices;
 
 
+    @Operation(summary = "Получить список всех курьеров")
     @GetMapping
     public ResponseEntity<List<CourierDto>> getCouriers() {
         return ResponseEntity.ok(courierServices.getCourierList());
     }
 
+    @Operation(summary = "Получить данные курьера по id", parameters = {
+            @Parameter(name = "id", description = "Идетификатор курьера", in = ParameterIn.PATH, required = true)
+    })
     @GetMapping("/{id}")
     public ResponseEntity<CourierDto> getCourier(@PathVariable long id) {
         return ResponseEntity.ok(courierServices.get(id));
     }
 
+    @Operation(summary = "Создать курьера")
     @PostMapping
     public ResponseEntity<CourierDto> addCourier(@RequestBody CourierReq courierReq) {
         return ResponseEntity.ok(courierServices.add(courierReq));
     }
 
+    @Operation(summary = "Изменить статус курьера на активный", parameters = {
+            @Parameter(name = "id", description = "Идетификатор курьера", in = ParameterIn.PATH, required = true)
+    })
     @PostMapping(value = "/{id}/active")
     public ResponseEntity<Object> setActive(@PathVariable long id, @RequestBody Coordinates location) {
         courierServices.setActive(id, location);
@@ -55,6 +66,9 @@ public class CourierController {
         return ResponseEntity.ok().build();
     }
 
+    @Operation(summary = "Изменить статус курьера на не активный", parameters = {
+            @Parameter(name = "id", description = "Идетификатор курьера", in = ParameterIn.PATH, required = true)
+    })
     @PostMapping(value = "/{id}/inactive")
     public ResponseEntity<Object> setInactive(@PathVariable long id) {
         courierServices.setInactive(id);
@@ -66,11 +80,18 @@ public class CourierController {
 //        return ResponseEntity.ok(courierServices.addCourierList(couriers));
 //    }
 
+    @Operation(summary = "Обновить данные курьера", description = "Если не указать поле оно встанет в null",
+            parameters = {
+                    @Parameter(name = "id", description = "Идетификатор курьера", in = ParameterIn.PATH, required = true)
+            })
     @PutMapping
     public ResponseEntity<CourierDto> updateCourier(@RequestBody CourierDto courier) {
         return ResponseEntity.ok(courierServices.update(courier));
     }
 
+    @Operation(summary = "Помечает курьера удаленным", parameters = {
+            @Parameter(name = "id", description = "Идетификатор курьера", in = ParameterIn.PATH, required = true)
+    })
     @DeleteMapping("/{id}")
     public void deleteCourier(@PathVariable long id) {
         courierServices.delete(id);

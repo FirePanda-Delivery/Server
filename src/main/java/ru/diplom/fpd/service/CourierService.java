@@ -1,6 +1,13 @@
 package ru.diplom.fpd.service;
 
-import java.util.stream.Collectors;
+import jakarta.persistence.EntityNotFoundException;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,19 +22,16 @@ import ru.diplom.fpd.dto.CourierDto;
 import ru.diplom.fpd.dto.requestModel.CourierReq;
 import ru.diplom.fpd.exception.CourierIsAlreadyActiveException;
 import ru.diplom.fpd.mapper.CourierMapper;
-import ru.diplom.fpd.model.Cities;
+import ru.diplom.fpd.model.City;
 import ru.diplom.fpd.model.Courier;
 import ru.diplom.fpd.repositories.CourierRepositories;
-
-import jakarta.persistence.EntityNotFoundException;
-import java.util.*;
 
 @Service
 public class CourierService {
 
     private final CourierRepositories courierRepositories;
     private final CitiesServices citiesServices;
-    private final Log logger =  LogFactory.getLog(getClass());
+    private final Log logger = LogFactory.getLog(getClass());
     private final CourierMapper courierMapper;
 
     @Autowired
@@ -41,6 +45,7 @@ public class CourierService {
 
     /**
      * get all users except deleted ones
+     *
      * @return list of users without deleted
      */
     public List<CourierDto> getCourierList() {
@@ -52,6 +57,7 @@ public class CourierService {
 
     /**
      * get all users
+     *
      * @return list of users together with deleted ones
      */
     public List<Courier> getAll() {
@@ -59,7 +65,9 @@ public class CourierService {
     }
 
     public CourierDto get(long id) {
-        if (id == 0) { throw new NullPointerException("id not set"); }
+        if (id == 0) {
+            throw new NullPointerException("id not set");
+        }
         return courierMapper.toDto(courierRepositories.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Courier is not found")));
     }
@@ -76,12 +84,12 @@ public class CourierService {
         return courierRepositories.findByIsDeletedTrue();
     }
 
-    public List<Courier> getByCities(Cities cities) {
+    public List<Courier> getByCities(City city) {
 
-        if (cities == null) {
+        if (city == null) {
             throw new NullPointerException("city not set");
         }
-        return courierRepositories.findAllByCity(cities);
+        return courierRepositories.findAllByCity(city);
     }
 
     public List<Courier> getByCitiesName(String cities) {
@@ -98,7 +106,9 @@ public class CourierService {
     }
 
     public List<Courier> addCourierList(List<Courier> couriers) {
-        if (couriers == null || couriers.isEmpty()) {  throw new NullPointerException("couriers not set"); }
+        if (couriers == null || couriers.isEmpty()) {
+            throw new NullPointerException("couriers not set");
+        }
         return courierRepositories.saveAll(couriers);
     }
 
@@ -113,7 +123,9 @@ public class CourierService {
 
         Optional<Courier> courierOptional = courierRepositories.findById(id);
 
-        if (courierOptional.isEmpty()) { throw new EntityNotFoundException("user not found!"); }
+        if (courierOptional.isEmpty()) {
+            throw new EntityNotFoundException("user not found!");
+        }
 
         Courier courier = courierOptional.get();
         courier.setDeleted(false);
@@ -124,7 +136,9 @@ public class CourierService {
 
         Optional<Courier> courierOptional = courierRepositories.findById(id);
 
-        if (courierOptional.isEmpty()) { throw new EntityNotFoundException("user not found!"); }
+        if (courierOptional.isEmpty()) {
+            throw new EntityNotFoundException("user not found!");
+        }
 
         Courier courier = courierOptional.get();
         courier.setDeleted(true);
@@ -187,7 +201,7 @@ public class CourierService {
         Map<String, String> map = new LinkedHashMap<>();
         logger.error(ex + ". " + request.toString() + ". " + Arrays.toString(ex.getStackTrace()));
         map.put("Timestamp", new Date().toString());
-        map.put("Status",  String.valueOf(status.value()));
+        map.put("Status", String.valueOf(status.value()));
         map.put("Error", status.getReasonPhrase());
         map.put("Message", ex.getMessage());
         map.put("Path", request.getContextPath());
@@ -208,7 +222,7 @@ public class CourierService {
 
     public static class Storage {
 
-        private static final Map<Cities, List<ActiveCourier>> activeCouriers = new LinkedHashMap<>();
+        private static final Map<City, List<ActiveCourier>> activeCouriers = new LinkedHashMap<>();
 
         public static ActiveCourier getActiveCourier(Courier courier) {
             List<ActiveCourier> storageCourier = activeCouriers.get(courier.getCity());
@@ -258,13 +272,13 @@ public class CourierService {
             courierList.add(activeCourier);
         }
 
-        public static List<ActiveCourier> getNotOnOrderCouriers(Cities cities) {
+        public static List<ActiveCourier> getNotOnOrderCouriers(City city) {
 
             List<ActiveCourier> courierList = new LinkedList<>();
 
-            activeCouriers.computeIfAbsent(cities, k -> new LinkedList<>());
+            activeCouriers.computeIfAbsent(city, k -> new LinkedList<>());
 
-            for (ActiveCourier activeCourier : activeCouriers.get(cities)) {
+            for (ActiveCourier activeCourier : activeCouriers.get(city)) {
                 if (!activeCourier.isOnOrder()) {
                     courierList.add(activeCourier);
                 }

@@ -1,5 +1,6 @@
 package ru.diplom.fpd.service;
 
+import com.ibm.icu.impl.Pair;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.criteria.Predicate;
 import java.util.ArrayList;
@@ -7,9 +8,11 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.diplom.fpd.dto.CategoriesDto;
 import ru.diplom.fpd.dto.CategoriesUpdateDto;
 import ru.diplom.fpd.dto.ProductDto;
@@ -20,7 +23,7 @@ import ru.diplom.fpd.mapper.CategoriesMapper;
 import ru.diplom.fpd.mapper.ProductMapper;
 import ru.diplom.fpd.mapper.RestaurantMapper;
 import ru.diplom.fpd.model.Categories;
-import ru.diplom.fpd.model.Cities;
+import ru.diplom.fpd.model.City;
 import ru.diplom.fpd.model.Product;
 import ru.diplom.fpd.model.Restaurant;
 import ru.diplom.fpd.model.RestaurantAddress;
@@ -115,7 +118,7 @@ public class RestaurantService {
             throw new NullPointerException("Category name not set");
         }
 
-        Cities cities = citiesServices.getByName(city);
+        City cities = citiesServices.getByName(city);
 
         List<Restaurant> restaurantList = new LinkedList<>();
 
@@ -183,7 +186,7 @@ public class RestaurantService {
         }
 
 
-        Cities cities = citiesServices.getByName(city);
+        City cities = citiesServices.getByName(city);
 
         List<Restaurant> restaurantList = new LinkedList<>();
 
@@ -224,7 +227,7 @@ public class RestaurantService {
         return restaurantRepositories.findAll((root, query, cb) -> {
                     List<Predicate> predicates = new ArrayList<>();
                     Optional.ofNullable(filter.getCity()).ifPresent(city ->
-                            predicates.add(cb.equal(root.join("citiesAddress").get("city"), city)));
+                            predicates.add(cb.equal(root.join("citiesAddress").get("city").get("city"), city)));
                     Optional.ofNullable(filter.getCategories()).ifPresent(categories ->
                             predicates.add(root.join("categories").get("name").in(categories)));
                     Optional.ofNullable(filter.getProducts()).ifPresent(products ->
@@ -291,14 +294,15 @@ public class RestaurantService {
                 .map(dto -> RestaurantAddress.builder()
                         .address(dto.getAddress())
                         .city(citiesServices.getByName(dto.getCity()))
+                        .restaurant(restaurant)
                         .build())
                 .toList());
         return restaurantRepositories.save(restaurant);
     }
 
 
-    public List<CategoriesDto> addCategory(long restId, CategoriesDto category) {
-        if (category == null) {
+    public List<CategoriesDto> addCategory(long restId, CategoriesDto categoryDto) {
+        if (categoryDto == null) {
             throw new NullPointerException("category not set");
         }
 
@@ -307,8 +311,10 @@ public class RestaurantService {
         }
 
         Restaurant restaurant = restaurantRepositories.findById(restId).orElseThrow(EntityNotFoundException::new);
-        restaurant.getCategories().add(categoriesMapper.toEntity(category));
-        restaurant = restaurantRepositories.save(restaurant);
+        Categories category = categoriesMapper.toEntity(categoryDto);
+        category.setRestaurant(restaurant);
+        categoriesRepositories.save(category);
+
         return restaurant.getCategories().stream()
                 .map(categoriesMapper::toDto)
                 .toList();
@@ -389,11 +395,22 @@ public class RestaurantService {
         restaurantRepositories.save(restaurant);
     }
 
+    @Transactional
     public RestaurantDto updateRestaurant(@NonNull CreateRestaurantDto restaurantDto) {
 
         Restaurant restaurant = getRestaurantEntity(restaurantDto.getId());
         restaurantMapper.updateEntity(restaurant, restaurantDto);
-
+        List<RestaurantAddress> restaurantAddresses = restaurantDto.getCitiesAddress().stream()
+                .map(address -> Pair.of(citiesServices.getByName(address.getCity()), address))
+                .map(pair ->
+                        addressRepositories.findByCityAndAddress(pair.first, pair.second.getAddress(), restaurant.getId())
+                                .orElseGet(() -> RestaurantAddress.builder()
+                                        .address(pair.second.getAddress())
+                                        .city(pair.first)
+                                        .restaurant(restaurant)
+                                        .build()))
+                .collect(Collectors.toList());
+        restaurant.setCitiesAddress(restaurantAddresses);
         return restaurantMapper.toDto(restaurantRepositories.save(restaurant));
     }
 

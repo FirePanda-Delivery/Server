@@ -1,12 +1,11 @@
 package ru.diplom.fpd.repositories;
 
-import org.springframework.data.jpa.repository.JpaRepository;
-import ru.diplom.fpd.model.Cities;
-import ru.diplom.fpd.model.Order;
-import ru.diplom.fpd.model.OrderStatus;
-
 import java.util.List;
 import java.util.Optional;
+import org.springframework.data.jpa.repository.JpaRepository;
+import ru.diplom.fpd.model.City;
+import ru.diplom.fpd.model.Order;
+import ru.diplom.fpd.model.OrderStatus;
 
 public interface OrderRepositories extends JpaRepository<Order, Long> {
 
@@ -22,5 +21,5 @@ public interface OrderRepositories extends JpaRepository<Order, Long> {
 
     List<Order> findAllByRestaurant_IdAndOrderStatusIsNotIn(long restaurant_id, Iterable<OrderStatus> orderStatus);
 
-    List<Order> findAllByCities(Cities cities);
+    List<Order> findAllByCity(City city);
 }

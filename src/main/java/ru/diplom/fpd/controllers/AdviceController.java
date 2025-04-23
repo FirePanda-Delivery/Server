@@ -1,6 +1,11 @@
 package ru.diplom.fpd.controllers;
 
 import jakarta.persistence.EntityNotFoundException;
+import java.io.FileNotFoundException;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -12,12 +17,6 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import ru.diplom.fpd.exception.AddressNotInDeliveryAreaException;
 import ru.diplom.fpd.exception.ImageExtensionNotSupportedException;
-
-import java.io.FileNotFoundException;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 @RestControllerAdvice
 //@Api(value = "Обработка ошибок", tags = {"Ошибки"})
@@ -65,12 +64,11 @@ public class AdviceController extends ResponseEntityExceptionHandler {
     }
 
 
-
     private ResponseEntity<Object> createResponse(Exception ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
         Map<String, String> map = new LinkedHashMap<>();
-        logger.error(ex + ". " + request.toString() + ". " + Arrays.toString(ex.getStackTrace()));
+        logger.error(ex + ". " + request.toString() + ". " + Arrays.toString(ex.getStackTrace()), ex);
         map.put("Timestamp", new Date().toString());
-        map.put("Status",  String.valueOf(status.value()));
+        map.put("Status", String.valueOf(status.value()));
         map.put("Error", status.getReasonPhrase());
         map.put("Message", ex.getMessage());
         map.put("Path", request.getContextPath());

@@ -1,13 +1,24 @@
 package ru.diplom.fpd.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-
-import jakarta.persistence.*;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.SequenceGenerator;
+import jakarta.persistence.Table;
 import java.sql.Time;
 import java.util.Date;
 import java.util.Set;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
@@ -15,12 +26,12 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "orders")
+@Table(name = "\"order\"")
 public class Order {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQUENCE")
-    @SequenceGenerator(name = "SEQUENCE", sequenceName = "order_id_sequence", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "ORDER_SEQUENCE")
+    @SequenceGenerator(name = "ORDER_SEQUENCE", sequenceName = "order_id_sequence", allocationSize = 1)
     private long id;
 
     @JoinColumn(nullable = false)
@@ -38,7 +49,7 @@ public class Order {
     @Column(nullable = false)
     private Date date;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "status")
     @Enumerated(EnumType.STRING)
     private OrderStatus orderStatus;
 
@@ -57,8 +68,8 @@ public class Order {
     private String address;
 
     @ManyToOne
-    @JoinColumn(nullable = false)
-    private Cities cities;
+    @JoinColumn(nullable = false, name = "city_id")
+    private City city;
 
 
     @ManyToOne

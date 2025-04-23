@@ -9,15 +9,16 @@ import java.util.function.Predicate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.RequestEntity;
+import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 import ru.diplom.fpd.dto.ActiveCourier;
 import ru.diplom.fpd.dto.Coordinates;
 import ru.diplom.fpd.dto.yandex.GeoObject;
-import ru.diplom.fpd.model.Cities;
+import ru.diplom.fpd.dto.yandex.GeoObjectCollection;
 import ru.diplom.fpd.model.CitiesCoordinates;
+import ru.diplom.fpd.model.City;
 import ru.diplom.fpd.model.Courier;
 import ru.diplom.fpd.model.Restaurant;
 import ru.diplom.fpd.model.RestaurantAddress;
@@ -41,7 +42,7 @@ public class AddressProcessing {
     }
 
 
-    public boolean isValid(String address, Cities city) {
+    public boolean isValid(String address, City city) {
 
         Coordinates cords = getCords(address);
         List<Coordinates> list = new LinkedList<>();
@@ -218,16 +219,26 @@ public class AddressProcessing {
             throw new NullPointerException("address not set");
         }
 
-        RequestEntity<Void> requestEntity = RequestEntity.get("/", Map.of(
-                        "apikey", apiKey,
-                        "format", "json",
-                        "results", 1,
-                        "geocode", address))
-                .build();
+        String urlTemplate = UriComponentsBuilder.fromHttpUrl("https://geocode-maps.yandex.ru/1.x")
+                .queryParam("apikey", "{apikey}")
+                .queryParam("format", "{format}")
+                .queryParam("results", "{results}")
+                .queryParam("geocode", "{geocode}")
+                .encode()
+                .toUriString();
+
+        Map<String, Object> params = Map.of(
+                "apikey", apiKey,
+                "format", "json",
+                "results", 1,
+                "geocode", address);
 
         List<GeoObject> result = restTemplate
-                .exchange(requestEntity, new ParameterizedTypeReference<List<GeoObject>>() {})
-                .getBody();
+                .exchange(urlTemplate, HttpMethod.GET, null,
+                        GeoObjectCollection.class,
+                        params)
+                .getBody()
+                .getGeoObjects();
 
         return Optional.ofNullable(result)
                 .filter(Predicate.not(List::isEmpty))
