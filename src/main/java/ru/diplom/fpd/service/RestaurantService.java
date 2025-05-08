@@ -118,7 +118,7 @@ public class RestaurantService {
             throw new NullPointerException("Category name not set");
         }
 
-        City cities = citiesServices.getByName(city);
+        City cities = citiesServices.getEntityByName(city);
 
         List<Restaurant> restaurantList = new LinkedList<>();
 
@@ -186,7 +186,7 @@ public class RestaurantService {
         }
 
 
-        City cities = citiesServices.getByName(city);
+        City cities = citiesServices.getEntityByName(city);
 
         List<Restaurant> restaurantList = new LinkedList<>();
 
@@ -293,7 +293,7 @@ public class RestaurantService {
                 .stream()
                 .map(dto -> RestaurantAddress.builder()
                         .address(dto.getAddress())
-                        .city(citiesServices.getByName(dto.getCity()))
+                        .city(citiesServices.getEntityByName(dto.getCity()))
                         .restaurant(restaurant)
                         .build())
                 .toList());
@@ -401,7 +401,7 @@ public class RestaurantService {
         Restaurant restaurant = getRestaurantEntity(restaurantDto.getId());
         restaurantMapper.updateEntity(restaurant, restaurantDto);
         List<RestaurantAddress> restaurantAddresses = restaurantDto.getCitiesAddress().stream()
-                .map(address -> Pair.of(citiesServices.getByName(address.getCity()), address))
+                .map(address -> Pair.of(citiesServices.getEntityByName(address.getCity()), address))
                 .map(pair ->
                         addressRepositories.findByCityAndAddress(pair.first, pair.second.getAddress(), restaurant.getId())
                                 .orElseGet(() -> RestaurantAddress.builder()

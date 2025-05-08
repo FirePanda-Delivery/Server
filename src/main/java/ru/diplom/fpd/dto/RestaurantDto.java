@@ -3,6 +3,7 @@ package ru.diplom.fpd.dto;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.io.Serializable;
 import java.sql.Time;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -21,5 +22,6 @@ public class RestaurantDto implements Serializable {
     private final double minPrice;
     private final float rating;
     private final boolean ownDelivery;
+    private final List<RestaurantAddressDto> addresses;
     private final String img;
 }
