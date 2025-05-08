@@ -26,6 +26,7 @@ public abstract class RestaurantMapper {
 
     public abstract Restaurant toEntity(RestaurantDto restaurantDto);
 
+    @Mapping(target = "addresses", source = "citiesAddress")
     public abstract RestaurantDto toDto(Restaurant restaurant);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)

@@ -6,17 +6,11 @@ import org.mapstruct.MappingConstants;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 import org.mapstruct.ReportingPolicy;
-import ru.diplom.fpd.dto.OrderProductDto;
 import ru.diplom.fpd.dto.ProductDto;
-import ru.diplom.fpd.model.OrderProduct;
 import ru.diplom.fpd.model.Product;
 
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = MappingConstants.ComponentModel.SPRING)
 public interface ProductMapper {
-
-    OrderProduct toOrderEntity(OrderProductDto orderProductDto);
-
-    OrderProductDto toOrderDto(OrderProduct orderProduct);
 
     Product toEntity(ProductDto productDto);
 

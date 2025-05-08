@@ -27,7 +27,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.WebRequest;
 import ru.diplom.fpd.dto.CategoriesDto;
 import ru.diplom.fpd.dto.CategoriesUpdateDto;
-import ru.diplom.fpd.dto.OrderDto;
 import ru.diplom.fpd.dto.ProductDto;
 import ru.diplom.fpd.dto.RestaurantDto;
 import ru.diplom.fpd.dto.filter.RestaurantFilterDto;
@@ -36,7 +35,6 @@ import ru.diplom.fpd.mapper.RestaurantMapper;
 import ru.diplom.fpd.model.Categories;
 import ru.diplom.fpd.model.Restaurant;
 import ru.diplom.fpd.service.CitiesServices;
-import ru.diplom.fpd.service.OrderServices;
 import ru.diplom.fpd.service.RestaurantService;
 
 @RestController
@@ -47,7 +45,6 @@ public class RestaurantController {
     private final RestaurantMapper restaurantMapper;
 
     private final RestaurantService restaurantService;
-    private final OrderServices orderServices;
     private final CitiesServices citiesServices;
 
     @Operation(summary = "Получить данные ресторана", parameters = {
@@ -80,14 +77,6 @@ public class RestaurantController {
 //        map.put("value", restaurantService.exist(id));
 //        return ResponseEntity.ok(map);
 //    }
-
-    @Operation(summary = "Получить активные заказы ресторана", parameters = {
-            @Parameter(name = "id", description = "Идетификатор ресторана", in = ParameterIn.PATH, required = true)
-    })
-    @GetMapping("/{id}/order/active")
-    public ResponseEntity<List<OrderDto>> getActiveOrder(@PathVariable long id) {
-        return ResponseEntity.ok(orderServices.getActiveRestaurantOrder(id));
-    }
 
     @Operation(summary = "Получить данные категории", parameters = {
             @Parameter(name = "id", description = "Идетификатор категории", in = ParameterIn.PATH, required = true)
