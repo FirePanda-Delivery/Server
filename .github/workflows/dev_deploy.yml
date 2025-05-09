@@ -44,4 +44,4 @@ jobs:
       - name: docker build
         run: docker build ./ -t dictionary-service
       - name: run image
-        run: docker run -p 8080:8080 --volume /opt/fpd/files:/opt/fpd/files --env IMAGE_UPLOAD_PATH=/opt/fpd/files --name dictionary-service dictionary-service
+        run: docker run -d -p 8080:8080 --volume /opt/fpd/files:/opt/fpd/files --env IMAGE_UPLOAD_PATH=/opt/fpd/files --name dictionary-service dictionary-service
