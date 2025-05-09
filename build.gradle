@@ -50,9 +50,5 @@ test {
 }
 
 jar {
-	manifest {
-		attributes(
-				'Main-Class': 'ru.diplom.fpd.FirePandaDeliveryApplication'
-		)
-	}
+	enabled = false
 }
