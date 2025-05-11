@@ -1,0 +1,35 @@
+spring:
+  datasource:
+    url: ${SPRING_DATASOURCE_UR:jdbc:postgresql://fpd.midavon.ru:5432/fpd?currentSchema=fpd}
+    username: ${SPRING_DATASOURCE_USERNAME:fpd_admin}
+    password: ${SPRING_DATASOURCE_PASSWORD:fpd_admin}
+    hikari:
+      schema: fpd
+    driverClassName: org.postgresql.Driver
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: "https://fpd.midavon.ru:8443/realms/test"
+          jwk-set-uri: "${spring.security.oauth2.resourceserver.jwt.issuer-uri}/protocol/openid-connect/certs"
+
+
+  jpa:
+    hibernate:
+      ddl-auto: none
+
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+
+server:
+  port: 8080
+
+image:
+  upload:
+    path: ${IMAGE_UPLOAD_PATH:E:/Workspace/java/Diplom/fire-panda-delivery/image}
+
+jwt:
+  auth:
+    converter:
+      resource-id: "fpd"
+      principle-attribute: "preferred_username"
