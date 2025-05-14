@@ -6,7 +6,8 @@ spring:
     hikari:
       schema: fpd
     driverClassName: org.postgresql.Driver
-
+  kafka:
+    bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS:fpd.midavon.ru:9092}
   security:
     oauth2:
       resourceserver:
@@ -33,3 +34,8 @@ jwt:
     converter:
       resource-id: "fpd"
       principle-attribute: "preferred_username"
+
+kafka:
+  delivery-time:
+    in-topic: ${KAFKA_DELIVERY_TIME_IN_TOPIC:avg_delivery_time_topic}
+    group-id: test
