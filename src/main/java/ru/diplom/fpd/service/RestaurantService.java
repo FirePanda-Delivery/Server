@@ -13,20 +13,24 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.diplom.fpd.dto.AverageDeliveryTimeDto;
 import ru.diplom.fpd.dto.CategoriesDto;
 import ru.diplom.fpd.dto.CategoriesUpdateDto;
 import ru.diplom.fpd.dto.ProductDto;
 import ru.diplom.fpd.dto.RestaurantDto;
 import ru.diplom.fpd.dto.filter.RestaurantFilterDto;
 import ru.diplom.fpd.dto.requestModel.CreateRestaurantDto;
+import ru.diplom.fpd.mapper.AverageDeliveryTimeMapper;
 import ru.diplom.fpd.mapper.CategoriesMapper;
 import ru.diplom.fpd.mapper.ProductMapper;
 import ru.diplom.fpd.mapper.RestaurantMapper;
+import ru.diplom.fpd.model.AverageDeliveryTime;
 import ru.diplom.fpd.model.Categories;
 import ru.diplom.fpd.model.City;
 import ru.diplom.fpd.model.Product;
 import ru.diplom.fpd.model.Restaurant;
 import ru.diplom.fpd.model.RestaurantAddress;
+import ru.diplom.fpd.repositories.AverageDeliveryTimeRepository;
 import ru.diplom.fpd.repositories.CategoriesRepositories;
 import ru.diplom.fpd.repositories.ProductRepositories;
 import ru.diplom.fpd.repositories.RestaurantAddressRepositories;
@@ -44,6 +48,8 @@ public class RestaurantService {
     private final RestaurantMapper restaurantMapper;
     private final CategoriesMapper categoriesMapper;
     private final ProductMapper productMapper;
+    private final AverageDeliveryTimeRepository averageDeliveryTimeRepository;
+    private final AverageDeliveryTimeMapper averageDeliveryTimeMapper;
 
     public List<Restaurant> getRestaurantList() {
         return restaurantRepositories.findByIsDeletedFalseAndPublishedTrue();
@@ -513,4 +519,14 @@ public class RestaurantService {
         productRepositories.save(product);
     }
 
+    @Transactional
+    public void updateRestaurantDeliveryTime(List<AverageDeliveryTimeDto> message) {
+        List<AverageDeliveryTime> list = message.stream()
+            .map(dto -> averageDeliveryTimeRepository
+                .findByRestaurant_Id(dto.getRestaurantId())
+                .map(deliveryTime -> averageDeliveryTimeMapper.partialUpdate(dto, deliveryTime))
+                .orElseGet(() -> averageDeliveryTimeMapper.toEntity(dto)))
+            .toList();
+        averageDeliveryTimeRepository.saveAll(list);
+    }
 }

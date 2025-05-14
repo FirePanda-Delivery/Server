@@ -12,6 +12,7 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import java.sql.Time;
+import java.time.Duration;
 import java.util.List;
 import lombok.Data;
 import org.hibernate.annotations.SQLRestriction;
@@ -53,6 +54,9 @@ public class Restaurant {
     @SQLRestriction("is_deleted = FALSE")
     private List<Categories> categories;
 
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "restaurant")
+    private List<AverageDeliveryTime> citiesDeliveryTimes;
+
     @OneToMany(mappedBy = "restaurant", cascade = {CascadeType.ALL})
     private List<RestaurantAddress> citiesAddress;
 
@@ -61,6 +65,7 @@ public class Restaurant {
     private boolean isDeleted;
 
     @Column
+
     private String img = "/defaultImage/restaurantDefault.png";
 
     @Column

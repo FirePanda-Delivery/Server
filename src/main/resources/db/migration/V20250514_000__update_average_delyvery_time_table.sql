@@ -1,0 +1,3 @@
+
+ALTER TABLE average_delivery_time
+DROP CONSTRAINT average_delivery_time_restaurant_id_key;
