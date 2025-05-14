@@ -92,4 +92,7 @@ public final class UserService {
         userRepositories.save(user);
     }
 
+    public UserDto getUserByUsername(String username) {
+        return userMapper.toDto(getByUserName(username));
+    }
 }

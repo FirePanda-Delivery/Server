@@ -3,6 +3,7 @@ package ru.diplom.fpd.controllers;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -15,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -34,18 +36,17 @@ import ru.diplom.fpd.dto.requestModel.CreateRestaurantDto;
 import ru.diplom.fpd.mapper.RestaurantMapper;
 import ru.diplom.fpd.model.Categories;
 import ru.diplom.fpd.model.Restaurant;
-import ru.diplom.fpd.service.CitiesServices;
 import ru.diplom.fpd.service.RestaurantService;
 
 @RestController
 @RequestMapping("/restaurant")
 @AllArgsConstructor
+@SecurityRequirement(name = "Bearer Authentication")
 @Slf4j
 public class RestaurantController {
     private final RestaurantMapper restaurantMapper;
 
     private final RestaurantService restaurantService;
-    private final CitiesServices citiesServices;
 
     @Operation(summary = "Получить данные ресторана", parameters = {
             @Parameter(name = "id", description = "Идетификатор ресторана", in = ParameterIn.PATH, required = true)
@@ -56,7 +57,7 @@ public class RestaurantController {
     }
 
     @Operation(summary = "Получить список ресторанов по фильтрам", parameters = {
-            @Parameter(name = "filters", description = "Фильтры", in = ParameterIn.QUERY, required = true)
+            @Parameter(name = "filters", description = "Фильтры", in = ParameterIn.QUERY)
     })
     @GetMapping
     public ResponseEntity<List<RestaurantDto>> getRestaurants(@ParameterObject RestaurantFilterDto filters) {
@@ -70,13 +71,6 @@ public class RestaurantController {
     public ResponseEntity<List<CategoriesDto>> getRestaurantCategories(@PathVariable long id) {
         return ResponseEntity.ok(restaurantService.getRestaurantCategories(id));
     }
-
-//    @GetMapping("/exist/{id}")
-//    public ResponseEntity<Object> existRestaurant(@PathVariable long id) {
-//        Map<String, Boolean> map = new HashMap<>();
-//        map.put("value", restaurantService.exist(id));
-//        return ResponseEntity.ok(map);
-//    }
 
     @Operation(summary = "Получить данные категории", parameters = {
             @Parameter(name = "id", description = "Идетификатор категории", in = ParameterIn.PATH, required = true)
@@ -99,11 +93,6 @@ public class RestaurantController {
     public ResponseEntity<ProductDto> getProduct(@PathVariable long id) {
         return ResponseEntity.ok(restaurantService.getProduct(id));
     }
-
-//    @GetMapping("/product")
-//    public ResponseEntity<List<Product>> getProductList() {
-//        return ResponseEntity.ok(restaurantService.getProductList());
-//    }
 
     //todo переделать логику поиска
     @Operation(summary = "Поиск по рестаранам, категориям и продуктам", parameters = {
@@ -136,6 +125,7 @@ public class RestaurantController {
     }
 
     @Operation(summary = "Создать ресторан")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or (hasRole('ROLE_RESTAURANT_ADMIN'))")
     @PostMapping()
     public ResponseEntity<RestaurantDto> addRestaurant(@RequestBody CreateRestaurantDto restaurantDto) {
 
@@ -145,6 +135,7 @@ public class RestaurantController {
     @Operation(summary = "Создать категорию", parameters = {
             @Parameter(name = "id", description = "Идетификатор ресторана", in = ParameterIn.PATH, required = true)
     })
+    @PreAuthorize("hasRole('ROLE_ADMIN') or (hasRole('ROLE_RESTAURANT_ADMIN'))")
     @PostMapping("/{id}/category")
     public ResponseEntity<List<CategoriesDto>> addCategory(@RequestBody CategoriesDto categories, @PathVariable long id) {
         return ResponseEntity.ok(restaurantService.addCategory(id, categories));
@@ -159,6 +150,7 @@ public class RestaurantController {
     @Operation(summary = "Создать продукт", parameters = {
             @Parameter(name = "id", description = "Идетификатор категории", in = ParameterIn.PATH, required = true)
     })
+    @PreAuthorize("hasRole('ROLE_ADMIN') or (hasRole('ROLE_RESTAURANT_ADMIN'))")
     @PostMapping("/categories/{id}/product")
     public ResponseEntity<List<ProductDto>> addProduct(@RequestBody ProductDto product, @PathVariable long id) {
         return ResponseEntity.ok(restaurantService.addProduct(id, product));
@@ -167,6 +159,7 @@ public class RestaurantController {
     @Operation(summary = "Создать список продуктов", parameters = {
             @Parameter(name = "id", description = "Идетификатор категории", in = ParameterIn.PATH, required = true)
     })
+    @PreAuthorize("hasRole('ROLE_ADMIN') or (hasRole('ROLE_RESTAURANT_ADMIN'))")
     @PostMapping("/categories/{id}/products")
     public ResponseEntity<List<ProductDto>> addProducts(@RequestBody List<ProductDto> products, @PathVariable long id) {
         return ResponseEntity.ok(restaurantService.addProductList(id, products));
@@ -175,6 +168,7 @@ public class RestaurantController {
     @Operation(summary = "Опубликовать ресторан", parameters = {
             @Parameter(name = "id", description = "Идетификатор ресторана", in = ParameterIn.PATH, required = true)
     })
+    @PreAuthorize("hasRole('ROLE_ADMIN') or (hasRole('ROLE_RESTAURANT_ADMIN'))")
     @PutMapping("/{id}/publish")
     public ResponseEntity<Void> publish(@PathVariable long id) {
         restaurantService.setPublish(id, true);
@@ -184,6 +178,7 @@ public class RestaurantController {
     @Operation(summary = "Скрыть ресторан", parameters = {
             @Parameter(name = "id", description = "Идетификатор ресторана", in = ParameterIn.PATH, required = true)
     })
+    @PreAuthorize("hasRole('ROLE_ADMIN') or (hasRole('ROLE_RESTAURANT_ADMIN'))")
     @PutMapping("/{id}/hide")
     public ResponseEntity<Void> hide(@PathVariable long id) {
         restaurantService.setPublish(id, false);
@@ -191,18 +186,21 @@ public class RestaurantController {
     }
 
     @Operation(summary = "Изменить данные ресторана")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or (hasRole('ROLE_RESTAURANT_ADMIN'))")
     @PutMapping()
     public ResponseEntity<RestaurantDto> updateRestaurant(@RequestBody CreateRestaurantDto restaurant) {
         return ResponseEntity.ok(restaurantService.updateRestaurant(restaurant));
     }
 
     @Operation(summary = "Изменить данные категории")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or (hasRole('ROLE_RESTAURANT_ADMIN'))")
     @PutMapping("/category")
     public ResponseEntity<CategoriesDto> updateCategory(@RequestBody CategoriesUpdateDto categories) {
         return ResponseEntity.ok(restaurantService.updateCategory(categories));
     }
 
     @Operation(summary = "Изменить данные проддукта")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or (hasRole('ROLE_RESTAURANT_ADMIN'))")
     @PutMapping("/product")
     public ResponseEntity<ProductDto> updateProduct(@RequestBody ProductDto product) {
         return ResponseEntity.ok(restaurantService.updateProduct(product));
@@ -211,6 +209,7 @@ public class RestaurantController {
     @Operation(summary = "Удалить ресторан", parameters = {
             @Parameter(name = "id", description = "Идетификатор ресторана", in = ParameterIn.PATH, required = true)
     })
+    @PreAuthorize("hasRole('ROLE_ADMIN') or (hasRole('ROLE_RESTAURANT_ADMIN'))")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteRestaurant(@PathVariable long id) {
         restaurantService.deleteRestaurant(id);
@@ -220,6 +219,7 @@ public class RestaurantController {
     @Operation(summary = "Удалить категорию", parameters = {
             @Parameter(name = "id", description = "Идетификатор категории", in = ParameterIn.PATH, required = true)
     })
+    @PreAuthorize("hasRole('ROLE_ADMIN') or (hasRole('ROLE_RESTAURANT_ADMIN'))")
     @DeleteMapping("/category/{id}")
     public ResponseEntity<Void> deleteCategory(@PathVariable long id) {
         restaurantService.deleteCategory(id);
@@ -231,6 +231,7 @@ public class RestaurantController {
             description = "Список идентификаторов категорий"
     )
     )
+    @PreAuthorize("hasRole('ROLE_ADMIN') or (hasRole('ROLE_RESTAURANT_ADMIN'))")
     @DeleteMapping("/categories")
     public ResponseEntity<Void> deleteCategoryList(@RequestBody long[] id) {
         restaurantService.deleteCategories(id);
@@ -240,6 +241,7 @@ public class RestaurantController {
     @Operation(summary = "Удалить продукт", parameters = {
             @Parameter(name = "id", description = "Идетификатор продукта", in = ParameterIn.PATH, required = true)
     })
+    @PreAuthorize("hasRole('ROLE_ADMIN') or (hasRole('ROLE_RESTAURANT_ADMIN'))")
     @DeleteMapping("/product/{id}")
     public ResponseEntity<Void> deleteProduct(@PathVariable long id) {
         restaurantService.deleteProduct(id);
@@ -250,6 +252,7 @@ public class RestaurantController {
     @io.swagger.v3.oas.annotations.parameters.RequestBody(
             description = "Список идентификаторов продуктов"
     ))
+    @PreAuthorize("hasRole('ROLE_ADMIN') or (hasRole('ROLE_RESTAURANT_ADMIN'))")
     @DeleteMapping("/products")
     public ResponseEntity<Void> deleteProductList(@RequestBody long[] id) {
         restaurantService.deleteCategories(id);
