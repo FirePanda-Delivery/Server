@@ -21,7 +21,7 @@ public class RestaurantDto implements Serializable {
     private final String description;
     private final Time workingHoursStart;
     private final Time workingHoursEnd;
-    private final double minPrice;
+    private final int minPrice;
     private final float rating;
     private final boolean ownDelivery;
     private final List<RestaurantAddressDto> addresses;
