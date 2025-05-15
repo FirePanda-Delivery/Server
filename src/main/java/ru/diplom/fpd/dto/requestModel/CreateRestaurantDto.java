@@ -20,7 +20,7 @@ public class CreateRestaurantDto {
 
     private Time workingHoursEnd;
 
-    private double minPrice;
+    private int minPrice;
 
     private boolean ownDelivery;
 

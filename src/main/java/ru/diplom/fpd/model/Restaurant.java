@@ -40,7 +40,7 @@ public class Restaurant {
     private Time workingHoursEnd;
 
     @Column
-    private double minPrice;
+    private int minPrice;
 
     @Column
 
