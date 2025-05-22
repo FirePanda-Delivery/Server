@@ -21,7 +21,6 @@ public class CityController {
     private final CitiesServices cityServices;
 
     @GetMapping("/coordinates")
-//    @PreAuthorize("hasRole('ROLE_ADMIN') or (hasRole('ROLE_TECH'))")
     public ResponseEntity<List<CitiesCoordinatesDto>> get(@RequestParam(name = "city") String city) {
 
         return ResponseEntity.ok(cityServices.getCoordinatesByName(city));

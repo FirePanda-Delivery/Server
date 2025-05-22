@@ -61,7 +61,6 @@ public class Restaurant {
     private List<RestaurantAddress> citiesAddress;
 
     @Column
-    @JsonIgnore
     private boolean isDeleted;
 
     @Column
@@ -69,6 +68,5 @@ public class Restaurant {
     private String img = "/defaultImage/restaurantDefault.png";
 
     @Column
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private boolean published = false;
 }

@@ -11,6 +11,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AuthorizationServiceException;
+import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
@@ -30,6 +31,11 @@ public class AdviceController extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler({AuthorizationServiceException.class})
     protected ResponseEntity<Object> handleAuthorizationService(AuthorizationServiceException ex, WebRequest request) {
+        return createResponse(ex, new HttpHeaders(), HttpStatus.FORBIDDEN, request);
+    }
+
+    @ExceptionHandler({AuthorizationDeniedException.class})
+    protected ResponseEntity<Object> handleAuthorizationService(AuthorizationDeniedException ex, WebRequest request) {
         return createResponse(ex, new HttpHeaders(), HttpStatus.FORBIDDEN, request);
     }
 
