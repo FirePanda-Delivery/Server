@@ -11,11 +11,15 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.diplom.fpd.dto.AverageDeliveryTimeDto;
 import ru.diplom.fpd.dto.CategoriesDto;
 import ru.diplom.fpd.dto.CategoriesUpdateDto;
+import ru.diplom.fpd.dto.PandaPage;
 import ru.diplom.fpd.dto.ProductDto;
 import ru.diplom.fpd.dto.RestaurantDto;
 import ru.diplom.fpd.dto.filter.RestaurantFilterDto;
@@ -228,9 +232,8 @@ public class RestaurantService {
         return restaurantList;
     }
 
-    public List<RestaurantDto> getRestaurantList(RestaurantFilterDto filter) {
-
-        return restaurantRepositories.findAll((root, query, cb) -> {
+    public PandaPage<RestaurantDto> getRestaurantList(Pageable pageable, RestaurantFilterDto filter) {
+        Page<RestaurantDto> page = restaurantRepositories.findAll((root, query, cb) -> {
                     List<Predicate> predicates = new ArrayList<>();
                     Optional.ofNullable(filter.getCity()).ifPresent(city ->
                             predicates.add(cb.equal(root.join("citiesAddress").get("city").get("city"), city)));
@@ -239,9 +242,8 @@ public class RestaurantService {
                     Optional.ofNullable(filter.getProducts()).ifPresent(products ->
                             predicates.add(root.join("categories").join("products").get("name").in(products)));
                     return cb.and(predicates.toArray(Predicate[]::new));
-                }).stream()
-                .map(restaurantMapper::toDto)
-                .toList();
+                }, pageable).map(restaurantMapper::toDto);
+        return PandaPage.of(page);
     }
 
     public List<CategoriesDto> getRestaurantCategories(long restaurantId) {

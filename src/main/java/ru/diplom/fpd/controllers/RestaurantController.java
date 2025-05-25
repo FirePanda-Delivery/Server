@@ -14,6 +14,7 @@ import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -29,6 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.WebRequest;
 import ru.diplom.fpd.dto.CategoriesDto;
 import ru.diplom.fpd.dto.CategoriesUpdateDto;
+import ru.diplom.fpd.dto.PandaPage;
 import ru.diplom.fpd.dto.ProductDto;
 import ru.diplom.fpd.dto.RestaurantDto;
 import ru.diplom.fpd.dto.filter.RestaurantFilterDto;
@@ -57,11 +59,13 @@ public class RestaurantController {
     }
 
     @Operation(summary = "Получить список ресторанов по фильтрам", parameters = {
-            @Parameter(name = "filters", description = "Фильтры", in = ParameterIn.QUERY)
+            @Parameter(name = "city", description = "Фильтр по городу", in = ParameterIn.QUERY),
+            @Parameter(name = "categories", description = "Фильтр по категориям", in = ParameterIn.QUERY),
+            @Parameter(name = "products", description = "Фильтр по продуктам", in = ParameterIn.QUERY)
     })
     @GetMapping
-    public ResponseEntity<List<RestaurantDto>> getRestaurants(@ParameterObject RestaurantFilterDto filters) {
-        return ResponseEntity.ok(restaurantService.getRestaurantList(filters));
+    public ResponseEntity<PandaPage<RestaurantDto>> getRestaurants(@ParameterObject Pageable pageable, @ParameterObject RestaurantFilterDto filters) {
+        return ResponseEntity.ok(restaurantService.getRestaurantList(pageable, filters));
     }
 
     @Operation(summary = "Получить категории ресторана", parameters = {
