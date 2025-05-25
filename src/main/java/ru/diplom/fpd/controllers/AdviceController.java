@@ -52,6 +52,7 @@ public class AdviceController extends ResponseEntityExceptionHandler {
     @ExceptionHandler({EntityNotFoundException.class})
     protected ResponseEntity<Object> handleEntityNotFound(EntityNotFoundException ex, WebRequest request) {
         return createResponse(ex, new HttpHeaders(), HttpStatus.NOT_FOUND, request);
+
     }
 
     @ExceptionHandler({DataIntegrityViolationException.class})
