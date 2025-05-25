@@ -47,6 +47,7 @@ public class AdviceController extends ResponseEntityExceptionHandler {
     @ExceptionHandler({FileNotFoundException.class})
     protected ResponseEntity<Object> handleFileNotFound(FileNotFoundException ex, WebRequest request) {
         return createResponse(ex, new HttpHeaders(), HttpStatus.NOT_FOUND, request);
+
     }
 
     @ExceptionHandler({EntityNotFoundException.class})
